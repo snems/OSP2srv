@@ -1,20 +1,14 @@
 # OSP2 server
 
-OSP server recovery:
-
 - [X] osp commands list
 - [ ] wstats
 - [ ] freezetag
 - [ ] clan arena
 
 
-Commands:
+## Commands:
 
-=========================
-
-   STARTUP (Reference)
-
-=========================
+### STARTUP (Reference)
 
 - [ ] `admin_log <logname>`
 - [ ] `dmflags <df_mask>`
@@ -45,21 +39,11 @@ Commands:
 - [ ] `server_timenudgemin <value>`
 - [ ] `server_timenudgemax <value>`
 
-
-=============
-
-   REFEREE
-
-=============
+### REFEREE
 
 - [ ] `ref_password <string>`
 
-
-========================
-
-   GENERAL Q3 OPTIONS
-
-========================
+### GENERAL Q3 OPTIONS
 
 - [ ] `bot_autoload <string>`
 - [ ] `bot_checktime <value>`
@@ -69,12 +53,7 @@ Commands:
 - [ ] `log_default <0|1>`
 - [ ] `log_stat <0|1|2>`
 
-
-==============================
-
-   MATCH-RELATED PARAMETERS
-
-==============================
+### MATCH-RELATED PARAMETERS
 
 - [ ] `g_doWarmup <0|1>`
 - [ ] `g_warmup <seconds>`
@@ -98,12 +77,7 @@ Commands:
 - [ ] `match_winbyscore <scorespread>`
 - [ ] `warmup_armor <value>`
 
-
-==============
-
-   TEAMPLAY
-
-==============
+### TEAMPLAY
 
 - [ ] `team_allcaptain <0|1>`
 - [ ] `team_armordamage <0|1>`
@@ -116,12 +90,7 @@ Commands:
 - [ ] `g_teamAutoJoin <0|1>`
 - [ ] `g_teamForceBalance <0|1>`
 
-
-==========
-
-   HOOK
-
-==========
+### HOOK
 
 - [ ] `hook_enable <0|1>`
 - [ ] `hook_delaytime <milliseconds>`
@@ -130,22 +99,12 @@ Commands:
 - [ ] `hook_speed <value>`
 - [ ] `hook_speedpull <value>`
 
-
-========================
-
-   MODE CONFIG VOTING
-
-========================
+### MODE CONFIG VOTING
 
 - [ ] `mode_start <mode_id>`
 - [ ] `mode_customfile <filename>`
 
-
-============
-
-   VOTING
-
-============
+### VOTING
 
 - [ ] `g_allowVote <0|1>`
 - [ ] `vote_limit <value>`
@@ -164,12 +123,7 @@ Commands:
 - [ ] `vote_allow_respawn <0|1>`
 - [ ] `vote_percent <1-100>`
 
-
-==================
-
-   MAP SETTINGS
-
-==================
+### MAP SETTINGS
 
 - [ ] `map_file	<filename>`
 - [ ] `map_autoload <0|1|2|3>`
@@ -180,12 +134,7 @@ Commands:
 - [ ] `map_nocount <0|1>`
 - [ ] `map_halt <0|1>`
 
-
-==========================
-
-   ITEM/WEAPON SETTINGS
-
-==========================
+### ITEM/WEAPON SETTINGS
 
 - [ ] `armor_q2style <0|1>`
 - [ ] `gauntlet_damage <value>`
