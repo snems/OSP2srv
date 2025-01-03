@@ -2,7 +2,7 @@
 
 OSP server recovery:
 
-- [ ] osp commands list
+- [X] osp commands list
 - [ ] wstats
 - [ ] freezetag
 - [ ] clan arena

@@ -27,161 +27,466 @@ level_locals_t  level;
 
 typedef struct
 {
-	vmCvar_t*    vmCvar;
-	char*        cvarName;
-	char*        defaultString;
+	vmCvar_t*   vmCvar;
+	char*       cvarName;
+	char*       defaultString;
 	int         cvarFlags;
 	int         modificationCount;  // for tracking changes
 	qboolean    trackChange;        // track this variable, and announce if changed
-	qboolean teamShader;        // track and if changed, update shader state
+	qboolean    teamShader;         // track and if changed, update shader state
+  qboolean    unk;
 } cvarTable_t;
 
 gentity_t       g_entities[MAX_GENTITIES];
 gclient_t       g_clients[MAX_CLIENTS];
 
-vmCvar_t    g_gametype;
-vmCvar_t    g_dmflags;
-vmCvar_t    g_fraglimit;
-vmCvar_t    g_timelimit;
-vmCvar_t    g_capturelimit;
-vmCvar_t    g_friendlyFire;
-vmCvar_t    g_password;
-vmCvar_t    g_needpass;
-vmCvar_t    g_maxclients;
-vmCvar_t    g_maxGameClients;
-vmCvar_t    g_dedicated;
-vmCvar_t    g_speed;
-vmCvar_t    g_gravity;
-vmCvar_t    g_cheats;
-vmCvar_t    g_knockback;
-vmCvar_t    g_quadfactor;
-vmCvar_t    g_forcerespawn;
-vmCvar_t    g_inactivity;
-vmCvar_t    g_debugMove;
-vmCvar_t    g_debugDamage;
-vmCvar_t    g_debugAlloc;
-vmCvar_t    g_weaponRespawn;
-vmCvar_t    g_weaponTeamRespawn;
-vmCvar_t    g_motd;
-vmCvar_t    g_synchronousClients;
-vmCvar_t    g_warmup;
-vmCvar_t    g_doWarmup;
-vmCvar_t    g_restarted;
-vmCvar_t    g_log;
-vmCvar_t    g_logSync;
-vmCvar_t    g_blood;
-vmCvar_t    g_podiumDist;
-vmCvar_t    g_podiumDrop;
-vmCvar_t    g_allowVote;
-vmCvar_t    g_teamAutoJoin;
-vmCvar_t    g_teamForceBalance;
-vmCvar_t    g_banIPs;
-vmCvar_t    g_filterBan;
-vmCvar_t    g_smoothClients;
-vmCvar_t    pmove_fixed;
-vmCvar_t    pmove_msec;
-vmCvar_t    g_rankings;
-vmCvar_t    g_listEntity;
-#ifdef MISSIONPACK
-vmCvar_t    g_obeliskHealth;
-vmCvar_t    g_obeliskRegenPeriod;
-vmCvar_t    g_obeliskRegenAmount;
-vmCvar_t    g_obeliskRespawnDelay;
-vmCvar_t    g_cubeTimeout;
-vmCvar_t    g_redteam;
-vmCvar_t    g_blueteam;
-vmCvar_t    g_singlePlayer;
-vmCvar_t    g_enableDust;
-vmCvar_t    g_enableBreath;
-vmCvar_t    g_proxMineTimeout;
-#endif
+vmCvar_t           g_cheats;
+vmCvar_t           osp_gamename;
+vmCvar_t           gamename;
+vmCvar_t           gamedate;
+vmCvar_t           g_restarted;
+vmCvar_t           sv_mapname;
+vmCvar_t           g_gametype;
+vmCvar_t           g_maxclients;
+vmCvar_t           g_maxGameClients;
+vmCvar_t           gameversion;
+vmCvar_t           mapsessionauto;
+vmCvar_t           mapsessioncount;
+vmCvar_t           ca_session;
+vmCvar_t           Players_Red;
+vmCvar_t           Players_Blue;
+vmCvar_t           Players_Active;
+vmCvar_t           Score_Red;
+vmCvar_t           Score_Blue;
+vmCvar_t           default_change;
+vmCvar_t           default_settings;
+vmCvar_t           Score_Time;
+vmCvar_t           server_promode;
+vmCvar_t           server_cq3;
+vmCvar_t           g_allowVote;
+vmCvar_t           g_banIPs;
+vmCvar_t           g_blood;
+vmCvar_t           g_capturelimit;
+vmCvar_t           g_debugAlloc;
+vmCvar_t           g_debugDamage;
+vmCvar_t           g_debugMove;
+vmCvar_t           g_dedicated;
+vmCvar_t           g_dmflags;
+vmCvar_t           g_doWarmup;
+vmCvar_t           g_filterBan;
+vmCvar_t           g_forcerespawn;
+vmCvar_t           g_friendlyFire;
+vmCvar_t           g_fraglimit;
+vmCvar_t           g_gravity;
+vmCvar_t           g_inactivity;
+vmCvar_t           g_knockback;
+vmCvar_t           g_listEntity;
+vmCvar_t           g_log;
+vmCvar_t           g_logSync;
+vmCvar_t           g_motd;
+vmCvar_t           g_needpass;
+vmCvar_t           g_password;
+vmCvar_t           g_podiumDist;
+vmCvar_t           g_podiumDrop;
+vmCvar_t           g_quadfactor;
+vmCvar_t           g_rankings;
+vmCvar_t           g_spectatorInactivity;
+vmCvar_t           g_speed;
+vmCvar_t           g_synchronousClients;
+vmCvar_t           g_teamAutoJoin;
+vmCvar_t           g_teamForceBalance;
+vmCvar_t           g_timelimit;
+vmCvar_t           g_warmup;
+vmCvar_t           g_weaponRespawn;
+vmCvar_t           g_weaponTeamRespawn;
+vmCvar_t           g_smoothClients;
+vmCvar_t           pmove_fixed;
+vmCvar_t           pmove_msec;
+vmCvar_t           osp_restart;
+vmCvar_t           roundlimit;
+vmCvar_t           sv_dcount;
+vmCvar_t           sv_hostname;
+vmCvar_t           admin_log;
+vmCvar_t           armor_q2style;
+vmCvar_t           bot_checktime;
+vmCvar_t           bot_autoload;
+vmCvar_t           decal_directory;
+vmCvar_t           filter_file;
+vmCvar_t           freezetag_latejoin;
+vmCvar_t           freezetag_respawn;
+vmCvar_t           gauntlet_damage;
+vmCvar_t           gauntlet_disable;
+vmCvar_t           hook_delaytime;
+vmCvar_t           hook_enable;
+vmCvar_t           hook_holdtime;
+vmCvar_t           hook_sky;
+vmCvar_t           hook_speed;
+vmCvar_t           hook_speedpull;
+vmCvar_t           instagib_reload;
+vmCvar_t           item_disable;
+vmCvar_t           log_default;
+vmCvar_t           log_stat;
+vmCvar_t           map_autoload;
+vmCvar_t           map_debug;
+vmCvar_t           map_file;
+vmCvar_t           map_halt;
+vmCvar_t           map_nocount;
+vmCvar_t           map_once;
+vmCvar_t           map_queue;
+vmCvar_t           map_random;
+vmCvar_t           map_rotate;
+vmCvar_t           match_carespawn;
+vmCvar_t           match_cawarmupfire;
+vmCvar_t           match_dropitems;
+vmCvar_t           match_hurtself;
+vmCvar_t           match_instagib;
+vmCvar_t           match_latejoin;
+vmCvar_t           match_maxsuicides;
+vmCvar_t           match_minplayers;
+vmCvar_t           match_mutespecs;
+vmCvar_t           match_overtime;
+vmCvar_t           match_overtimecount;
+vmCvar_t           match_overtimelength;
+vmCvar_t           match_poweruprespawn;
+vmCvar_t           match_readypercent;
+vmCvar_t           match_roundtimer;
+vmCvar_t           match_timeoutlength;
+vmCvar_t           match_timeoutcount;
+vmCvar_t           match_winbyscore;
+vmCvar_t           mg_damage;
+vmCvar_t           mg_damageTeamplay;
+vmCvar_t           z_m_current;
+vmCvar_t           mode_customfile;
+vmCvar_t           z_m_default;
+vmCvar_t           mode_start;
+vmCvar_t           player_always;
+vmCvar_t           player_file;
+vmCvar_t           powerup_disable;
+vmCvar_t           ref_password;
+vmCvar_t           railgun_damage;
+vmCvar_t           replace_machinegun;
+vmCvar_t           replace_shotgun;
+vmCvar_t           replace_glauncher;
+vmCvar_t           replace_rlauncher;
+vmCvar_t           replace_lightning;
+vmCvar_t           replace_railgun;
+vmCvar_t           replace_plasmagun;
+vmCvar_t           replace_bfg;
+vmCvar_t           replace_invis;
+vmCvar_t           replace_quad;
+vmCvar_t           replace_battlesuit;
+vmCvar_t           replace_haste;
+vmCvar_t           replace_regen;
+vmCvar_t           replace_flight;
+vmCvar_t           server_availmodes;
+vmCvar_t           server_batcher;
+vmCvar_t           server_customclient;
+vmCvar_t           server_fastrail;
+vmCvar_t           server_freezetag;
+vmCvar_t           server_gfxspecfile;
+vmCvar_t           server_lgcooldown;
+vmCvar_t           server_maxpacketsmin;
+vmCvar_t           server_maxpacketsmax;
+vmCvar_t           server_motdfile;
+vmCvar_t           server_motd1;
+vmCvar_t           server_motd2;
+vmCvar_t           server_motd3;
+vmCvar_t           server_motd4;
+vmCvar_t           server_motd5;
+vmCvar_t           server_motd6;
+vmCvar_t           server_motd7;
+vmCvar_t           server_motd8;
+vmCvar_t           server_ospauth;
+vmCvar_t           server_realping;
+vmCvar_t           server_record;
+vmCvar_t           server_thrufloors;
+vmCvar_t           server_timenudgemax;
+vmCvar_t           server_timenudgemin;
+vmCvar_t           start_armor;
+vmCvar_t           start_bfg;
+vmCvar_t           start_bullets;
+vmCvar_t           start_cells;
+vmCvar_t           start_grenades;
+vmCvar_t           start_health;
+vmCvar_t           start_lightning;
+vmCvar_t           start_rockets;
+vmCvar_t           start_shells;
+vmCvar_t           start_slugs;
+vmCvar_t           team_allcaptain;
+vmCvar_t           team_armordamage;
+vmCvar_t           team_maxplayers;
+vmCvar_t           team_nocontrols;
+vmCvar_t           team_noteamready;
+vmCvar_t           viewcam_directory;
+vmCvar_t           vote_allow_allcaptain;
+vmCvar_t           vote_allow_altgraphics;
+vmCvar_t           vote_allow_armordamage;
+vmCvar_t           vote_allow_capfps;
+vmCvar_t           vote_allow_capturelimit;
+vmCvar_t           vote_allow_ca_startrespawn;
+vmCvar_t           vote_allow_ca_warmupfire;
+vmCvar_t           vote_allow_cq3;
+vmCvar_t           vote_allow_dropitems;
+vmCvar_t           vote_allow_falling;
+vmCvar_t           vote_allow_fastrail;
+vmCvar_t           vote_allow_fraglimit;
+vmCvar_t           vote_allow_hook;
+vmCvar_t           vote_allow_items;
+vmCvar_t           vote_allow_instagib;
+vmCvar_t           vote_allow_kick;
+vmCvar_t           vote_allow_lgcooldown;
+vmCvar_t           vote_allow_map;
+vmCvar_t           vote_allow_maxpackets;
+vmCvar_t           vote_allow_machinegun;
+vmCvar_t           vote_allow_mutespecs;
+vmCvar_t           vote_allow_notimer;
+vmCvar_t           vote_allow_osphud;
+vmCvar_t           vote_allow_overtime;
+vmCvar_t           vote_allow_pmove;
+vmCvar_t           vote_allow_poweruprespawn;
+vmCvar_t           vote_allow_powerups;
+vmCvar_t           vote_allow_promode;
+vmCvar_t           vote_allow_referee;
+vmCvar_t           vote_allow_reload;
+vmCvar_t           vote_allow_respawn;
+vmCvar_t           vote_allow_roundlimit;
+vmCvar_t           vote_allow_teamdamage;
+vmCvar_t           vote_allow_thrufloors;
+vmCvar_t           vote_allow_timenudge;
+vmCvar_t           vote_allow_timelimit;
+vmCvar_t           vote_allow_weaponrespawn;
+vmCvar_t           vote_limit;
+vmCvar_t           vote_percent;
+vmCvar_t           warmup_armor;
+vmCvar_t           weapon_deaddrop;
+vmCvar_t           weapon_have;
+vmCvar_t           weapon_start;
+
 
 // bk001129 - made static to avoid aliasing
 static cvarTable_t      gameCvarTable[] =
 {
-	// don't override the cheat state set by the system
-	{ &g_cheats, "sv_cheats", "", 0, 0, qfalse },
-
-	// noset vars
-	{ NULL, "gamename", GAMEVERSION, CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
-	{ NULL, "gamedate", __DATE__, CVAR_ROM, 0, qfalse  },
-	{ &g_restarted, "g_restarted", "0", CVAR_ROM, 0, qfalse  },
-	{ NULL, "sv_mapname", "", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
-
-	// latched vars
-	{ &g_gametype, "g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH, 0, qfalse  },
-
-	{ &g_maxclients, "sv_maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH | CVAR_ARCHIVE, 0, qfalse  },
-	{ &g_maxGameClients, "g_maxGameClients", "0", CVAR_SERVERINFO | CVAR_LATCH | CVAR_ARCHIVE, 0, qfalse  },
-
-	// change anytime vars
-	{ &g_dmflags, "dmflags", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
-	{ &g_fraglimit, "fraglimit", "20", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-	{ &g_timelimit, "timelimit", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-	{ &g_capturelimit, "capturelimit", "8", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-
-	{ &g_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO, 0, qfalse  },
-
-	{ &g_friendlyFire, "g_friendlyFire", "0", CVAR_ARCHIVE, 0, qtrue  },
-
-	{ &g_teamAutoJoin, "g_teamAutoJoin", "0", CVAR_ARCHIVE  },
-	{ &g_teamForceBalance, "g_teamForceBalance", "0", CVAR_ARCHIVE  },
-
-	{ &g_warmup, "g_warmup", "20", CVAR_ARCHIVE, 0, qtrue  },
-	{ &g_doWarmup, "g_doWarmup", "0", 0, 0, qtrue  },
-	{ &g_log, "g_log", "games.log", CVAR_ARCHIVE, 0, qfalse  },
-	{ &g_logSync, "g_logSync", "0", CVAR_ARCHIVE, 0, qfalse  },
-
-	{ &g_password, "g_password", "", CVAR_USERINFO, 0, qfalse  },
-
-	{ &g_banIPs, "g_banIPs", "", CVAR_ARCHIVE, 0, qfalse  },
-	{ &g_filterBan, "g_filterBan", "1", CVAR_ARCHIVE, 0, qfalse  },
-
-	{ &g_needpass, "g_needpass", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse },
-
-	{ &g_dedicated, "dedicated", "0", 0, 0, qfalse  },
-
-	{ &g_speed, "g_speed", "320", 0, 0, qtrue  },
-	{ &g_gravity, "g_gravity", "800", 0, 0, qtrue  },
-	{ &g_knockback, "g_knockback", "1000", 0, 0, qtrue  },
-	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue  },
-	{ &g_weaponRespawn, "g_weaponrespawn", "5", 0, 0, qtrue  },
-	{ &g_weaponTeamRespawn, "g_weaponTeamRespawn", "30", 0, 0, qtrue },
-	{ &g_forcerespawn, "g_forcerespawn", "20", 0, 0, qtrue },
-	{ &g_inactivity, "g_inactivity", "0", 0, 0, qtrue },
-	{ &g_debugMove, "g_debugMove", "0", 0, 0, qfalse },
-	{ &g_debugDamage, "g_debugDamage", "0", 0, 0, qfalse },
-	{ &g_debugAlloc, "g_debugAlloc", "0", 0, 0, qfalse },
-	{ &g_motd, "g_motd", "", 0, 0, qfalse },
-	{ &g_blood, "com_blood", "1", 0, 0, qfalse },
-
-	{ &g_podiumDist, "g_podiumDist", "80", 0, 0, qfalse },
-	{ &g_podiumDrop, "g_podiumDrop", "70", 0, 0, qfalse },
-
-	{ &g_allowVote, "g_allowVote", "1", CVAR_ARCHIVE, 0, qfalse },
-	{ &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
-
-#ifdef MISSIONPACK
-	{ &g_obeliskHealth, "g_obeliskHealth", "2500", 0, 0, qfalse },
-	{ &g_obeliskRegenPeriod, "g_obeliskRegenPeriod", "1", 0, 0, qfalse },
-	{ &g_obeliskRegenAmount, "g_obeliskRegenAmount", "15", 0, 0, qfalse },
-	{ &g_obeliskRespawnDelay, "g_obeliskRespawnDelay", "10", CVAR_SERVERINFO, 0, qfalse },
-
-	{ &g_cubeTimeout, "g_cubeTimeout", "30", 0, 0, qfalse },
-	{ &g_redteam, "g_redteam", "Stroggs", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO, 0, qtrue, qtrue },
-	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO, 0, qtrue, qtrue  },
-	{ &g_singlePlayer, "ui_singlePlayerActive", "", 0, 0, qfalse, qfalse  },
-
-	{ &g_enableDust, "g_enableDust", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
-	{ &g_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
-	{ &g_proxMineTimeout, "g_proxMineTimeout", "20000", 0, 0, qfalse },
-#endif
-	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
-	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},
-	{ &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO, 0, qfalse},
-
-	{ &g_rankings, "g_rankings", "0", 0, 0, qfalse}
-
+	{ &g_cheats, "sv_cheats", "", 0, qfalse, qfalse, qfalse },
+	{ &osp_gamename, "osp_gamename", "1", 0, qfalse, qfalse, qfalse },
+	{ &gamename, "gamename", "osp", CVAR_SERVERINFO | CVAR_ROM, qfalse, qfalse, qfalse },
+	{ &gamedate, "gamedate", "Mar 04 2003", CVAR_ROM, qfalse, qfalse, qfalse },
+	{ &g_restarted, "g_restarted", "0", CVAR_ROM, qfalse, qfalse, qfalse },
+	{ &sv_mapname, "sv_mapname", "", CVAR_ROM, qfalse, qfalse, qfalse },
+	{ &g_gametype, "g_gametype", "0", CVAR_SERVERINFO | CVAR_LATCH, qfalse, qfalse, qfalse },
+	{ &g_maxclients, "sv_maxclients", "8", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_LATCH, qfalse, qfalse, qfalse },
+	{ &g_maxGameClients, "g_maxGameClients", "0", CVAR_ARCHIVE | CVAR_LATCH, qfalse, qfalse, qfalse },
+	{ &gameversion, "gameversion", "OSP v1.03a", CVAR_SERVERINFO | CVAR_INIT | CVAR_ROM, qfalse, qfalse, qfalse },
+	{ &mapsessionauto, "mapsessionauto", "-1", 0, qfalse, qfalse, qfalse },
+	{ &mapsessioncount, "mapsessioncount", "none", 0, qfalse, qfalse, qfalse },
+	{ &ca_session, "ca_session", "0 0 0", 0, qfalse, qtrue, qtrue },
+	{ &Players_Red, "Players_Red", "", CVAR_SERVERINFO, qfalse, qtrue, qtrue },
+	{ &Players_Blue, "Players_Blue", "", CVAR_SERVERINFO, qfalse, qtrue, qtrue },
+	{ &Players_Active, "Players_Active", "", CVAR_SERVERINFO, qfalse, qtrue, qtrue },
+	{ &Score_Red, "Score_Red", "", CVAR_SERVERINFO, qfalse, qtrue, qtrue },
+	{ &Score_Blue, "Score_Blue", "", CVAR_SERVERINFO, qfalse, qtrue, qtrue },
+	{ &default_change, "default_change", "0", 0, qfalse, qtrue, qtrue },
+	{ &default_settings, "default_settings", "none", 0, qfalse, qtrue, qtrue },
+	{ &Score_Time, "Score_Time", "", CVAR_SERVERINFO, qfalse, qtrue, qtrue },
+	{ &server_promode, "server_promode", "0", CVAR_SERVERINFO, qfalse, qfalse, qfalse },
+	{ &server_cq3, "server_cq3", "0", 0, qfalse, qfalse, qfalse },
+	{ &g_allowVote, "g_allowVote", "1", 0, qfalse, qtrue, qtrue },
+	{ &g_banIPs, "g_banIPs", "", CVAR_ARCHIVE, qfalse, qfalse, qfalse },
+	{ &g_blood, "g_blood", "1", 0, qfalse, qfalse, qfalse },
+	{ &g_capturelimit, "capturelimit", "8", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_NORESTART, qfalse, qtrue, qtrue },
+	{ &g_debugAlloc, "g_debugAlloc", "0", 0, qfalse, qfalse, qfalse },
+	{ &g_debugDamage, "g_debugDamage", "0", 0, qfalse, qfalse, qfalse },
+	{ &g_debugMove, "g_debugMove", "0", 0, qfalse, qfalse, qfalse },
+	{ &g_dedicated, "dedicated", "0", 0, qfalse, qfalse, qfalse },
+	{ &g_dmflags, "dmflags", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, qfalse, qtrue, qtrue },
+	{ &g_doWarmup, "g_doWarmup", "1", CVAR_ARCHIVE, qtrue, qtrue, qtrue },
+	{ &g_filterBan, "g_filterBan", "1", CVAR_ARCHIVE, qfalse, qfalse, qfalse },
+	{ &g_forcerespawn, "g_forcerespawn", "20", 0, qfalse, qtrue, qtrue },
+	{ &g_friendlyFire, "g_friendlyFire", "1", CVAR_ARCHIVE, qfalse, qtrue, qtrue },
+	{ &g_fraglimit, "fraglimit", "20", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_NORESTART, qfalse, qtrue, qtrue },
+	{ &g_gravity, "g_gravity", "800", 0, qtrue, qtrue, qtrue },
+	{ &g_inactivity, "g_inactivity", "0", 0, qtrue, qfalse, qfalse },
+	{ &g_knockback, "g_knockback", "1000", 0, qtrue, qfalse, qfalse },
+	{ &g_listEntity, "g_listEntity", "0", 0, qfalse, qfalse, qfalse },
+	{ &g_log, "g_log", "games.log", CVAR_ARCHIVE, qfalse, qfalse, qfalse },
+	{ &g_logSync, "g_logSync", "0", CVAR_ARCHIVE, qfalse, qfalse, qfalse },
+	{ &g_motd, "g_motd", "", 0, qfalse, qfalse, qfalse },
+	{ &g_needpass, "g_needpass", "0", CVAR_SERVERINFO | CVAR_ROM, qfalse, qfalse, qfalse },
+	{ &g_password, "g_password", "none", CVAR_USERINFO, qfalse, qfalse, qfalse },
+	{ &g_podiumDist, "g_podiumDist", "80", 0, qfalse, qfalse, qfalse },
+	{ &g_podiumDrop, "g_podiumDrop", "70", 0, qfalse, qfalse, qfalse },
+	{ &g_quadfactor, "g_quadfactor", "3", 0, qfalse, qtrue, qtrue },
+	{ &g_rankings, "g_rankings", "0", 0, qfalse, qfalse, qfalse },
+	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, qtrue, qfalse, qfalse },
+	{ &g_speed, "g_speed", "320", 0, qtrue, qfalse, qfalse },
+	{ &g_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO, qfalse, qfalse, qfalse },
+	{ &g_teamAutoJoin, "g_teamAutoJoin", "0", CVAR_ARCHIVE, qfalse, qfalse, qfalse },
+	{ &g_teamForceBalance, "g_teamForceBalance", "0", CVAR_ARCHIVE, qfalse, qfalse, qfalse },
+	{ &g_timelimit, "timelimit", "0", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_NORESTART, qfalse, qtrue, qtrue },
+	{ &g_warmup, "g_warmup", "20", CVAR_ARCHIVE, qtrue, qtrue, qtrue },
+	{ &g_weaponRespawn, "g_weaponrespawn", "5", 0, qfalse, qtrue, qtrue },
+	{ &g_weaponTeamRespawn, "g_weaponteamrespawn", "30", 0, qfalse, qtrue, qtrue },
+	{ &g_smoothClients, "g_smoothClients", "0", 0, qfalse, qtrue, qtrue },
+	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, qfalse, qtrue, qtrue },
+	{ &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO, qfalse, qtrue, qtrue },
+	{ &osp_restart, "osp_restart", "0", 0, qfalse, qfalse, qfalse },
+	{ &roundlimit, "roundlimit", "5", 0, qfalse, qtrue, qtrue },
+	{ &sv_dcount, "sv_dcount", "0", 0, qfalse, qtrue, qtrue },
+	{ &sv_hostname, "sv_hostname", "noname", 0, qfalse, qfalse, qfalse },
+	{ &admin_log, "admin_log", "none", 0, qfalse, qfalse, qfalse },
+	{ &armor_q2style, "armor_q2style", "0", 0, qfalse, qtrue, qtrue },
+	{ &bot_checktime, "bot_checktime", "10", 0, qfalse, qfalse, qfalse },
+	{ &bot_autoload, "bot_autoload", "[none]", 0, qfalse, qfalse, qfalse },
+	{ &decal_directory, "decal_directory", "decals", 0, qfalse, qfalse, qfalse },
+	{ &filter_file, "filter_file", "filters.txt", 0, qfalse, qfalse, qfalse },
+	{ &freezetag_latejoin, "freezetag_latejoin", "0", 0, qfalse, qtrue, qtrue },
+	{ &freezetag_respawn, "freezetag_respawn", "8.0", 0, qfalse, qtrue, qtrue },
+	{ &gauntlet_damage, "gauntlet_damage", "50", 0, qfalse, qtrue, qtrue },
+	{ &gauntlet_disable, "gauntlet_disable", "0", 0, qfalse, qtrue, qtrue },
+	{ &hook_delaytime, "hook_delaytime", "750", 0, qfalse, qfalse, qfalse },
+	{ &hook_enable, "hook_enable", "0", 0, qfalse, qtrue, qtrue },
+	{ &hook_holdtime, "hook_holdtime", "3", 0, qfalse, qfalse, qfalse },
+	{ &hook_sky, "hook_sky", "0", 0, qfalse, qfalse, qfalse },
+	{ &hook_speed, "hook_speed", "1200", 0, qfalse, qfalse, qfalse },
+	{ &hook_speedpull, "hook_speedpull", "950", 0, qfalse, qfalse, qfalse },
+	{ &instagib_reload, "instagib_reload", "1500", 0, qtrue, qfalse, qfalse },
+	{ &item_disable, "item_disable", "0", 0, qfalse, qtrue, qtrue },
+	{ &log_default, "log_default", "0", 0, qfalse, qfalse, qfalse },
+	{ &log_stat, "log_stat", "0", 0, qfalse, qfalse, qfalse },
+	{ &map_autoload, "map_autoload", "1", 0, qfalse, qfalse, qfalse },
+	{ &map_debug, "map_debug", "0", 0, qfalse, qfalse, qfalse },
+	{ &map_file, "map_file", "maps.txt", 0, qfalse, qfalse, qfalse },
+	{ &map_halt, "map_halt", "0", 0, qfalse, qfalse, qfalse },
+	{ &map_nocount, "map_nocount", "0", 0, qfalse, qfalse, qfalse },
+	{ &map_once, "map_once", "1", 0, qfalse, qtrue, qtrue },
+	{ &map_queue, "map_queue", "1", 0, qfalse, qtrue, qtrue },
+	{ &map_random, "map_random", "1", 0, qfalse, qfalse, qfalse },
+	{ &map_rotate, "map_rotate", "0", 0, qfalse, qfalse, qfalse },
+	{ &match_carespawn, "match_carespawn", "0", 0, qfalse, qtrue, qtrue },
+	{ &match_cawarmupfire, "match_cawarmupfire", "1", 0, qfalse, qtrue, qtrue },
+	{ &match_dropitems, "match_dropitems", "0", 0, qfalse, qtrue, qtrue },
+	{ &match_hurtself, "match_hurtself", "1", 0, qfalse, qtrue, qtrue },
+	{ &match_instagib, "match_instagib", "0", 0, qfalse, qfalse, qfalse },
+	{ &match_latejoin, "match_latejoin", "0", 0, qfalse, qtrue, qtrue },
+	{ &match_maxsuicides, "match_maxsuicides", "0", 0, qfalse, qtrue, qtrue },
+	{ &match_minplayers, "match_minplayers", "2", 0, qfalse, qtrue, qtrue },
+	{ &match_mutespecs, "match_mutespecs", "0", 0, qfalse, qtrue, qtrue },
+	{ &match_overtime, "match_overtime", "0", 0, qfalse, qtrue, qtrue },
+	{ &match_overtimecount, "match_overtimecount", "0", 0, qfalse, qtrue, qtrue },
+	{ &match_overtimelength, "match_overtimelength", "5", 0, qfalse, qtrue, qtrue },
+	{ &match_poweruprespawn, "match_poweruprespawn", "60", 0, qfalse, qfalse, qfalse },
+	{ &match_readypercent, "match_readypercent", "51", 0, qfalse, qtrue, qtrue },
+	{ &match_roundtimer, "match_roundtimer", "10", 0, qfalse, qtrue, qtrue },
+	{ &match_timeoutlength, "match_timeoutlength", "60", 0, qfalse, qtrue, qtrue },
+	{ &match_timeoutcount, "match_timeoutcount", "3", 0, qfalse, qtrue, qtrue },
+	{ &match_winbyscore, "match_winbyscore", "0", 0, qfalse, qtrue, qtrue },
+	{ &mg_damage, "mg_damage", "7", 0, qfalse, qtrue, qtrue },
+	{ &mg_damageTeamplay, "mg_damageTeamplay", "5", 0, qfalse, qtrue, qtrue },
+	{ &z_m_current, "z_m_current", "-1", 0, qfalse, qfalse, qfalse },
+	{ &mode_customfile, "mode_customfile", "none", 0, qfalse, qfalse, qfalse },
+	{ &z_m_default, "z_m_default", "-1", 0, qfalse, qfalse, qfalse },
+	{ &mode_start, "mode_start", "-1", 0, qfalse, qfalse, qfalse },
+	{ &player_always, "player_always", "", 0, qfalse, qfalse, qfalse },
+	{ &player_file, "player_file", "none", 0, qfalse, qfalse, qfalse },
+	{ &powerup_disable, "powerup_disable", "0", 0, qfalse, qtrue, qtrue },
+	{ &ref_password, "ref_password", "none", 0, qfalse, qfalse, qfalse },
+	{ &railgun_damage, "railgun_damage", "100", 0, qfalse, qtrue, qtrue },
+	{ &replace_machinegun, "replace_machinegun", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_shotgun, "replace_shotgun", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_glauncher, "replace_glauncher", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_rlauncher, "replace_rlauncher", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_lightning, "replace_lightning", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_railgun, "replace_railgun", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_plasmagun, "replace_plasmagun", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_bfg, "replace_bfg", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_invis, "replace_invis", "0", 0, qfalse, qfalse, qfalse },
+	{ &replace_quad, "replace_quad", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_battlesuit, "replace_battlesuit", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_haste, "replace_haste", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_regen, "replace_regen", "0", 0, qfalse, qtrue, qtrue },
+	{ &replace_flight, "replace_flight", "0", 0, qfalse, qtrue, qtrue },
+	{ &server_availmodes, "server_availmodes", "127", 0, qfalse, qfalse, qfalse },
+	{ &server_batcher, "server_batcher", "none", 0, qfalse, qfalse, qfalse },
+	{ &server_customclient, "server_customclient", "15", 0, qfalse, qfalse, qfalse },
+	{ &server_fastrail, "server_fastrail", "0", 0, qfalse, qfalse, qfalse },
+	{ &server_freezetag, "server_freezetag", "0", CVAR_SERVERINFO, qfalse, qtrue, qtrue },
+	{ &server_gfxspecfile, "server_gfxspecfile", "none", 0, qfalse, qfalse, qfalse },
+	{ &server_lgcooldown, "server_lgcooldown", "0", 0, qfalse, qfalse, qfalse },
+	{ &server_maxpacketsmin, "server_maxpacketsmin", "0", 0, qfalse, qfalse, qfalse },
+	{ &server_maxpacketsmax, "server_maxpacketsmax", "0", 0, qfalse, qfalse, qfalse },
+	{ &server_motdfile, "server_motdfile", "none", 0, qfalse, qfalse, qfalse },
+	{ &server_motd1, "server_motd1", " ^B^3*** Welcome to OSP Tourney DM/CA/CTF v(1.03a) *** ", 0, qfalse, qfalse, qfalse },
+	{ &server_motd2, "server_motd2", "  ", 0, qfalse, qfalse, qfalse },
+	{ &server_motd3, "server_motd3", "           http://www.OrangeSmoothie.org", 0, qfalse, qfalse, qfalse },
+	{ &server_motd4, "server_motd4", "", 0, qfalse, qfalse, qfalse },
+	{ &server_motd5, "server_motd5", "", 0, qfalse, qfalse, qfalse },
+	{ &server_motd6, "server_motd6", "", 0, qfalse, qfalse, qfalse },
+	{ &server_motd7, "server_motd7", "", 0, qfalse, qfalse, qfalse },
+	{ &server_motd8, "server_motd8", "", 0, qfalse, qfalse, qfalse },
+	{ &server_ospauth, "server_ospauth", "0", CVAR_SERVERINFO, qfalse, qfalse, qfalse },
+	{ &server_realping, "server_realping", "0", 0, qfalse, qfalse, qfalse },
+	{ &server_record, "server_record", "0", 0, qfalse, qfalse, qfalse },
+	{ &server_thrufloors, "server_thrufloors", "0", 0, qfalse, qtrue, qtrue },
+	{ &server_timenudgemax, "server_timenudgemax", "0", 0, qfalse, qfalse, qfalse },
+	{ &server_timenudgemin, "server_timenudgemin", "0", 0, qfalse, qfalse, qfalse },
+	{ &start_armor, "start_armor", "0", 0, qfalse, qtrue, qtrue },
+	{ &start_bfg, "start_bfg", "0", 0, qfalse, qtrue, qtrue },
+	{ &start_bullets, "start_bullets", "100", 0, qfalse, qtrue, qtrue },
+	{ &start_cells, "start_cells", "0", 0, qfalse, qtrue, qtrue },
+	{ &start_grenades, "start_grenades", "0", 0, qfalse, qtrue, qtrue },
+	{ &start_health, "start_health", "125", 0, qfalse, qtrue, qtrue },
+	{ &start_lightning, "start_lightning", "0", 0, qfalse, qtrue, qtrue },
+	{ &start_rockets, "start_rockets", "0", 0, qfalse, qtrue, qtrue },
+	{ &start_shells, "start_shells", "0", 0, qfalse, qtrue, qtrue },
+	{ &start_slugs, "start_slugs", "0", 0, qfalse, qtrue, qtrue },
+	{ &team_allcaptain, "team_allcaptain", "1", 0, qfalse, qtrue, qtrue },
+	{ &team_armordamage, "team_armordamage", "0", 0, qfalse, qtrue, qtrue },
+	{ &team_maxplayers, "team_maxplayers", "0", 0, qfalse, qtrue, qtrue },
+	{ &team_nocontrols, "team_nocontrols", "0", 0, qfalse, qtrue, qtrue },
+	{ &team_noteamready, "team_noteamready", "0", 0, qfalse, qfalse, qfalse },
+	{ &viewcam_directory, "viewcam_directory", "cfg-viewcam", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_allcaptain, "vote_allow_allcaptain", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_altgraphics, "vote_allow_altgraphics", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_armordamage, "vote_allow_armordamage", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_capfps, "vote_allow_capfps", "0", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_capturelimit, "vote_allow_capturelimit", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_ca_startrespawn, "vote_allow_ca_startrespawn", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_ca_warmupfire, "vote_allow_ca_warmupfire", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_cq3, "vote_allow_cq3", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_dropitems, "vote_allow_dropitems", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_falling, "vote_allow_falling", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_fastrail, "vote_allow_fastrail", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_fraglimit, "vote_allow_fraglimit", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_hook, "vote_allow_hook", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_items, "vote_allow_items", "1023", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_instagib, "vote_allow_instagib", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_kick, "vote_allow_kick", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_lgcooldown, "vote_allow_lgcooldown", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_map, "vote_allow_map", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_maxpackets, "vote_allow_maxpackets", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_machinegun, "vote_allow_machinegun", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_mutespecs, "vote_allow_mutespecs", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_notimer, "vote_allow_notimer", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_osphud, "vote_allow_osphud", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_overtime, "vote_allow_overtime", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_pmove, "vote_allow_pmove", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_poweruprespawn, "vote_allow_poweruprespawn", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_powerups, "vote_allow_powerups", "255", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_promode, "vote_allow_promode", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_referee, "vote_allow_referee", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_reload, "vote_allow_reload", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_respawn, "vote_allow_respawn", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_roundlimit, "vote_allow_roundlimit", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_teamdamage, "vote_allow_teamdamage", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_thrufloors, "vote_allow_thrufloors", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_allow_timenudge, "vote_allow_timenudge", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_timelimit, "vote_allow_timelimit", "1", 0, qfalse, qtrue, qtrue },
+	{ &vote_allow_weaponrespawn, "vote_allow_weaponrespawn", "1", 0, qfalse, qfalse, qfalse },
+	{ &vote_limit, "vote_limit", "5", 0, qfalse, qtrue, qtrue },
+	{ &vote_percent, "vote_percent", "50", 0, qfalse, qtrue, qtrue },
+	{ &warmup_armor, "warmup_armor", "100", 0, qfalse, qtrue, qtrue },
+	{ &weapon_deaddrop, "weapon_deaddrop", "1", 0, qfalse, qtrue, qtrue },
+	{ &weapon_have, "weapon_have", "257", 0, qfalse, qtrue, qtrue },
+	{ &weapon_start, "weapon_start", "1", 0, qfalse, qtrue, qtrue },
 };
 
 // bk001129 - made static to avoid aliasing
