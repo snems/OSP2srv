@@ -420,9 +420,11 @@ typedef struct
 	gentity_t*   locationHead;          // head of the location list
 	int         bodyQueIndex;           // dead bodies
 	gentity_t*   bodyQue[BODY_QUEUE_SIZE];
-#ifdef MISSIONPACK
-	int         portalSequence;
-#endif
+	int osp_levelTime;
+	int unknown_flag1;
+	int unknown1;
+	int unknown2;
+	int unknown3;
 } level_locals_t;
 
 
@@ -1149,4 +1151,11 @@ void    trap_BotResetWeaponState(int weaponstate);
 int     trap_GeneticParentsAndChildSelection(int numranks, float* ranks, int* parent1, int* parent2, int* child);
 
 void    trap_SnapVector(float* v);
+
+int     trap_RealTime(qtime_t* qtime);
+
+/*--------debug stuff-------------*/
+#define OSP_UNK_CODE(MSG) G_Printf( "^1%s:%d: unknown code: %s\n", __FILE__, __LINE__, MSG)
+
+/*--------------------------------*/
 

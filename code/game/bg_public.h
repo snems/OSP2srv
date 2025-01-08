@@ -88,7 +88,31 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CS_LOCATIONS            (CS_PLAYERS+MAX_CLIENTS)
 #define CS_PARTICLES            (CS_LOCATIONS+MAX_LOCATIONS)
 
-#define CS_MAX                  (CS_PARTICLES+MAX_LOCATIONS)
+#define CS_OSP_SERVER_MODE                        806
+#define CS_OSP_CUSTOM_CLIENT                      807
+
+#define CS_OSP_ALLOW_PMOVE                        809
+#define CS_OSP_MAXPACKETS_MIN                     810
+#define CS_OSP_MAXPACKETS_MAX                     811
+#define CS_OSP_TIMENUDGE_MIN                      812
+#define CS_OSP_TIMENUDGE_MAX                      813
+#define CS_OSP_VERSION_STR                        814
+#define CS_OSP_CLAN_BASE_TEAM_DM                  815
+#define CS_OSP_MOTD0                              816
+#define CS_OSP_MOTD1                              817
+#define CS_OSP_MOTD2                              818
+#define CS_OSP_MOTD3                              819
+#define CS_OSP_MOTD4                              820
+#define CS_OSP_MOTD5                              821
+#define CS_OSP_MOTD6                              822
+#define CS_OSP_MOTD7                              823
+#define CS_OSP_CUSTOM_GFX                         824
+#define CS_OSP_DECALS                             840
+#define CS_OSP_AUTH                               872
+#define CS_OSP_FREEZE_GAME_TYPE                   873
+#define CS_OSP_CUSTOM_CLIENT2                     874
+
+#define CS_MAX                  (CS_OSP_CUSTOM_CLIENT2)
 
 #if (CS_MAX) > MAX_CONFIGSTRINGS
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS

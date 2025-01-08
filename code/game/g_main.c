@@ -25,6 +25,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 level_locals_t  level;
 
+#define MAXPACKETSMIN 15
+#define MAXPACKETSMAX 125
+#define TIMENUDGEMIN -200
+#define TIMENUDGEMAX 200
+
 typedef struct
 {
 	vmCvar_t*   vmCvar;
@@ -726,6 +731,17 @@ void G_UpdateCvars(void)
 	}
 }
 
+static const char* G_GetMapName(void) 
+{
+	char    serverinfo[MAX_INFO_STRING];
+	static char mapname[128];
+
+	trap_GetServerinfo(serverinfo, sizeof(serverinfo));
+	strncpy(mapname, Info_ValueForKey(serverinfo, "mapname"), 127);
+
+	return mapname;
+}
+
 /*
 ============
 G_InitGame
@@ -735,10 +751,13 @@ G_InitGame
 void G_InitGame(int levelTime, int randomSeed, int restart)
 {
 	int                 i;
+	int                 maxpacketsmin;
+	int                 maxpacketsmax;
+	int                 timenudgemin;
+	int                 timenudgemax;
+	int                 freezeGameType;
 
 	G_Printf("------- Game Initialization -------\n");
-	G_Printf("gamename: %s\n", GAMEVERSION);
-	G_Printf("gamedate: %s\n", __DATE__);
 
 	srand(randomSeed);
 
@@ -748,13 +767,89 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 
 	G_InitMemory();
 
+	trap_SetConfigstring(CS_OSP_VERSION_STR, "OSP Tourney DM/CA/CTF v(1.03a)");
+	trap_SetConfigstring(CS_OSP_ALLOW_PMOVE, va("%d", pmove_fixed.integer));
+	trap_SetConfigstring(CS_OSP_CUSTOM_CLIENT, va("%d", server_customclient.integer));
+	trap_SetConfigstring(CS_OSP_AUTH, va("%d", server_ospauth.integer));
+
+	if (server_maxpacketsmin.integer > MAXPACKETSMIN)
+	{
+		maxpacketsmin = server_maxpacketsmin.integer;
+	}
+	else
+	{
+		maxpacketsmin = MAXPACKETSMIN;
+	}
+	trap_SetConfigstring(CS_OSP_MAXPACKETS_MIN, va("%d", maxpacketsmin));
+
+	if (server_maxpacketsmax.integer < MAXPACKETSMAX)
+	{
+		maxpacketsmax = server_maxpacketsmax.integer;
+	}
+	else
+	{
+		maxpacketsmax = MAXPACKETSMAX;
+	}
+	trap_SetConfigstring(CS_OSP_MAXPACKETS_MAX, va("%d", maxpacketsmax));
+
+	if (server_timenudgemin.integer > TIMENUDGEMIN)
+	{
+		timenudgemin = server_timenudgemin.integer;
+	}
+	else
+	{
+		timenudgemin = TIMENUDGEMIN;
+	}
+	trap_SetConfigstring(CS_OSP_TIMENUDGE_MIN, va("%d", timenudgemin));
+
+	if (server_timenudgemax.integer < TIMENUDGEMAX)
+	{
+		timenudgemax = server_timenudgemax.integer;
+	}
+	else
+	{
+		timenudgemax = TIMENUDGEMAX;
+	}
+	trap_SetConfigstring(CS_OSP_TIMENUDGE_MAX, va("%d", timenudgemax));
+
+	trap_SetConfigstring(CS_OSP_CLAN_BASE_TEAM_DM, va("%d", z_m_current.integer == 2 ? 1 : 0));
+
+	if (server_freezetag.integer)
+	{
+		freezeGameType = 0;
+	}
+	else
+	{
+		if (server_freezetag.integer == 2)
+		{
+			freezeGameType = 2;
+		}
+		else
+		{
+			freezeGameType = 1;
+		}
+	}
+
+	trap_SetConfigstring(CS_OSP_FREEZE_GAME_TYPE, va("%d", freezeGameType));
+
+	G_Printf("gamename: %s\n", osp_gamename.integer ? "osp" : "baseq3 -- osp");
+	G_Printf("gamedate: %s\n", __DATE__);
+
+	trap_SetConfigstring(CS_INTERMISSION, "0");
+
 	// set some level globals
 	memset(&level, 0, sizeof(level));
+
+	OSP_UNK_CODE("g_unk_33677()");
+
 	level.time = levelTime;
 	level.startTime = levelTime;
+	level.osp_levelTime = levelTime;
+	level.unknown2 = 0;
+	level.unknown1 = 7900;
 
 	level.snd_fry = G_SoundIndex("sound/player/fry.wav");   // FIXME standing in lava / slime
-
+																													//
 	if (g_gametype.integer != GT_SINGLE_PLAYER && g_log.string[0])
 	{
 		if (g_logSync.integer)
@@ -772,11 +867,26 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 		else
 		{
 			char    serverinfo[MAX_INFO_STRING];
+			qtime_t localTime;
+			static const char* monthName[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 			trap_GetServerinfo(serverinfo, sizeof(serverinfo));
-
 			G_LogPrintf("------------------------------------------------------------\n");
 			G_LogPrintf("InitGame: %s\n", serverinfo);
+			trap_RealTime(&localTime);
+			G_LogPrintf("ServerTime:\t%d%02d%02d%02d%02d%02d\t%02d:%02d:%02d (%02d %s %d)\n", 
+					localTime.tm_year + 1900, 
+					localTime.tm_mon + 1, 
+					localTime.tm_mday, 
+					localTime.tm_hour, 
+					localTime.tm_min, 
+					localTime.tm_sec, 
+					localTime.tm_hour, 
+					localTime.tm_min, 
+					localTime.tm_sec, 
+					localTime.tm_mday, 
+					monthName[localTime.tm_mon], 
+					localTime.tm_year + 1900);
 		}
 	}
 	else
@@ -815,6 +925,16 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 
 	ClearRegisteredItems();
 
+	OSP_UNK_CODE("g_unk_3285c()");
+	if (Q_stricmp(G_GetMapName(), "ospdm4") == 0)
+	{
+		level.unknown_flag1 |= 1;
+	}
+	if (Q_stricmp(G_GetMapName(), "ospdm2") == 0)
+	{
+		level.unknown_flag1 |= 2;
+	}
+
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString();
 
@@ -846,7 +966,8 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 	}
 
 	G_RemapTeamShaders();
-
+	OSP_UNK_CODE("g_unk_30dd4()");
+	G_UpdateCvars();
 }
 
 
