@@ -201,7 +201,7 @@ void SP_team_blueobelisk(gentity_t* ent);
 void SP_team_redobelisk(gentity_t* ent);
 void SP_team_neutralobelisk(gentity_t* ent);
 #endif
-void SP_item_botroam(gentity_t* ent) {};
+void SP_item_botroam(gentity_t* ent) {}
 
 spawn_t spawns[] =
 {

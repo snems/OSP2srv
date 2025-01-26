@@ -346,7 +346,7 @@ void Team_FragBonuses(gentity_t* targ, gentity_t* inflictor, gentity_t* attacker
 		enemy_flag_pw = PW_REDFLAG;
 	}
 
-	if (g_gametype.integer == GT_1FCTF)
+	if (g_gametype.integer == GT_CA)
 	{
 		enemy_flag_pw = PW_NEUTRALFLAG;
 	}

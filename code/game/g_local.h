@@ -307,6 +307,7 @@ struct gclient_s
 
 	// timers
 	int         respawnTime;        // can respawn when time > this, force after g_forcerespwan
+	int         OSPAuth;                    //
 	int         inactivityTime;     // kick players when time > this
 	qboolean    inactivityWarning;  // qtrue if the five seoond warning has been given
 	int         rewardTime;         // clear the EF_AWARD_IMPRESSIVE, etc when time > this
@@ -332,6 +333,9 @@ struct gclient_s
 #endif
 
 	char*        areabits;
+	char         tail1[344];
+	int          unknown1;
+	char         tail2[428];
 };
 
 
@@ -1156,6 +1160,30 @@ int     trap_RealTime(qtime_t* qtime);
 
 /*--------debug stuff-------------*/
 #define OSP_UNK_CODE(MSG) G_Printf( "^1%s:%d: unknown code: %s\n", __FILE__, __LINE__, MSG)
+
+
+// UNIMPLEMENTED CODE
+//=============================================
+void G_OSPAuth(const gentity_t* ent);
+void Cmd_Uinfo_f(const gentity_t* ent);
+void Cmd_ViewList_f(const gentity_t* ent);
+qboolean Cmd_Ref_f(const gentity_t* ent, int arg);
+void g_unk_369d2(const gentity_t* ent, int arg);
+void Cmd_PlayerList_f(const gentity_t* ent);
+void Cmd_PlayerList_f(const gentity_t* ent);
+void Cmd_GetStatsInfo_f(const gentity_t* ent);
+void Cmd_Stats_f(const gentity_t* ent, int arg);
+void Cmd_StatsAll_f(const gentity_t* ent, int arg);
+void Cmd_Acc_f(const gentity_t* ent, int arg);
+void Cmd_OSPAuth_f(const gentity_t* ent);
+void Cmd_AutoScreenshot_f(int arg1, int arg2, int arg3);
+void Cmd_ScoresFT_f(const gentity_t* ent, int arg);
+void Cmd_ScoresDM_f(const gentity_t* ent, int arg);
+void Cmd_ScoresCTF_f(const gentity_t* ent, int arg);
+void Cmd_ScoresCA_f(const gentity_t* ent, int arg);
+void Cmd_ScoresFFA_f(const gentity_t* ent, int arg);
+qboolean g_unk_3660b(const gentity_t* ent, char* cmd, int arg);
+void Cmd_CallVote2_f(const gentity_t* ent, int arg);
 
 /*--------------------------------*/
 

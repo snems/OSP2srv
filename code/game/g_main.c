@@ -39,7 +39,7 @@ typedef struct
 	int         modificationCount;  // for tracking changes
 	qboolean    trackChange;        // track this variable, and announce if changed
 	qboolean    teamShader;         // track and if changed, update shader state
-  qboolean    unk;
+	qboolean    unk;
 } cvarTable_t;
 
 gentity_t       g_entities[MAX_GENTITIES];
@@ -731,7 +731,7 @@ void G_UpdateCvars(void)
 	}
 }
 
-static const char* G_GetMapName(void) 
+static const char* G_GetMapName(void)
 {
 	char    serverinfo[MAX_INFO_STRING];
 	static char mapname[128];
@@ -849,7 +849,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 	level.unknown1 = 7900;
 
 	level.snd_fry = G_SoundIndex("sound/player/fry.wav");   // FIXME standing in lava / slime
-																													//
+	//
 	if (g_gametype.integer != GT_SINGLE_PLAYER && g_log.string[0])
 	{
 		if (g_logSync.integer)
@@ -874,19 +874,19 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 			G_LogPrintf("------------------------------------------------------------\n");
 			G_LogPrintf("InitGame: %s\n", serverinfo);
 			trap_RealTime(&localTime);
-			G_LogPrintf("ServerTime:\t%d%02d%02d%02d%02d%02d\t%02d:%02d:%02d (%02d %s %d)\n", 
-					localTime.tm_year + 1900, 
-					localTime.tm_mon + 1, 
-					localTime.tm_mday, 
-					localTime.tm_hour, 
-					localTime.tm_min, 
-					localTime.tm_sec, 
-					localTime.tm_hour, 
-					localTime.tm_min, 
-					localTime.tm_sec, 
-					localTime.tm_mday, 
-					monthName[localTime.tm_mon], 
-					localTime.tm_year + 1900);
+			G_LogPrintf("ServerTime:\t%d%02d%02d%02d%02d%02d\t%02d:%02d:%02d (%02d %s %d)\n",
+			            localTime.tm_year + 1900,
+			            localTime.tm_mon + 1,
+			            localTime.tm_mday,
+			            localTime.tm_hour,
+			            localTime.tm_min,
+			            localTime.tm_sec,
+			            localTime.tm_hour,
+			            localTime.tm_min,
+			            localTime.tm_sec,
+			            localTime.tm_mday,
+			            monthName[localTime.tm_mon],
+			            localTime.tm_year + 1900);
 		}
 	}
 	else

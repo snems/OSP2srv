@@ -5,7 +5,7 @@ QA_SRC = \
  ai_dmnet ai_dmq3 ai_team ai_main ai_chat ai_cmd ai_vcmd \
  g_active g_arenas g_bot g_client g_cmds g_combat g_items g_mem g_misc \
  g_missile g_mover g_session g_spawn g_svcmds g_target g_team \
- g_trigger g_utils g_weapon \
+ g_trigger g_utils g_weapon g_unimplemented\
 
 CG_SRC = \
  cg_main $(CGDIR)/cg_syscalls.asm \

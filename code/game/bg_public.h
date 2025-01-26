@@ -128,7 +128,7 @@ typedef enum
 
 	GT_TEAM,            // team deathmatch
 	GT_CTF,             // capture the flag
-	GT_1FCTF,
+	GT_CA,
 	GT_OBELISK,
 	GT_HARVESTER,
 	GT_MAX_GAME_TYPE

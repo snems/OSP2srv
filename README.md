@@ -1,5 +1,6 @@
 # OSP2 server
 
+- [X] osp variables list
 - [X] osp commands list
 - [ ] wstats
 - [ ] freezetag
@@ -7,6 +8,36 @@
 
 
 ## Commands:
+
+### CLIENT
+
+- [ ] `uinfo`
+- [ ] `uvinfo`
+- [ ] `ref`
+- [ ] `admin`
+- [ ] `referee`
+- [ ] `players`
+- [ ] `playerlist`
+- [ ] `getstatsinfo`
+- [ ] `stats`
+- [ ] `stat`
+- [ ] `statsdump`
+- [ ] `statsall`
+- [ ] `statsblue`
+- [ ] `statsred`
+- [ ] `topshots`
+- [ ] `acc`
+- [ ] `accuracy`
+- [ ] `bottomshots`
+- [ ] `autoscreenshot`
+- [ ] `scores`
+- [ ] `viewlist`
+- [ ] `cv`
+- [ ] `follow`
+- [ ] `follownext`
+- [ ] `followprev`
+
+## Variables:
 
 ### STARTUP (Reference)
 

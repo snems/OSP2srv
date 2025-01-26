@@ -137,7 +137,7 @@ int BotSortTeamMatesByBaseTravelTime(bot_state_t* bs, int* teammates, int maxtea
 	int traveltimes[MAX_CLIENTS];
 	bot_goal_t* goal = NULL;
 
-	if (gametype == GT_CTF || gametype == GT_1FCTF)
+	if (gametype == GT_CTF || gametype == GT_CA)
 	{
 		if (BotTeam(bs) == TEAM_RED)
 			goal = &ctf_redflag;

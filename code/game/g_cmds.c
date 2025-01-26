@@ -1829,32 +1829,10 @@ void Cmd_SetViewpos_f(gentity_t* ent)
 
 /*
 =================
-Cmd_Stats_f
-=================
-*/
-void Cmd_Stats_f(gentity_t* ent)
-{
-	/*
-	    int max, n, i;
-
-	    max = trap_AAS_PointReachabilityAreaIndex( NULL );
-
-	    n = 0;
-	    for ( i = 0; i < max; i++ ) {
-	        if ( ent->client->areabits[i >> 3] & (1 << (i & 7)) )
-	            n++;
-	    }
-
-	    //trap_SendServerCommand( ent-g_entities, va("print \"visited %d of %d areas\n\"", n, max));
-	    trap_SendServerCommand( ent-g_entities, va("print \"%d%% level coverage\n\"", n * 100 / max));
-	*/
-}
-
-/*
-=================
 ClientCommand
 =================
 */
+
 void ClientCommand(int clientNum)
 {
 	gentity_t* ent;
@@ -1866,110 +1844,199 @@ void ClientCommand(int clientNum)
 		return;     // not fully in game yet
 	}
 
-
 	trap_Argv(0, cmd, sizeof(cmd));
 
-	if (Q_stricmp(cmd, "say") == 0)
+	if (ent->client->OSPAuth > 0 && server_ospauth.integer)
 	{
-		Cmd_Say_f(ent, SAY_ALL, qfalse);
-		return;
+		G_OSPAuth(ent);
 	}
-	if (Q_stricmp(cmd, "say_team") == 0)
-	{
-		Cmd_Say_f(ent, SAY_TEAM, qfalse);
-		return;
-	}
-	if (Q_stricmp(cmd, "tell") == 0)
-	{
-		Cmd_Tell_f(ent);
-		return;
-	}
-	if (Q_stricmp(cmd, "vsay") == 0)
-	{
-		Cmd_Voice_f(ent, SAY_ALL, qfalse, qfalse);
-		return;
-	}
-	if (Q_stricmp(cmd, "vsay_team") == 0)
-	{
-		Cmd_Voice_f(ent, SAY_TEAM, qfalse, qfalse);
-		return;
-	}
-	if (Q_stricmp(cmd, "vtell") == 0)
-	{
-		Cmd_VoiceTell_f(ent, qfalse);
-		return;
-	}
-	if (Q_stricmp(cmd, "vosay") == 0)
-	{
-		Cmd_Voice_f(ent, SAY_ALL, qfalse, qtrue);
-		return;
-	}
-	if (Q_stricmp(cmd, "vosay_team") == 0)
-	{
-		Cmd_Voice_f(ent, SAY_TEAM, qfalse, qtrue);
-		return;
-	}
-	if (Q_stricmp(cmd, "votell") == 0)
-	{
-		Cmd_VoiceTell_f(ent, qtrue);
-		return;
-	}
-	if (Q_stricmp(cmd, "vtaunt") == 0)
-	{
-		Cmd_VoiceTaunt_f(ent);
-		return;
-	}
+	trap_Argv(0, &cmd[0], 0x400);
 	if (Q_stricmp(cmd, "score") == 0)
 	{
 		Cmd_Score_f(ent);
+	}
+	else if (Q_stricmp(cmd, "say") == 0)
+	{
+		Cmd_Say_f(ent, 0, 0);
+	}
+	else if (Q_stricmp(cmd, "say_team") == 0)
+	{
+		Cmd_Say_f(ent, 1, 0);
+	}
+	else if (Q_stricmp(cmd, "tell") == 0)
+	{
+		Cmd_Say_f(ent, 1, 0);
+	}
+	else if (Q_stricmp(cmd, "team") == 0)
+	{
+		if (Cmd_Ref_f(ent, 0x25) == 0)
+		{
+			Cmd_Team_f(ent);
+		}
+	}
+	else if (Q_stricmp(cmd, "uinfo") == 0)
+	{
+		Cmd_Uinfo_f(ent);
+	}
+	else if (Q_stricmp(cmd, "uvinfo") == 0)
+	{
+		Cmd_Uinfo_f(ent);
+		Cmd_ViewList_f(ent);
+	}
+	else if ((Q_stricmp(cmd, "ref") == 0) || (Q_stricmp(cmd, "admin") == 0) || (Q_stricmp(cmd, "referee") == 0))
+	{
+		if (!Cmd_Ref_f(ent, 0x18))
+		{
+			g_unk_369d2(ent, 0);
+		}
+	}
+	else if ((Q_stricmp(cmd, "players") == 0) || (Q_stricmp(cmd, "playerslist") == 0))
+	{
+		Cmd_PlayerList_f(ent);
+	}
+	else if (Q_stricmp(cmd, "getstatsinfo") == 0)
+	{
+		Cmd_GetStatsInfo_f(ent);
+	}
+	else if ((Q_stricmp(cmd, "stats") == 0) || (Q_stricmp(cmd, "stat") == 0))
+	{
+		Cmd_Stats_f(ent, 0);
+	}
+	else if (Q_stricmp(cmd, "statsdump") == 0)
+	{
+		Cmd_Stats_f(ent, 1);
+	}
+	else if (Q_stricmp(cmd, "statsall") == 0)
+	{
+		Cmd_StatsAll_f(ent, 0);
+	}
+	else if (Q_stricmp(cmd, "statsblue") == 0)
+	{
+		Cmd_StatsAll_f(ent, 2);
+	}
+	else if (Q_stricmp(cmd, "statsred") == 0)
+	{
+		Cmd_StatsAll_f(ent, 1);
+	}
+	else if ((Q_stricmp(cmd, "topshots") == 0) || (Q_stricmp(cmd, "acc") == 0) || (Q_stricmp(cmd, "accuracy") == 0))
+	{
+		Cmd_Acc_f(ent, 1);
+	}
+	else if (Q_stricmp(cmd, "bottomshots") == 0)
+	{
+		Cmd_Acc_f(ent, 0);
+	}
+	else if (server_ospauth.integer && Q_stricmp(cmd, "htuatneilc") == 0)
+	{
+		Cmd_OSPAuth_f(ent);
+	}
+	else if (Q_stricmp(cmd, "autoscreenshot") == 0)
+	{
+		if (!Cmd_Ref_f(ent, 0x16))
+		{
+			g_unk_369d2(ent, 0);
+			Cmd_AutoScreenshot_f(ent - g_entities, 0, 1);
+		}
+	}
+	else if (Q_stricmp(cmd, "scores") == 0)
+	{
+		switch (g_gametype.integer)
+		{
+			case GT_TEAM:
+				if (server_freezetag.integer)
+				{
+					Cmd_ScoresFT_f(ent, 0);
+				}
+				else
+				{
+					Cmd_ScoresDM_f(ent, 0);
+				}
+				break;
+			case GT_CTF:
+				Cmd_ScoresCTF_f(ent, 0);
+				break;
+			case GT_CA:
+				Cmd_ScoresCA_f(ent, 0);
+				break;
+			case GT_FFA:
+			case GT_TOURNAMENT:
+				Cmd_ScoresFFA_f(ent, 0);
+				break;
+			default:
+				break;
+		}
+
+	}
+	else if (Q_stricmp(cmd, "viewlist") == 0)
+	{
+		Cmd_ViewList_f(ent);
+	}
+	else if (ent->client->unknown1 && g_unk_3660b(ent, cmd, 0))
+	{
 		return;
 	}
-
-	// ignore all other commands when at intermission
-	if (level.intermissiontime)
+	else if ((Q_stricmp(cmd, "callvote") == 0) || (Q_stricmp(cmd, "vote") == 0))
+	{
+		Cmd_Ref_f(ent, 0x28);
+		Cmd_CallVote2_f(ent, 0);
+	}
+	else if (Q_stricmp(cmd, "vote") == 0)
+	{
+		Cmd_Vote_f(ent);
+	}
+	else if (level.intermissiontime)
 	{
 		Cmd_Say_f(ent, qfalse, qtrue);
-		return;
 	}
-
-	if (Q_stricmp(cmd, "give") == 0)
+	else if (Q_stricmp(cmd, "give") == 0)
+	{
 		Cmd_Give_f(ent);
+	}
 	else if (Q_stricmp(cmd, "god") == 0)
+	{
 		Cmd_God_f(ent);
+	}
 	else if (Q_stricmp(cmd, "notarget") == 0)
+	{
 		Cmd_Notarget_f(ent);
+	}
 	else if (Q_stricmp(cmd, "noclip") == 0)
+	{
 		Cmd_Noclip_f(ent);
+	}
 	else if (Q_stricmp(cmd, "kill") == 0)
+	{
 		Cmd_Kill_f(ent);
-	else if (Q_stricmp(cmd, "teamtask") == 0)
-		Cmd_TeamTask_f(ent);
-	else if (Q_stricmp(cmd, "levelshot") == 0)
-		Cmd_LevelShot_f(ent);
+	}
 	else if (Q_stricmp(cmd, "follow") == 0)
-		Cmd_Follow_f(ent);
+	{
+		if (!Cmd_Ref_f(ent, 0x26))
+		{
+			Cmd_Follow_f(ent);
+		}
+	}
 	else if (Q_stricmp(cmd, "follownext") == 0)
+	{
 		Cmd_FollowCycle_f(ent, 1);
+	}
 	else if (Q_stricmp(cmd, "followprev") == 0)
+	{
 		Cmd_FollowCycle_f(ent, -1);
-	else if (Q_stricmp(cmd, "team") == 0)
-		Cmd_Team_f(ent);
+	}
+	else if (Q_stricmp(cmd, "followprev") == 0)
+	{
+		Cmd_FollowCycle_f(ent, -1);
+	}
 	else if (Q_stricmp(cmd, "where") == 0)
+	{
 		Cmd_Where_f(ent);
-	else if (Q_stricmp(cmd, "callvote") == 0)
-		Cmd_CallVote_f(ent);
-	else if (Q_stricmp(cmd, "vote") == 0)
-		Cmd_Vote_f(ent);
-	else if (Q_stricmp(cmd, "callteamvote") == 0)
-		Cmd_CallTeamVote_f(ent);
-	else if (Q_stricmp(cmd, "teamvote") == 0)
-		Cmd_TeamVote_f(ent);
+	}
 	else if (Q_stricmp(cmd, "gc") == 0)
+	{
 		Cmd_GameCommand_f(ent);
-	else if (Q_stricmp(cmd, "setviewpos") == 0)
-		Cmd_SetViewpos_f(ent);
-	else if (Q_stricmp(cmd, "stats") == 0)
-		Cmd_Stats_f(ent);
+	}
 	else
-		trap_SendServerCommand(clientNum, va("print \"unknown cmd %s\n\"", cmd));
+	{
+		trap_SendServerCommand(clientNum, va("print \"Unknown command: ^5%s^7\nType ^3\\help^7 for a list of all commands.\n\"", &cmd[0]));
+	}
 }
