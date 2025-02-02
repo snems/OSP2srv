@@ -21,21 +21,6 @@ void Cmd_ViewList_f(const gentity_t* ent)
 	OSP2_UNIMPLEMENTED_FUNCTION();
 }
 
-qboolean Cmd_Ref_f(const gentity_t* ent, int arg)
-{
-	(void)ent;
-	(void)arg;
-	OSP2_UNIMPLEMENTED_FUNCTION();
-	return qfalse;
-}
-
-void g_unk_369d2(const gentity_t* ent, int arg)
-{
-	(void)ent;
-	(void)arg;
-	OSP2_UNIMPLEMENTED_FUNCTION();
-}
-
 void Cmd_PlayerList_f(const gentity_t* ent)
 {
 	(void)ent;
@@ -118,21 +103,35 @@ void Cmd_ScoresFFA_f(const gentity_t* ent, int arg)
 	OSP2_UNIMPLEMENTED_FUNCTION();
 }
 
-qboolean g_unk_3660b(const gentity_t* ent, char* cmd, int arg)
+qboolean Cmd_CallVote2_f(const gentity_t* ent, int arg)
 {
 	(void)ent;
-	(void)cmd;
 	(void)arg;
 	OSP2_UNIMPLEMENTED_FUNCTION();
 	return qfalse;
 }
 
-void Cmd_CallVote2_f(const gentity_t* ent, int arg)
+void Cmd_RefHelp(const gentity_t* ent)
 {
 	(void)ent;
-	(void)arg;
 	OSP2_UNIMPLEMENTED_FUNCTION();
 }
 
+qboolean Cmd_ControlCommands_f(const gentity_t* ent, const char *arg, qboolean unk)
+{
+	(void)ent;
+	(void)arg;
+	(void)unk;
+	OSP2_UNIMPLEMENTED_FUNCTION();
+	return qfalse;
+}
 
+qboolean Cmd_RefCommandArg_f(const gentity_t* ent, const char *arg, qboolean unk)
+{
+	(void)ent;
+	(void)arg;
+	(void)unk;
+	OSP2_UNIMPLEMENTED_FUNCTION();
+	return qfalse;
+}
 

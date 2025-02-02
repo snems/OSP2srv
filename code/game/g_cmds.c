@@ -23,6 +23,89 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "g_local.h"
 
 #include "../../ui/menudef.h"           // for the voice chats
+                                        //
+	static const char* cmdHelp[] = 
+	{
+      ":^7 Locks/unlocks a player's team"
+    , ":^7 Locks/unlocks a player's team from spectators"
+    , ":^7 Toggles option to stay as a spectator in 1v1"
+    , ":^7 Sets your status to ^5ready^7 to start a match"
+    , ":^7 Lists all active players and their IDs/information"
+    , " <player_ID>:^7 Invites a player to join a team"
+    , ":^7 Invites a player to spectate a spec-locked team"
+    , " <player_ID>:^7 Invites a player to coach team"
+    , ":^7 Declines coach invitation or resigns coach status"
+    , " <player_ID>:^7 Kicks active coach from team"
+    , ":^7 Accepts coach invitation/restarts coach view"
+    , " <player_ID>:^7 Removes a player from the team"
+    , " [player_ID]:^7 Resigns captainship.  Can optionally be given to another teammate"
+    , ":^7 Sets an entire team's status to ^5ready^7 to start a match"
+    , ":^7 Shows team captains"
+    , ":^7 Pause the match or issue a team timeout/timein"
+    , " [player_ID]:^7 Shows weapon accuracy stats for a player"
+    , " [player_ID]:^7 Shows player stats + match info saved locally to a file"
+    , " [password]:^7 Shows/sets team joincode or used to join a locked team"
+    , " <item>:^7 Drops available weapon/ammo/flag"
+    , ":^7 Shows BEST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon"
+    , ":^7 Creates a demo with a consistant naming scheme (OSP clients only)"
+    , ":^7 Creates a screenshot with a consistant naming scheme (OSP clients only)"
+    , ":^7 Shows WORST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon"
+    , " <password>:^7 Become a referee (admin access)"
+    , ":^7 Switches to cinematic camera mode"
+    , " [player_ID]:^7 Puts viewcam in follow mode.  Can optionally to follow a specific player"
+    , ":^7 Toggle viewcam between manual/automatic change"
+    , ":^7 Toggle ViewCam between static/dynamic views"
+    , " <player_ID>:^7 Adds a player to multi-screen view"
+    , ":^7 Adds all active players to a multi-screen view"
+    , " [player_ID]:^7 Removes current selected or specific player from multi-screen view"
+    , ":^7 Disables multiview mode and goes back to spectator mode"
+    , ":^7 Moves through active screen in a multi-screen display"
+    , ":^7 Cycles through players in current view"
+    , ":^7 Follows current highlighted view"
+    , ": ^7 Views entire red/blue team"
+    , " <r|b|s|none>:^7 Chooses a team or shows current team (s = spectator mode)"
+    , " <player_ID|red|blue>:^7 Spectates a particular player or team"
+    , ":^7 Sets player's status to ^5not ready^7 to start a match"
+    , " <params>:^7 Calls a vote"
+    , ":^7 Gives a list of most OSP commands"
+	};
+
+#define CMDHELP_0   0
+#define CMDHELP_1   1
+#define CMDHELP_2   2
+#define CMDHELP_3   3
+#define CMDHELP_4   4
+#define CMDHELP_5   5
+#define CMDHELP_6   6
+#define CMDHELP_7   7
+#define CMDHELP_8   8
+#define CMDHELP_9   9
+#define CMDHELP_10  10
+#define CMDHELP_11  11
+#define CMDHELP_12  12
+#define CMDHELP_13  13
+#define CMDHELP_14  14
+#define CMDHELP_15  15
+#define CMDHELP_16  16
+#define CMDHELP_17  17
+#define CMDHELP_18  18
+#define CMDHELP_19  19
+#define CMDHELP_20  20
+#define CMDHELP_21  21
+#define CMDHELP_AUTOSCREENSHOT  22
+#define CMDHELP_23  23
+#define CMDHELP_REF  24
+#define CMDHELP_25  25
+#define CMDHELP_26  26
+#define CMDHELP_27  27
+#define CMDHELP_28  28
+#define CMDHELP_29  29
+#define CMDHELP_30  30
+#define CMDHELP_TEAM  37
+#define CMDHELP_FOLLOW  38
+#define CMDHELP_39  39
+#define CMDHELP_CALLVOTE  40
+#define CMDHELP_41  41
 
 /*
 ==================
@@ -1825,6 +1908,82 @@ void Cmd_SetViewpos_f(gentity_t* ent)
 	TeleportPlayer(ent, origin, angles);
 }
 
+/*
+=================
+Cmd_Help_f
+=================
+*/
+static qboolean Cmd_Help_f(const gentity_t* ent, int cmdNumber)
+{
+	int rc;
+	char text[MAX_STRING_CHARS];
+
+	if (!ent)
+	{
+		return qfalse;
+	}
+
+	trap_Argv(1, text, MAX_STRING_CHARS);
+
+	if (Q_stricmp(text, "?") == 0)
+	{
+		trap_Argv(0, text, MAX_STRING_CHARS);
+		trap_SendServerCommand(ent - g_entities, va("print \"\n^3%s%s\n\n\"", text, cmdHelp[cmdNumber]));
+		return qtrue;
+	}
+	return qfalse;
+}
+
+/*
+=================
+Cmd_RefCommand_f
+=================
+*/
+static void Cmd_RefCommand_f(const gentity_t* ent, qboolean skipSomething)
+{
+	char text[MAX_STRING_CHARS];
+	if (ent->client->isReferee)
+	{
+		if (!skipSomething)
+		{
+			trap_Argv(1, &text[0], MAX_STRING_CHARS);
+			if (Cmd_ControlCommands_f(ent, &text[0], 1) && Cmd_RefCommandArg_f(ent, &text[0], 1) && !Cmd_CallVote2_f(ent, 1))
+			{
+				Cmd_RefHelp(ent);
+			}
+		}
+	}
+	else
+	{
+		if (Q_stricmp(ref_password.string, "none") == 0 || ref_password.string[0] == 0)
+		{
+			trap_SendServerCommand(ent - g_entities, "print \"Sorry, referee status disabled on this server.\n\"");
+			return;
+		}
+
+		if (trap_Argc() < 2)
+		{
+			trap_SendServerCommand(ent - g_entities, "print \"Usage: ref [password]\n\"");
+		}
+		else
+		{
+			trap_Argv(1, &text[0], 0x400);
+			if (Q_stricmp(&text[0], ref_password.string))
+			{
+				trap_SendServerCommand(ent - g_entities, "print \"Invalid referee password!\n\"");
+				G_AdminLog(va("Referee_Attempt_Fail\t%s\t(%s)", ent->client->pers.netname, &text[0]));
+			}
+			else
+			{
+				ent->client->isReferee = qtrue;
+				ent->client->unknown2 = 3;
+				trap_SendServerCommand(ent - g_entities, "print \"Type: ^3ref ?^7 for a list of referee commands.\n\"");
+				trap_SendServerCommand(-1, va("cp \"%s\n^3has become a referee\n\"", ent->client->pers.netname));
+				G_AdminLog(va("Referee_Attempt_Success\t%s\t(%s)", ent->client->pers.netname, text));
+			}
+		}
+	}
+}
 
 
 /*
@@ -1869,7 +2028,7 @@ void ClientCommand(int clientNum)
 	}
 	else if (Q_stricmp(cmd, "team") == 0)
 	{
-		if (Cmd_Ref_f(ent, 0x25) == 0)
+		if (Cmd_Help_f(ent, CMDHELP_TEAM) == 0)
 		{
 			Cmd_Team_f(ent);
 		}
@@ -1885,9 +2044,9 @@ void ClientCommand(int clientNum)
 	}
 	else if ((Q_stricmp(cmd, "ref") == 0) || (Q_stricmp(cmd, "admin") == 0) || (Q_stricmp(cmd, "referee") == 0))
 	{
-		if (!Cmd_Ref_f(ent, 0x18))
+		if (!Cmd_Help_f(ent, CMDHELP_REF))
 		{
-			g_unk_369d2(ent, 0);
+			Cmd_RefCommand_f(ent, 0);
 		}
 	}
 	else if ((Q_stricmp(cmd, "players") == 0) || (Q_stricmp(cmd, "playerslist") == 0))
@@ -1932,9 +2091,9 @@ void ClientCommand(int clientNum)
 	}
 	else if (Q_stricmp(cmd, "autoscreenshot") == 0)
 	{
-		if (!Cmd_Ref_f(ent, 0x16))
+		if (!Cmd_Help_f(ent, CMDHELP_AUTOSCREENSHOT))
 		{
-			g_unk_369d2(ent, 0);
+			Cmd_RefCommand_f(ent, 0);
 			Cmd_AutoScreenshot_f(ent - g_entities, 0, 1);
 		}
 	}
@@ -1971,13 +2130,13 @@ void ClientCommand(int clientNum)
 	{
 		Cmd_ViewList_f(ent);
 	}
-	else if (ent->client->unknown1 && g_unk_3660b(ent, cmd, 0))
+	else if (ent->client->isReferee && Cmd_RefCommandArg_f(ent, cmd, 0))
 	{
 		return;
 	}
 	else if ((Q_stricmp(cmd, "callvote") == 0) || (Q_stricmp(cmd, "vote") == 0))
 	{
-		Cmd_Ref_f(ent, 0x28);
+		Cmd_Help_f(ent, CMDHELP_CALLVOTE);
 		Cmd_CallVote2_f(ent, 0);
 	}
 	else if (Q_stricmp(cmd, "vote") == 0)
@@ -2010,7 +2169,7 @@ void ClientCommand(int clientNum)
 	}
 	else if (Q_stricmp(cmd, "follow") == 0)
 	{
-		if (!Cmd_Ref_f(ent, 0x26))
+		if (!Cmd_Help_f(ent, CMDHELP_FOLLOW))
 		{
 			Cmd_Follow_f(ent);
 		}
@@ -2040,3 +2199,4 @@ void ClientCommand(int clientNum)
 		trap_SendServerCommand(clientNum, va("print \"Unknown command: ^5%s^7\nType ^3\\help^7 for a list of all commands.\n\"", &cmd[0]));
 	}
 }
+

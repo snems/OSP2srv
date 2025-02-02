@@ -13,9 +13,7 @@
 
 - [ ] `uinfo`
 - [ ] `uvinfo`
-- [ ] `ref`
-- [ ] `admin`
-- [ ] `referee`
+- [X] `ref/admin/referee`
 - [ ] `players`
 - [ ] `playerlist`
 - [ ] `getstatsinfo`
@@ -37,11 +35,99 @@
 - [ ] `follownext`
 - [ ] `followprev`
 
+### Control commands
+
+- [ ] `lock`
+- [ ] `unlock`
+- [ ] `speclock`
+- [ ] `specunlock`
+- [ ] `ready`
+- [ ] `notready`
+- [ ] `unready`
+- [ ] `teamready`
+- [ ] `readyteam`
+- [ ] `invite`
+- [ ] `pickplayer`
+- [ ] `specinvite`
+- [ ] `invitespec`
+- [ ] `remove`
+- [ ] `kickplayer`
+- [ ] `captains`
+- [ ] `resign`
+- [ ] `joincode`
+- [ ] `time`
+- [ ] `pause`
+- [ ] `timeout`
+- [ ] `timein`
+- [ ] `unpause`
+- [ ] `help`
+- [ ] `commands`
+- [ ] `followpowerup`
+- [ ] `speconly`
+- [ ] `autorecord`
+- [ ] `maplist`
+- [ ] `mapload`
+- [ ] `range`
+- [ ] `snapshot`
+- [ ] `snapshotdump`
+- [ ] `viewadd`
+- [ ] `viewall`
+- [ ] `viewremove`
+- [ ] `viewfollow`
+- [ ] `viewnone`
+- [ ] `viewframe`
+- [ ] `viewnext`
+- [ ] `viewprev`
+- [ ] `viewcyclenext`
+- [ ] `viewcycleprev`
+- [ ] `viewred`
+- [ ] `viewblue`
+- [ ] `coach`
+- [ ] `coachinvite`
+- [ ] `coachdecline`
+- [ ] `coachkick`
+- [ ] `vc_proximity`
+- [ ] `vc_info`
+- [ ] `vc_follow`
+- [ ] `vc_free`
+- [ ] `vc_view`
+- [ ] `drop`
+- [ ] `settings`
+
+### Referee commands
+
+- [ ] `r_pause/pause`
+- [ ] `r_kick`
+- [ ] `r_map`
+- [ ] `r_ban/ban`
+- [ ] `r_abort/abort`
+- [ ] `r_help`
+- [ ] `r_allcaptain/allcaptain`
+- [ ] `r_allready/allready`
+- [ ] `r_lock`
+- [ ] `r_unlock`
+- [ ] `r_speclock`
+- [ ] `r_specunlock`
+- [ ] `r_lockred/lockred`
+- [ ] `r_unlockred/unlockred`
+- [ ] `r_lockblue/lockblue`
+- [ ] `r_unlockblue/unlockblue`
+- [ ] `r_speclockred/speclockred`
+- [ ] `r_specunlockred/specunlockred`
+- [ ] `r_specklockblue/speclockblue`
+- [ ] `r_specunlockblue/specunlockblue`
+- [ ] `r_mutespecs/mutespecs`
+- [ ] `r_promote/promote`
+- [ ] `r_putred/putred`
+- [ ] `r_putblue/putblue`
+- [ ] `r_remove/remove`
+- [ ] `r_restart/restart`
+
 ## Variables:
 
 ### STARTUP (Reference)
 
-- [ ] `admin_log <logname>`
+- [X] `admin_log <logname>`
 - [ ] `dmflags <df_mask>`
 - [ ] `filter_file <filename>`
 - [ ] `freezetag_latejoin <0|1>`
@@ -72,7 +158,7 @@
 
 ### REFEREE
 
-- [ ] `ref_password <string>`
+- [X] `ref_password <string>`
 
 ### GENERAL Q3 OPTIONS
 

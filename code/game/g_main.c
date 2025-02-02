@@ -504,6 +504,12 @@ void G_ShutdownGame(int restart);
 void CheckExitRules(void);
 
 
+static const char* monthName[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+static fileHandle_t adminLogHandle;
+static qboolean adminLogDisabled;
+
+
 /*
 ================
 vmMain
@@ -574,6 +580,42 @@ void QDECL G_Error(const char* fmt, ...)
 	va_end(argptr);
 
 	trap_Error(text);
+}
+
+/*
+================
+G_AdminLog
+================
+*/
+void G_AdminLog(const char* text)
+{
+	qtime_t localTime;
+	const char* tmp;
+	char textToWrite[MAX_STRING_CHARS];
+	if (!admin_log.string[0] || Q_stricmp(admin_log.string, "none"))
+	{
+		adminLogDisabled = qtrue;
+		return;
+	}
+
+	(void)trap_FS_FOpenFile(admin_log.string, &adminLogHandle, FS_WRITE | FS_APPEND);
+	if (!adminLogHandle)
+	{
+		adminLogDisabled = qtrue;
+		G_Printf("*** ERROR: Couldn't open admin log \"%s\"\n\n", admin_log.string);
+	}
+	else
+	{
+		trap_RealTime(&localTime);
+		tmp = va("%02d %s %d (%02d:%02d:%02d)\t%s\n", localTime.tm_mday, monthName[localTime.tm_mon], localTime.tm_year + 1900, localTime.tm_hour, localTime.tm_min, localTime.tm_sec, text);
+		Q_strncpyz(textToWrite, tmp, MAX_STRING_CHARS);
+		trap_FS_Write(textToWrite, strlen(textToWrite), adminLogHandle);
+		trap_FS_FCloseFile(adminLogHandle);
+		if (g_dedicated.integer)
+		{
+			G_Printf("%s\n", textToWrite);
+		}
+	}
 }
 
 /*
@@ -706,6 +748,11 @@ void G_UpdateCvars(void)
 		if (cv->vmCvar)
 		{
 			trap_Cvar_Update(cv->vmCvar);
+
+			if (cv->vmCvar == &admin_log)
+			{
+				adminLogDisabled = qfalse;
+			}
 
 			if (cv->modificationCount != cv->vmCvar->modificationCount)
 			{
@@ -868,7 +915,6 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 		{
 			char    serverinfo[MAX_INFO_STRING];
 			qtime_t localTime;
-			static const char* monthName[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 			trap_GetServerinfo(serverinfo, sizeof(serverinfo));
 			G_LogPrintf("------------------------------------------------------------\n");
@@ -2524,3 +2570,6 @@ void G_RunFrame(int levelTime)
 		trap_Cvar_Set("g_listEntity", "0");
 	}
 }
+
+
+

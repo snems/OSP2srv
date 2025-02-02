@@ -334,8 +334,9 @@ struct gclient_s
 
 	char*        areabits;
 	char         tail1[344];
-	int          unknown1;
-	char         tail2[428];
+	int          isReferee;
+	int          unknown2;
+	char         tail2[424];
 };
 
 
@@ -643,6 +644,7 @@ void QDECL G_LogPrintf(const char* fmt, ...);
 void SendScoreboardMessageToAllClients(void);
 void QDECL G_Printf(const char* fmt, ...);
 void QDECL G_Error(const char* fmt, ...);
+void G_AdminLog(const char* text);
 
 //
 // g_client.c
@@ -1167,8 +1169,6 @@ int     trap_RealTime(qtime_t* qtime);
 void G_OSPAuth(const gentity_t* ent);
 void Cmd_Uinfo_f(const gentity_t* ent);
 void Cmd_ViewList_f(const gentity_t* ent);
-qboolean Cmd_Ref_f(const gentity_t* ent, int arg);
-void g_unk_369d2(const gentity_t* ent, int arg);
 void Cmd_PlayerList_f(const gentity_t* ent);
 void Cmd_PlayerList_f(const gentity_t* ent);
 void Cmd_GetStatsInfo_f(const gentity_t* ent);
@@ -1182,8 +1182,9 @@ void Cmd_ScoresDM_f(const gentity_t* ent, int arg);
 void Cmd_ScoresCTF_f(const gentity_t* ent, int arg);
 void Cmd_ScoresCA_f(const gentity_t* ent, int arg);
 void Cmd_ScoresFFA_f(const gentity_t* ent, int arg);
-qboolean g_unk_3660b(const gentity_t* ent, char* cmd, int arg);
-void Cmd_CallVote2_f(const gentity_t* ent, int arg);
-
+qboolean Cmd_CallVote2_f(const gentity_t* ent, int arg);
+void Cmd_RefHelp(const gentity_t* ent);
+qboolean Cmd_ControlCommands_f(const gentity_t* ent, const char *arg, qboolean unk);
+qboolean Cmd_RefCommandArg_f(const gentity_t* ent, const char *arg, qboolean unk);
 /*--------------------------------*/
 
