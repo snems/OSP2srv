@@ -35,7 +35,7 @@
 - [ ] `follownext`
 - [ ] `followprev`
 
-### Control commands
+### OSP commands
 
 - [ ] `lock`
 - [ ] `unlock`
@@ -93,6 +93,8 @@
 - [ ] `vc_view`
 - [ ] `drop`
 - [ ] `settings`
+- [X] `rhea/osp/dess/shod`
+- [X] `arqon`
 
 ### Referee commands
 

@@ -1,3 +1,5 @@
+#ifndef G_LOCAL_H
+#define G_LOCAL_H
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
@@ -320,23 +322,25 @@ struct gclient_s
 	gentity_t*   hook;              // grapple hook if out
 
 	int         switchTeamTime;     // time the player switched teams
+	qboolean    isFollowPowerUp;      // 
+	qboolean    isHaveView;            // 
 
 	// timeResidual is used to handle events that happen every second
 	// like health / armor countdowns and regeneration
 	int         timeResidual;
 
-#ifdef MISSIONPACK
-	gentity_t*   persistantPowerup;
-	int         portalID;
-	int         ammoTimes[WP_NUM_WEAPONS];
-	int         invulnerabilityTime;
-#endif
-
 	char*        areabits;
-	char         tail1[344];
+	int          tail1[52];
+	int          isVcInfoEnabled;
+	int          isVcFreeEnabled;
+	int          tail4[7];
+	int          isVcViewEnabled;
+	int          tail5[21];
 	int          isReferee;
 	int          unknown2;
-	char         tail2[424];
+	int          tail2[45];
+	qboolean     isViewDisabled;
+	int          tail3[60];
 };
 
 
@@ -1162,29 +1166,6 @@ int     trap_RealTime(qtime_t* qtime);
 
 /*--------debug stuff-------------*/
 #define OSP_UNK_CODE(MSG) G_Printf( "^1%s:%d: unknown code: %s\n", __FILE__, __LINE__, MSG)
-
-
-// UNIMPLEMENTED CODE
-//=============================================
-void G_OSPAuth(const gentity_t* ent);
-void Cmd_Uinfo_f(const gentity_t* ent);
-void Cmd_ViewList_f(const gentity_t* ent);
-void Cmd_PlayerList_f(const gentity_t* ent);
-void Cmd_PlayerList_f(const gentity_t* ent);
-void Cmd_GetStatsInfo_f(const gentity_t* ent);
-void Cmd_Stats_f(const gentity_t* ent, int arg);
-void Cmd_StatsAll_f(const gentity_t* ent, int arg);
-void Cmd_Acc_f(const gentity_t* ent, int arg);
-void Cmd_OSPAuth_f(const gentity_t* ent);
-void Cmd_AutoScreenshot_f(int arg1, int arg2, int arg3);
-void Cmd_ScoresFT_f(const gentity_t* ent, int arg);
-void Cmd_ScoresDM_f(const gentity_t* ent, int arg);
-void Cmd_ScoresCTF_f(const gentity_t* ent, int arg);
-void Cmd_ScoresCA_f(const gentity_t* ent, int arg);
-void Cmd_ScoresFFA_f(const gentity_t* ent, int arg);
-qboolean Cmd_CallVote2_f(const gentity_t* ent, int arg);
-void Cmd_RefHelp(const gentity_t* ent);
-qboolean Cmd_ControlCommands_f(const gentity_t* ent, const char *arg, qboolean unk);
-qboolean Cmd_RefCommandArg_f(const gentity_t* ent, const char *arg, qboolean unk);
 /*--------------------------------*/
 
+#endif

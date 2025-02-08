@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 #include "g_local.h"
+#include "g_unimplemented.h"
 
 #include "../../ui/menudef.h"           // for the voice chats
                                         //
@@ -72,7 +73,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define CMDHELP_0   0
 #define CMDHELP_1   1
-#define CMDHELP_2   2
+#define CMDHELP_SPECONLY   2
 #define CMDHELP_3   3
 #define CMDHELP_4   4
 #define CMDHELP_5   5
@@ -80,32 +81,38 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CMDHELP_7   7
 #define CMDHELP_8   8
 #define CMDHELP_9   9
-#define CMDHELP_10  10
-#define CMDHELP_11  11
-#define CMDHELP_12  12
-#define CMDHELP_13  13
-#define CMDHELP_14  14
-#define CMDHELP_15  15
-#define CMDHELP_16  16
-#define CMDHELP_17  17
-#define CMDHELP_18  18
-#define CMDHELP_19  19
-#define CMDHELP_20  20
-#define CMDHELP_21  21
+#define CMDHELP_10  10 //0a
+#define CMDHELP_11  11 //0b
+#define CMDHELP_12  12 //0c
+#define CMDHELP_13  13 //0d
+#define CMDHELP_14  14 //0e
+#define CMDHELP_15  15 //0f
+#define CMDHELP_16  16 //10
+#define CMDHELP_17  17 //11
+#define CMDHELP_18  18 //12
+#define CMDHELP_19  19 //13
+#define CMDHELP_20  20 //14
+#define CMDHELP_AUTORECORD  21
 #define CMDHELP_AUTOSCREENSHOT  22
-#define CMDHELP_23  23
-#define CMDHELP_REF  24
-#define CMDHELP_25  25
-#define CMDHELP_26  26
-#define CMDHELP_27  27
-#define CMDHELP_28  28
-#define CMDHELP_29  29
-#define CMDHELP_30  30
-#define CMDHELP_TEAM  37
-#define CMDHELP_FOLLOW  38
-#define CMDHELP_39  39
-#define CMDHELP_CALLVOTE  40
-#define CMDHELP_41  41
+#define CMDHELP_23  23 //17
+#define CMDHELP_REF  24 //18
+#define CMDHELP_VIEWCAM  25 //19
+#define CMDHELP_VCFOLLOW  26 //1a
+#define CMDHELP_VCFREE  27 //1b
+#define CMDHELP_VCVIEW  28 //1c
+#define CMDHELP_VIEWADD  29 //1d
+#define CMDHELP_VIEWALL  30 //1e
+#define CMDHELP_VIEWREMOVE  31 //1f
+#define CMDHELP_VIEWNONE  32 //20
+#define CMDHELP_VIEWNEXT  33 //21
+#define CMDHELP_VIEWCYCLENEXT  34 //22
+#define CMDHELP_VIEWFOLLOW  35 //23
+#define CMDHELP_VIEWTEAM  36 //24
+#define CMDHELP_TEAM  37 //25
+#define CMDHELP_FOLLOW  38 //26
+#define CMDHELP_39  39 //27
+#define CMDHELP_CALLVOTE  40 //28
+#define CMDHELP_MOST  41 //29
 
 /*
 ==================
@@ -1939,15 +1946,334 @@ static qboolean Cmd_Help_f(const gentity_t* ent, int cmdNumber)
 Cmd_RefCommand_f
 =================
 */
-static void Cmd_RefCommand_f(const gentity_t* ent, qboolean skipSomething)
+static qboolean Cmd_OSPCommands_f (const gentity_t* ent, char* arg, qboolean isReferee) 
+{
+	if (g_gametype.integer >= GT_TEAM)
+	{
+		if (!Q_stricmp(arg, "lock") || !Q_stricmp(arg, "unlock"))
+		{
+			Cmd_Lock_f(ent, arg);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "lock") || !Q_stricmp(arg, "unlock"))
+		{
+			Cmd_SpecLock_f(ent, arg);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "teamready") || !Q_stricmp(arg, "readyteam"))
+		{
+			Cmd_TeamReady_f(ent);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "invite") || !Q_stricmp(arg, "pickplayer"))
+		{
+			Cmd_Invite_f(ent);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "specinvite") || !Q_stricmp(arg, "invitespec"))
+		{
+			Cmd_SpecInvite_f(ent);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "remove") || !Q_stricmp(arg, "kickplayer"))
+		{
+			Cmd_Remove_f(ent);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "capitans"))
+		{
+			Cmd_Capitans_f(ent);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "resign"))
+		{
+			Cmd_Resign_f(ent);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "joincode"))
+		{
+			Cmd_JoinCode_f(ent);
+			return qtrue;
+		}
+	}
+
+	if (g_gametype.integer != GT_SINGLE_PLAYER)
+	{
+		if (!Q_stricmp(arg, "ready"))
+		{
+			Cmd_Ready_f(ent, qtrue);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "notready") || !Q_stricmp(arg, "unready"))
+		{
+			Cmd_Ready_f(ent, qfalse);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "time") || !Q_stricmp(arg, "pause") || !Q_stricmp(arg, "timeout"))
+		{
+			Cmd_Pause_f(ent, qtrue);
+			return qtrue;
+		}
+		else if (!Q_stricmp(arg, "timein") || !Q_stricmp(arg, "unpause"))
+		{
+			Cmd_Pause_f(ent, qfalse);
+			return qtrue;
+		}
+	}
+
+	if (!Q_stricmp(arg, "help") || !Q_stricmp(arg, "commands") || !Q_stricmp(arg, "?"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_MOST))
+		{
+			Cmd_HelpAvailOspGameCommands_f(ent);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "followpowerup"))
+	{
+		ent->client->isFollowPowerUp = !ent->client->isFollowPowerUp;
+		trap_SendServerCommand(ent - g_entities, va("print \"\nAuto-follow of powerup pickups is: ^3%s\n\n\"", ent->client->isFollowPowerUp ? "ENABLED" : "DISABLED"));
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "speconly"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_SPECONLY))
+		{
+			Cmd_SpecOnly_f(ent);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "autorecord"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_AUTORECORD))
+		{
+			Cmd_AutoScreenshot_f(ent - g_entities, qtrue, qtrue);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "maplist"))
+	{
+		Cmd_MapList_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "mapload"))
+	{
+		Cmd_MapLoad_f(qtrue);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "range"))
+	{
+		Cmd_Range_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "snapshot"))
+	{
+		Cmd_Snapshot_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "snapshotdump"))
+	{
+		Cmd_SnapshotDump_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewadd"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWADD))
+		{
+			Cmd_ViewAdd_f(ent);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewall"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWALL) && !ent->client->isViewDisabled)
+		{
+			Cmd_ViewAll_f(ent);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewremove"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWREMOVE) && !ent->client->isViewDisabled)
+		{
+			Cmd_ViewerMove_f(ent);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewfollow"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWFOLLOW))
+		{
+			Cmd_ViewFollow(ent);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewnone"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWNONE) && !ent->client->isViewDisabled)
+		{
+			Cmd_ViewNone_f(ent);
+			ent->client->isHaveView = qfalse;
+			ClientUserinfoChanged(ent - g_entities);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewframe"))
+	{
+		Cmd_ViewFrame_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewnext"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWNEXT))
+		{
+			Cmd_ViewNext_f(ent, 1);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewprev"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWNEXT))
+		{
+			Cmd_ViewNext_f(ent, -1);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewcyclenext"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWCYCLENEXT))
+		{
+			Cmd_ViewCycleNext_f(ent, 1);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewcycleprev"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWCYCLENEXT))
+		{
+			Cmd_ViewCycleNext_f(ent, -1);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewred"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWTEAM))
+		{
+			Cmd_ViewTeam_f(ent, 0, 0);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewblue"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWTEAM))
+		{
+			Cmd_ViewTeam_f(ent, 2, 1);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "coach"))
+	{
+		Cmd_Coach_f(ent, qtrue);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "coachinvite"))
+	{
+		Cmd_CoachInvite_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "coachdecline"))
+	{
+		Cmd_CoachDecline_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "coachkick"))
+	{
+		Cmd_CoachKick_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "vc_proximity"))
+	{
+		Cmd_VcProximity_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "vc_info"))
+	{
+		ent->client->isVcInfoEnabled = !ent->client->isVcInfoEnabled;
+		trap_SendServerCommand(ent - g_entities, va("print \"ViewCam info is ^5%s\n\"", ent->client->isVcInfoEnabled ? "ENABLED" : "DISABLED"));
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "vc_follw"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VCFOLLOW))
+		{
+			Cmd_ViewTeam_f(ent, 0, 0);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "vc_free"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VCFREE))
+		{
+		  ent->client->isVcFreeEnabled = !ent->client->isVcFreeEnabled;
+		  trap_SendServerCommand(ent - g_entities, va("print \"ViewCam is now ^5%s\n\"", ent->client->isVcFreeEnabled ? "ENABLED" : "DISABLED"));
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "vc_view"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VCVIEW))
+		{
+		  ent->client->isVcViewEnabled = !ent->client->isVcViewEnabled;
+		  trap_SendServerCommand(ent - g_entities, va("print \"ViewCam is now ^5%s\n\"", ent->client->isVcViewEnabled ? "ENABLED" : "DISABLED"));
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "drop"))
+	{
+		Cmd_Drop_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "viewcam"))
+	{
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWCAM))
+		{
+			Cmd_ViewCam_f(ent);
+		}
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "settings"))
+	{
+		Cmd_Settings_f(ent);
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "rhea") || !Q_stricmp(arg, "osp")  || !Q_stricmp(arg, "dess") || !Q_stricmp(arg, "shod"))
+	{
+	  trap_SendServerCommand(ent - g_entities, va("print \"OSP2 Tourney DM for Quake3!\n\""));
+	  trap_SendServerCommand(ent - g_entities, "print \"^5https://github.com/snems/osp2^7\n\n\"");
+		return qtrue;
+	}
+	else if (!Q_stricmp(arg, "arqon"))
+	{
+		trap_SendServerCommand(ent - g_entities, "print \"\n^3 OSP2 > OSP > CPMA !!!\n\n\"");
+		return qtrue;
+	}
+
+	return qfalse;
+}
+/*
+=================
+Cmd_RefCommand_f
+=================
+*/
+static void Cmd_RefCommand_f(const gentity_t* ent, qboolean skipOSPCommands)
 {
 	char text[MAX_STRING_CHARS];
 	if (ent->client->isReferee)
 	{
-		if (!skipSomething)
+		if (!skipOSPCommands)
 		{
 			trap_Argv(1, &text[0], MAX_STRING_CHARS);
-			if (Cmd_ControlCommands_f(ent, &text[0], 1) && Cmd_RefCommandArg_f(ent, &text[0], 1) && !Cmd_CallVote2_f(ent, 1))
+			if (Cmd_OSPCommands_f(ent, &text[0], qtrue) && Cmd_RefCommandArg_f(ent, &text[0], 1) && !Cmd_CallVote2_f(ent, 1))
 			{
 				Cmd_RefHelp(ent);
 			}
@@ -1997,6 +2323,7 @@ void ClientCommand(int clientNum)
 	gentity_t* ent;
 	char    cmd[MAX_TOKEN_CHARS];
 
+
 	ent = g_entities + clientNum;
 	if (!ent->client)
 	{
@@ -2028,7 +2355,7 @@ void ClientCommand(int clientNum)
 	}
 	else if (Q_stricmp(cmd, "team") == 0)
 	{
-		if (Cmd_Help_f(ent, CMDHELP_TEAM) == 0)
+		if (!Cmd_Help_f(ent, CMDHELP_TEAM))
 		{
 			Cmd_Team_f(ent);
 		}
@@ -2194,7 +2521,7 @@ void ClientCommand(int clientNum)
 	{
 		Cmd_GameCommand_f(ent);
 	}
-	else
+	else if (!Cmd_OSPCommands_f(ent, cmd, qfalse))
 	{
 		trap_SendServerCommand(clientNum, va("print \"Unknown command: ^5%s^7\nType ^3\\help^7 for a list of all commands.\n\"", &cmd[0]));
 	}
