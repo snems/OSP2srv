@@ -2311,6 +2311,56 @@ static void Cmd_RefCommand_f(const gentity_t* ent, qboolean skipOSPCommands)
 	}
 }
 
+/*
+=================
+Cmd_Uinfo_f
+
+There is eight values:
+
+- cl_maxpackets.integer
+- snaps.integer
+- cl_timenudge.integer
+- customLocationsEnabled
+- flags (follow mode)
+- cg_autoAction.integer
+- using_jpeg
+
+=================
+*/
+void Cmd_Uinfo_f (gentity_t* ent) 
+{
+	char buf[MAX_STRING_CHARS];
+	int ui_flags;
+
+	if (trap_Argc() < 8)
+	{
+		return;
+	}
+
+	trap_Argv(1, buf, MAX_STRING_CHARS);
+	ent->client->maxPackets = atoi(buf);
+
+	trap_Argv(2, buf, MAX_STRING_CHARS);
+	ent->client->snaps = atoi(buf);
+
+	trap_Argv(3, buf, MAX_STRING_CHARS);
+	ent->client->timeNudge = atoi(buf);
+
+	trap_Argv(4, buf, MAX_STRING_CHARS);
+	ent->client->customLoc = atoi(buf);
+
+	trap_Argv(5, buf, MAX_STRING_CHARS);
+	ui_flags = atoi(buf);
+	ent->client->followPowerup = ui_flags & 1;
+	ent->client->followKiller = ui_flags & 2;
+	ent->client->followViewCam = ui_flags & 4;
+
+	trap_Argv(6, buf, MAX_STRING_CHARS);
+	ent->client->autoAction = atoi(buf);
+
+	trap_Argv(7, buf, MAX_STRING_CHARS);
+	ent->client->usingJPEG = atoi(buf);
+}
 
 /*
 =================

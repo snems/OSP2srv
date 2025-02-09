@@ -2,7 +2,6 @@
 
 
 void G_OSPAuth(const gentity_t* ent);
-void Cmd_Uinfo_f(const gentity_t* ent);
 void Cmd_ViewList_f(const gentity_t* ent);
 void Cmd_PlayerList_f(const gentity_t* ent);
 void Cmd_GetStatsInfo_f(const gentity_t* ent);

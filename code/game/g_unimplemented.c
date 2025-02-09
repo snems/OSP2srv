@@ -9,12 +9,6 @@ void G_OSPAuth(const gentity_t* ent)
 }
 
 
-void Cmd_Uinfo_f(const gentity_t* ent)
-{
-  OSP2_UNIMPLEMENTED_FUNCTION(Cmd_Uinfo_f);
-}
-
-
 void Cmd_ViewList_f(const gentity_t* ent)
 {
   OSP2_UNIMPLEMENTED_FUNCTION(Cmd_ViewList_f);

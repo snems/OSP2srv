@@ -330,7 +330,16 @@ struct gclient_s
 	int         timeResidual;
 
 	char*        areabits;
-	int          tail1[52];
+  int          tail1[43];
+  int          maxPackets;
+  int          snaps;
+  int          timeNudge;
+  int          customLoc;
+  qboolean     followPowerup;
+  qboolean     followKiller;
+  qboolean     followViewCam;
+  int          autoAction;
+  qboolean     usingJPEG;
 	int          isVcInfoEnabled;
 	int          isVcFreeEnabled;
 	int          tail4[7];

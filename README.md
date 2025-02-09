@@ -11,7 +11,7 @@
 
 ### CLIENT
 
-- [ ] `uinfo`
+- [X] `uinfo`
 - [ ] `uvinfo`
 - [X] `ref/admin/referee`
 - [ ] `players`
