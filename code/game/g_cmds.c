@@ -24,52 +24,52 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "g_unimplemented.h"
 
 #include "../../ui/menudef.h"           // for the voice chats
-                                        //
-	static const char* cmdHelp[] = 
-	{
-      ":^7 Locks/unlocks a player's team"
-    , ":^7 Locks/unlocks a player's team from spectators"
-    , ":^7 Toggles option to stay as a spectator in 1v1"
-    , ":^7 Sets your status to ^5ready^7 to start a match"
-    , ":^7 Lists all active players and their IDs/information"
-    , " <player_ID>:^7 Invites a player to join a team"
-    , ":^7 Invites a player to spectate a spec-locked team"
-    , " <player_ID>:^7 Invites a player to coach team"
-    , ":^7 Declines coach invitation or resigns coach status"
-    , " <player_ID>:^7 Kicks active coach from team"
-    , ":^7 Accepts coach invitation/restarts coach view"
-    , " <player_ID>:^7 Removes a player from the team"
-    , " [player_ID]:^7 Resigns captainship.  Can optionally be given to another teammate"
-    , ":^7 Sets an entire team's status to ^5ready^7 to start a match"
-    , ":^7 Shows team captains"
-    , ":^7 Pause the match or issue a team timeout/timein"
-    , " [player_ID]:^7 Shows weapon accuracy stats for a player"
-    , " [player_ID]:^7 Shows player stats + match info saved locally to a file"
-    , " [password]:^7 Shows/sets team joincode or used to join a locked team"
-    , " <item>:^7 Drops available weapon/ammo/flag"
-    , ":^7 Shows BEST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon"
-    , ":^7 Creates a demo with a consistant naming scheme (OSP clients only)"
-    , ":^7 Creates a screenshot with a consistant naming scheme (OSP clients only)"
-    , ":^7 Shows WORST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon"
-    , " <password>:^7 Become a referee (admin access)"
-    , ":^7 Switches to cinematic camera mode"
-    , " [player_ID]:^7 Puts viewcam in follow mode.  Can optionally to follow a specific player"
-    , ":^7 Toggle viewcam between manual/automatic change"
-    , ":^7 Toggle ViewCam between static/dynamic views"
-    , " <player_ID>:^7 Adds a player to multi-screen view"
-    , ":^7 Adds all active players to a multi-screen view"
-    , " [player_ID]:^7 Removes current selected or specific player from multi-screen view"
-    , ":^7 Disables multiview mode and goes back to spectator mode"
-    , ":^7 Moves through active screen in a multi-screen display"
-    , ":^7 Cycles through players in current view"
-    , ":^7 Follows current highlighted view"
-    , ": ^7 Views entire red/blue team"
-    , " <r|b|s|none>:^7 Chooses a team or shows current team (s = spectator mode)"
-    , " <player_ID|red|blue>:^7 Spectates a particular player or team"
-    , ":^7 Sets player's status to ^5not ready^7 to start a match"
-    , " <params>:^7 Calls a vote"
-    , ":^7 Gives a list of most OSP commands"
-	};
+//
+static const char* cmdHelp[] =
+{
+	":^7 Locks/unlocks a player's team"
+	, ":^7 Locks/unlocks a player's team from spectators"
+	, ":^7 Toggles option to stay as a spectator in 1v1"
+	, ":^7 Sets your status to ^5ready^7 to start a match"
+	, ":^7 Lists all active players and their IDs/information"
+	, " <player_ID>:^7 Invites a player to join a team"
+	, ":^7 Invites a player to spectate a spec-locked team"
+	, " <player_ID>:^7 Invites a player to coach team"
+	, ":^7 Declines coach invitation or resigns coach status"
+	, " <player_ID>:^7 Kicks active coach from team"
+	, ":^7 Accepts coach invitation/restarts coach view"
+	, " <player_ID>:^7 Removes a player from the team"
+	, " [player_ID]:^7 Resigns captainship.  Can optionally be given to another teammate"
+	, ":^7 Sets an entire team's status to ^5ready^7 to start a match"
+	, ":^7 Shows team captains"
+	, ":^7 Pause the match or issue a team timeout/timein"
+	, " [player_ID]:^7 Shows weapon accuracy stats for a player"
+	, " [player_ID]:^7 Shows player stats + match info saved locally to a file"
+	, " [password]:^7 Shows/sets team joincode or used to join a locked team"
+	, " <item>:^7 Drops available weapon/ammo/flag"
+	, ":^7 Shows BEST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon"
+	, ":^7 Creates a demo with a consistant naming scheme (OSP clients only)"
+	, ":^7 Creates a screenshot with a consistant naming scheme (OSP clients only)"
+	, ":^7 Shows WORST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon"
+	, " <password>:^7 Become a referee (admin access)"
+	, ":^7 Switches to cinematic camera mode"
+	, " [player_ID]:^7 Puts viewcam in follow mode.  Can optionally to follow a specific player"
+	, ":^7 Toggle viewcam between manual/automatic change"
+	, ":^7 Toggle ViewCam between static/dynamic views"
+	, " <player_ID>:^7 Adds a player to multi-screen view"
+	, ":^7 Adds all active players to a multi-screen view"
+	, " [player_ID]:^7 Removes current selected or specific player from multi-screen view"
+	, ":^7 Disables multiview mode and goes back to spectator mode"
+	, ":^7 Moves through active screen in a multi-screen display"
+	, ":^7 Cycles through players in current view"
+	, ":^7 Follows current highlighted view"
+	, ": ^7 Views entire red/blue team"
+	, " <r|b|s|none>:^7 Chooses a team or shows current team (s = spectator mode)"
+	, " <player_ID|red|blue>:^7 Spectates a particular player or team"
+	, ":^7 Sets player's status to ^5not ready^7 to start a match"
+	, " <params>:^7 Calls a vote"
+	, ":^7 Gives a list of most OSP commands"
+};
 
 #define CMDHELP_0   0
 #define CMDHELP_1   1
@@ -1943,10 +1943,99 @@ static qboolean Cmd_Help_f(const gentity_t* ent, int cmdNumber)
 
 /*
 =================
+Cmd_HelpAvailOspGameCommands_f
+=================
+\help
+^5
+Available OSP Game-Commands:
+----------------------------
+^3autorecord       invite           specinvite       vc_free
+^3autoscreenshot   joincode         speclock         vc_view
+^3bottomshots      lock/unlock      speconly         viewcam
+^3callvote         menu             specunlock       viewadd
+^3captains         ready            stats            viewblue
+^3coach            notready         statsall         viewred
+^3coachdecline     players          statsblue        viewfollow
+^3coachinvite      readyteam        statsdump        viewnext
+^3coachkick        ref/admin        statsred         viewnone
+^3credits          remove           time/pause       viewprev
+^3currenttime      resign           timein/unpause   viewremove
+^3drop             scores           topshots         viewcyclenext
+^3help/commands    settings         vc_follow        viewcycleprev
+
+Type: ^3\command_name ?^7 for more information
+
+^6OSP Tourney DM for Quake3 v(1.03a)
+^5http://www.OrangeSmoothie.org/^7
+*/
+
+static void Cmd_HelpAvailOspGameCommands_f(const gentity_t* ent)
+{
+	static const char* availOspGameCommands[] =
+	{
+		"autorecord", "autoscreenshot", "bottomshots", "callvote",
+		"captains", "coach", "coachdecline", "coachinvite",
+		"coachkick", "credits", "currenttime", "drop",
+		"help/commands", "invite", "joincode", "lock/unlock",
+		"menu", "ready", "notready", "players",
+		"readyteam", "ref/admin", "remove", "resign",
+		"scores", "settings", "specinvite", "speclock",
+		"speconly", "specunlock", "stats", "statsall",
+		"statsblue", "statsdump", "statsred", "time/pause",
+		"timein/unpause", "topshots", "vc_follow", "vc_free",
+		"vc_view", "viewcam", "viewadd", "viewblue",
+		"viewred", "viewfollow", "viewnext", "viewnone",
+		"viewprev", "viewremove", "viewcyclenext", "viewcycleprev",
+	};
+
+	static const int numberOfCommands = sizeof(availOspGameCommands) / sizeof(char*);
+	static const int numberOfColums = 4;
+	const int numberOfRows = (numberOfCommands / 4) + ((numberOfCommands % 4) ? 1 : 0);
+	int i = 0;
+	const char* c1;
+	const char* c2;
+	const char* c3;
+	const char* c4;
+
+	trap_SendServerCommand(ent - g_entities, "print \"^5\nAvailable OSP Game-Commands:\n----------------------------\n\"");
+
+	while (i < numberOfRows)
+	{
+		c1 = availOspGameCommands[i];
+		c2 = (i + numberOfRows < numberOfCommands) ? availOspGameCommands[i + numberOfRows] : "";
+		c3 = (i + numberOfRows * 2 < numberOfCommands) ? availOspGameCommands[i + numberOfRows * 2] : "";
+		c4 = (i + numberOfRows * 3 < numberOfCommands) ? availOspGameCommands[i + numberOfRows * 3] : "";
+
+		trap_SendServerCommand(ent - g_entities, va("print \"^3%-17s%-17s%-17s%-17s\n\"", c1, c2, c3, c4));
+		++i;
+	}
+
+	trap_SendServerCommand(ent - g_entities, "print \"\nType: ^3\ncommand_name ?^7 for more information\n\"");
+	trap_SendServerCommand(ent - g_entities, va("print \"\n^6OSP Tourney DM for Quake3 %s\n\"", OSP_VERSION_STR));
+	trap_SendServerCommand(ent - g_entities, "print \"^5http://www.OrangeSmoothie.org/^7\n\n\"");
+
+
+	if (level.serverMode & 1)
+	{
+		trap_SendServerCommand(ent - g_entities, "print \"^3ProMode^7 settings provided by:\n\"");
+		trap_SendServerCommand(ent - g_entities, "print \"Challenge ProMode - http://www.promode.org\n\"");
+	}
+	else
+	{
+		if (level.serverMode & 2)
+		{
+			trap_SendServerCommand(ent - g_entities, "print \"^3CQ3^7 settings provided by:\n\"");
+			trap_SendServerCommand(ent - g_entities, "print \"Challenge Q3 - http://www.promode.org\n\"");
+		}
+	}
+}
+
+/*
+=================
 Cmd_RefCommand_f
 =================
 */
-static qboolean Cmd_OSPCommands_f (const gentity_t* ent, char* arg, qboolean isReferee) 
+static qboolean Cmd_OSPCommands_f(const gentity_t* ent, char* arg, qboolean isReferee)
 {
 	if (g_gametype.integer >= GT_TEAM)
 	{
@@ -2214,8 +2303,8 @@ static qboolean Cmd_OSPCommands_f (const gentity_t* ent, char* arg, qboolean isR
 	{
 		if (!Cmd_Help_f(ent, CMDHELP_VCFREE))
 		{
-		  ent->client->isVcFreeEnabled = !ent->client->isVcFreeEnabled;
-		  trap_SendServerCommand(ent - g_entities, va("print \"ViewCam is now ^5%s\n\"", ent->client->isVcFreeEnabled ? "ENABLED" : "DISABLED"));
+			ent->client->isVcFreeEnabled = !ent->client->isVcFreeEnabled;
+			trap_SendServerCommand(ent - g_entities, va("print \"ViewCam is now ^5%s\n\"", ent->client->isVcFreeEnabled ? "ENABLED" : "DISABLED"));
 		}
 		return qtrue;
 	}
@@ -2223,8 +2312,8 @@ static qboolean Cmd_OSPCommands_f (const gentity_t* ent, char* arg, qboolean isR
 	{
 		if (!Cmd_Help_f(ent, CMDHELP_VCVIEW))
 		{
-		  ent->client->isVcViewEnabled = !ent->client->isVcViewEnabled;
-		  trap_SendServerCommand(ent - g_entities, va("print \"ViewCam is now ^5%s\n\"", ent->client->isVcViewEnabled ? "ENABLED" : "DISABLED"));
+			ent->client->isVcViewEnabled = !ent->client->isVcViewEnabled;
+			trap_SendServerCommand(ent - g_entities, va("print \"ViewCam is now ^5%s\n\"", ent->client->isVcViewEnabled ? "ENABLED" : "DISABLED"));
 		}
 		return qtrue;
 	}
@@ -2248,8 +2337,8 @@ static qboolean Cmd_OSPCommands_f (const gentity_t* ent, char* arg, qboolean isR
 	}
 	else if (!Q_stricmp(arg, "rhea") || !Q_stricmp(arg, "osp")  || !Q_stricmp(arg, "dess") || !Q_stricmp(arg, "shod"))
 	{
-	  trap_SendServerCommand(ent - g_entities, va("print \"OSP2 Tourney DM for Quake3!\n\""));
-	  trap_SendServerCommand(ent - g_entities, "print \"^5https://github.com/snems/osp2^7\n\n\"");
+		trap_SendServerCommand(ent - g_entities, va("print \"OSP2 Tourney DM for Quake3!\n\""));
+		trap_SendServerCommand(ent - g_entities, "print \"^5https://github.com/snems/osp2^7\n\n\"");
 		return qtrue;
 	}
 	else if (!Q_stricmp(arg, "arqon"))
@@ -2327,7 +2416,7 @@ There is eight values:
 
 =================
 */
-void Cmd_Uinfo_f (gentity_t* ent) 
+void Cmd_Uinfo_f(gentity_t* ent)
 {
 	char buf[MAX_STRING_CHARS];
 	int ui_flags;

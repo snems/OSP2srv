@@ -322,24 +322,24 @@ struct gclient_s
 	gentity_t*   hook;              // grapple hook if out
 
 	int         switchTeamTime;     // time the player switched teams
-	qboolean    isFollowPowerUp;      // 
-	qboolean    isHaveView;            // 
+	qboolean    isFollowPowerUp;      //
+	qboolean    isHaveView;            //
 
 	// timeResidual is used to handle events that happen every second
 	// like health / armor countdowns and regeneration
 	int         timeResidual;
 
 	char*        areabits;
-  int          tail1[43];
-  int          maxPackets;
-  int          snaps;
-  int          timeNudge;
-  int          customLoc;
-  qboolean     followPowerup;
-  qboolean     followKiller;
-  qboolean     followViewCam;
-  int          autoAction;
-  qboolean     usingJPEG;
+	int          tail1[43];
+	int          maxPackets;
+	int          snaps;
+	int          timeNudge;
+	int          customLoc;
+	qboolean     followPowerup;
+	qboolean     followKiller;
+	qboolean     followViewCam;
+	int          autoAction;
+	qboolean     usingJPEG;
 	int          isVcInfoEnabled;
 	int          isVcFreeEnabled;
 	int          tail4[7];
@@ -438,8 +438,13 @@ typedef struct
 	gentity_t*   locationHead;          // head of the location list
 	int         bodyQueIndex;           // dead bodies
 	gentity_t*   bodyQue[BODY_QUEUE_SIZE];
+	int tail1[1157];
 	int osp_levelTime;
+	int tail2[8];
 	int unknown_flag1;
+	int tail3[3];
+	int serverMode;
+	int tail4[4];
 	int unknown1;
 	int unknown2;
 	int unknown3;
@@ -1173,6 +1178,7 @@ void    trap_SnapVector(float* v);
 
 int     trap_RealTime(qtime_t* qtime);
 
+#define OSP_VERSION_STR "v(1.03a)"
 /*--------debug stuff-------------*/
 #define OSP_UNK_CODE(MSG) G_Printf( "^1%s:%d: unknown code: %s\n", __FILE__, __LINE__, MSG)
 /*--------------------------------*/
