@@ -15,12 +15,6 @@ void Cmd_ViewList_f(const gentity_t* ent)
 }
 
 
-void Cmd_PlayerList_f(const gentity_t* ent)
-{
-	OSP2_UNIMPLEMENTED_FUNCTION(Cmd_PlayerList_f);
-}
-
-
 void Cmd_GetStatsInfo_f(const gentity_t* ent)
 {
 	OSP2_UNIMPLEMENTED_FUNCTION(Cmd_GetStatsInfo_f);

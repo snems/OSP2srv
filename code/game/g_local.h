@@ -330,7 +330,9 @@ struct gclient_s
 	int         timeResidual;
 
 	char*        areabits;
-	int          tail1[43];
+	int          tail1[19];
+	int          playerReady;
+	int          tail1_1[2];
 	int          maxPackets;
 	int          snaps;
 	int          timeNudge;
@@ -344,7 +346,9 @@ struct gclient_s
 	int          isVcFreeEnabled;
 	int          tail4[7];
 	int          isVcViewEnabled;
-	int          tail5[21];
+	int          tail5[3];
+	team_t       team;
+	int          tail6[17];
 	int          isReferee;
 	int          unknown2;
 	int          tail2[45];

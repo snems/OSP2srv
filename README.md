@@ -14,8 +14,7 @@
 - [X] `uinfo`
 - [ ] `uvinfo`
 - [X] `ref/admin/referee`
-- [ ] `players`
-- [ ] `playerlist`
+- [X] `players/playerlist`
 - [ ] `getstatsinfo`
 - [ ] `stats`
 - [ ] `stat`

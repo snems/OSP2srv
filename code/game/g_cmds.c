@@ -75,7 +75,7 @@ static const char* cmdHelp[] =
 #define CMDHELP_1   1
 #define CMDHELP_SPECONLY   2
 #define CMDHELP_3   3
-#define CMDHELP_4   4
+#define CMDHELP_PLAYER_LIST 4
 #define CMDHELP_5   5
 #define CMDHELP_6   6
 #define CMDHELP_7   7
@@ -263,24 +263,66 @@ SanitizeString
 Remove case and control characters
 ==================
 */
-void SanitizeString(char* in, char* out)
+static void SanitizeString(const char* in, char* out, qboolean toLower)
 {
+	char tmp;
 	while (*in)
 	{
-		if (*in == 27)
+		tmp = *in;                                                          /* Address : 0x1ea57 Type : Interium */
+		if (tmp == 27 || tmp == Q_COLOR_ESCAPE)
 		{
-			in += 2;        // skip color code
-			continue;
+			tmp = *(++in);
+			if (tmp == 'x' || tmp == 'X')
+			{
+				tmp = *(in + 1);
+				if ((tmp >= '0' && tmp <= '9') || (tmp >= 'A' && tmp <= 'F') || (tmp >= 'a' && tmp <= 'f'))
+				{
+					tmp = *(in + 2);
+					if ((tmp >= '0' && tmp <= '9') || (tmp >= 'A' && tmp <= 'F') || (tmp >= 'a' && tmp <= 'f'))
+					{
+						tmp = *(in + 3);
+						if ((tmp >= '0' && tmp <= '9') || (tmp >= 'A' && tmp <= 'F') || (tmp >= 'a' && tmp <= 'f'))
+						{
+							tmp = *(in + 4);
+							if ((tmp >= '0' && tmp <= '9') || (tmp >= 'A' && tmp <= 'F') || (tmp >= 'a' && tmp <= 'f'))
+							{
+								tmp = *(in + 5);
+								if ((tmp >= '0' && tmp <= '9') || (tmp >= 'A' && tmp <= 'F') || (tmp >= 'a' && tmp <= 'f'))
+								{
+									tmp = *(in + 6);
+									if ((tmp >= '0' && tmp <= '9') || (tmp >= 'A' && tmp <= 'F') || (tmp >= 'a' && tmp <= 'f'))
+									{
+										in = in + 7;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else if (*in)
+			{
+				++in;
+			}
 		}
-		if (*in < 32)
+		else if (*in < ' ')
 		{
-			in++;
-			continue;
+			++in;
 		}
-		*out++ = tolower(*in++);
+		else
+		{
+			if (toLower)
+			{
+				*(out++) = tolower(*(in++));
+			}
+			else
+			{
+				*(out++) = *(in++);
+			}
+		}
 	}
 
-	*out = 0;
+	*out = 0;                                                                   /* Address : 0x1ec27 Type : Interium */
 }
 
 /*
@@ -318,14 +360,14 @@ int ClientNumberFromString(gentity_t* to, char* s)
 	}
 
 	// check for a name match
-	SanitizeString(s, s2);
+	SanitizeString(s, s2, qtrue);
 	for (idnum = 0, cl = level.clients ; idnum < level.maxclients ; idnum++, cl++)
 	{
 		if (cl->pers.connected != CON_CONNECTED)
 		{
 			continue;
 		}
-		SanitizeString(cl->pers.netname, n2);
+		SanitizeString(cl->pers.netname, n2, qtrue);
 		if (!strcmp(n2, s2))
 		{
 			return idnum;
@@ -2449,6 +2491,249 @@ void Cmd_Uinfo_f(gentity_t* ent)
 
 	trap_Argv(7, buf, MAX_STRING_CHARS);
 	ent->client->usingJPEG = atoi(buf);
+}
+
+/*
+=================
+Cmd_PlayerList_f
+=================
+]\players
+
+^3Status^1   : ^3ID^1 : ^3Player                    Nudge  Rate  MaxPkts  Snaps
+^1---------------------------------------------------------------------^7
+^3(READY)^1  :^1R^7 5 ^1:^7 Grunt                     ^7[BOT] -----       --     --  ^3
+^3(READY)^1  :^4B^7 1 ^1:^7 Grunt                     ^7[BOT] -----       --     --  ^3
+^3(READY)^1  :^1R^7 6 ^1:^7 Major                     ^7[BOT] -----       --     --  ^3
+^3(READY)^1  :^4B^7 2 ^1:^7 Major                     ^7[BOT] -----       --     --  ^3
+^3(READY)^1  :^1R^7 4 ^1:^7 Sarge                     ^7[BOT] -----       --     --  ^3
+^3(READY)^1  :^1R^7 7 ^1:^7 Visor                     ^7[BOT] -----       --     --  ^3
+^3(READY)^1  :^4B^7 3 ^1:^7 Visor                     ^7[BOT] -----       --     --  ^3
+NOTREADY^1 :^4B^7 0 ^1:^7 snems                     ^7    0 25000      125     40  ^3
+
+^3 8^7 total players
+
+]quit
+*/
+static void Cmd_PlayerList_f(const gentity_t* ent)
+{
+	const gclient_t* clientLocal;
+	int clientID;
+	char readyStr[16];
+	char refStr[16];
+	const char* viewStr;
+	const char* colorStr;
+	const gentity_t* clientEntity;
+	char* teamStr = NULL;
+	int maxRate;
+	int i;
+	int numberOfPlayers;
+	char playerNameSanitized[MAX_NETNAME];
+	char tmp[256];
+	char userinfo[MAX_INFO_STRING];
+	int clientRate;
+	qboolean isBot;
+	int team;
+
+	if (ent && Cmd_Help_f(ent, CMDHELP_PLAYER_LIST)) return;
+
+	maxRate =   trap_Cvar_VariableIntegerValue("sv_maxrate");
+
+	if (level.warmupTime)
+	{
+		if (ent)
+		{
+			trap_SendServerCommand(ent - g_entities, "print \"\n^3Status^1   : ^3ID^1 : ^3Player                    Nudge  Rate  MaxPkts  Snaps\n\"");
+			trap_SendServerCommand(ent - g_entities, "print \"^1---------------------------------------------------------------------^7\n\"");
+		}
+		else
+		{
+			G_Printf("Status   : ID : Player                    Nudge  Rate  MaxPkts  Snaps\n");
+			G_Printf("---------------------------------------------------------------------\n");
+		}
+	}
+	else
+	{
+		if (ent)
+		{
+			trap_SendServerCommand(ent - g_entities, "print \"\n^3 ID^1 : ^3Player                    Nudge  Rate  MaxPkts  Snaps\n\"");
+			trap_SendServerCommand(ent - g_entities, "print \"^1-----------------------------------------------------------^7\n\"");
+		}
+		else
+		{
+			G_Printf(" ID : Player                    Nudge  Rate  MaxPkts  Snaps\n");
+			G_Printf("-----------------------------------------------------------\n");
+		}
+	}
+	for (i = 0, numberOfPlayers = 0; i < level.numConnectedClients; ++i, ++numberOfPlayers)
+	{
+		clientID = level.sortedClients[i];
+		clientLocal = &level.clients[clientID];
+		clientEntity = &g_entities[clientID];
+		isBot = clientEntity->r.svFlags & SVF_BOT;
+
+		G_Printf("netname before %s\n", clientLocal->pers.netname);
+		SanitizeString(clientLocal->pers.netname, playerNameSanitized, qfalse);
+		G_Printf("netname after %s\n", playerNameSanitized);
+
+		if (isBot)
+		{
+			strcpy(tmp, va("%s%s%s%s", "[BOT]", " -----", "       --", "     --"));
+		}
+		else if (clientLocal->pers.connected == CON_CONNECTING)
+		{
+			strcpy(tmp, va("%s", "^3>>> CONNECTING <<<"));
+		}
+		else
+		{
+			trap_GetUserinfo(clientID, userinfo, sizeof(userinfo));
+			clientRate = atoi(Info_ValueForKey(userinfo, "rate"));
+			if (maxRate && clientRate > maxRate)
+			{
+				clientRate = maxRate;
+			}
+			strcpy(tmp, va("%5d%6d%9d%7d", clientLocal->timeNudge, clientRate, clientLocal->maxPackets, clientLocal->snaps));
+		}
+		/* Ready status */
+		readyStr[0] = 0;
+		if (level.warmupTime)
+		{
+			if (clientLocal->team == GT_TEAM && clientLocal->pers.connected == CON_CONNECTING)
+			{
+				if (ent)
+				{
+					strcpy(readyStr, "^5--------^1 :");
+				}
+				else
+				{
+					strcpy(readyStr, "-------- :");
+				}
+			}
+			else
+			{
+				if (clientLocal->playerReady || isBot)
+				{
+					if (ent)
+					{
+						strcpy(readyStr, "^3(READY)^1  :");
+					}
+					else
+					{
+						strcpy(readyStr, "(READY)  :");
+					}
+				}
+				else
+				{
+					if (ent)
+					{
+						strcpy(readyStr, "NOTREADY^1 :");
+					}
+					else
+					{
+						strcpy(readyStr, "NOTREADY :");
+					}
+				}
+			}
+		}
+		/* Ref */
+		if (clientLocal->isReferee != 0)
+		{
+			strcpy(refStr, "REF");
+		}
+		else
+		{
+			refStr[0] = 0;
+		}
+		/* Client view */
+		if (clientLocal->isViewDisabled)
+		{
+			team = clientLocal->isViewDisabled;
+			if (ent)
+			{
+				viewStr = "^3C";
+			}
+			else
+			{
+				viewStr = "C";
+			}
+		}
+		else
+		{
+			team = clientLocal->team;
+			viewStr = " ";
+		}
+		/* Team */
+		if (g_gametype.integer < GT_TEAM)
+		{
+			if (ent)
+			{
+				teamStr = "^7 ";
+			}
+			else
+			{
+				teamStr = " ";
+			}
+		}
+		else if (team == TEAM_RED)
+		{
+			if (ent)
+			{
+				teamStr = "^1R^7";
+			}
+			else
+			{
+				teamStr = "R";
+			}
+		}
+		else if (team == TEAM_RED)
+		{
+			if (ent)
+			{
+				teamStr = "^4B^7";
+			}
+			else
+			{
+				teamStr = "B";
+			}
+		}
+		else
+		{
+			if (ent)
+			{
+				teamStr = "^7 ";
+			}
+			else
+			{
+				teamStr = " ";
+			}
+		}
+
+		if (ent)
+		{
+			if (refStr[0])
+			{
+				colorStr = "^3";
+			}
+			else
+			{
+				colorStr = "^7";
+			}
+			trap_SendServerCommand(ent - g_entities, va("print \"%s%s%2d%s^1:%s %-26s^7%s  ^3%s\n\"", readyStr, teamStr, clientID, viewStr, colorStr, playerNameSanitized, tmp, refStr));
+		}
+		else
+		{
+			G_Printf("%s%s%2d%s: %-26s%s  %s\n", readyStr, teamStr, clientID, viewStr, playerNameSanitized, tmp, refStr);
+		}
+	}
+
+
+	if (ent)
+	{
+		trap_SendServerCommand(ent - g_entities, va("print \"\n^3%2d^7 total players\n\n\"", numberOfPlayers));
+	}
+	else
+	{
+		G_Printf("\n%2d total players\n\n", numberOfPlayers);
+	}
 }
 
 /*
