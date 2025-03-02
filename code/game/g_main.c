@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 #include "g_local.h"
+#include "q_shared.h"
+#include "g_unimplemented.h"
 
 level_locals_t  level;
 
@@ -695,6 +697,16 @@ void G_RemapTeamShaders()
 
 /*
 =================
+G_IsGameTypeOSP
+=================
+*/
+qboolean G_IsGameTypeOSP(int gametype)
+{
+	return gametype >= GT_CA;
+}
+
+/*
+=================
 G_RegisterCvars
 =================
 */
@@ -706,8 +718,100 @@ void G_RegisterCvars(void)
 
 	for (i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++)
 	{
-		trap_Cvar_Register(cv->vmCvar, cv->cvarName,
-		                   cv->defaultString, cv->cvarFlags);
+		//skip if not team game and cvar name start with Score_ but not gametype 1 and name "Score_Time"
+		if (g_gametype.integer < GT_TEAM && cv->cvarName == strstr(cv->cvarName, "Score_") && (g_gametype.integer != 1 || Q_stricmp(cv->cvarName, "Score_Time")))
+		{
+			continue;
+		}
+		//skip if not team game and name is Players_Red or Players_Blue
+		if (g_gametype.integer < GT_TEAM && (!Q_stricmp(cv->cvarName, "Players_Red") || !Q_stricmp(cv->cvarName, "Players_Blue")))
+		{
+			continue;
+		}
+		//skip if team game and name Players_Active
+		if (g_gametype.integer >= GT_TEAM && Q_stricmp(cv->cvarName, "Players_Active"))
+		{
+			continue;
+		}
+
+		if (Q_stricmp(cv->cvarName, "gamename"))
+		{
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, "baseq3", cv->cvarFlags);
+		}
+		else if (cv->vmCvar == &start_health && server_promode.integer <= 0 && server_cq3.integer <= 0)
+		{
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, "100", cv->cvarFlags);
+		}
+		else if (cv->vmCvar == &g_weaponRespawn && (server_promode.integer > 0 || server_cq3.integer > 0))
+		{
+			const char* wprStr = "5";
+			switch (g_gametype.integer)
+			{
+				default:
+					break;
+				case GT_TEAM:
+					wprStr = "30";
+					break;
+				case GT_TOURNAMENT:
+					wprStr = "15";
+					break;
+				case GT_CTF:
+					wprStr = "10";
+					break;
+			}
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, wprStr, cv->cvarFlags);
+		}
+		else if (g_gametype.integer == GT_TEAM && cv->vmCvar == &start_bullets)
+		{
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, "50", cv->cvarFlags);
+		}
+		else if (g_gametype.integer == GT_CTF && cv->vmCvar == &match_poweruprespawn)
+		{
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, "120", cv->cvarFlags);
+		}
+		else if (cv->vmCvar == &g_forcerespawn)
+		{
+			const char* respStr = "5";
+			if (g_gametype.integer == GT_TOURNAMENT)
+			{
+				respStr = "10";
+			}
+			else
+			{
+				respStr = "20";
+			}
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, respStr, cv->cvarFlags);                                       /* Address : 0x354 Type : Interium */
+		}
+		else if (cv->vmCvar == &match_mutespecs && g_gametype.integer == GT_TOURNAMENT)
+		{
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, "1", cv->cvarFlags);                                               /* Address : 0x374 Type : Interium */
+		}
+		else if (g_gametype.integer == GT_CA && cv->vmCvar == &start_armor)
+		{
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, "200", cv->cvarFlags);                                                 /* Address : 0x394 Type : Interium */
+		}
+		else if (G_IsGameTypeOSP(g_gametype.integer) && cv->vmCvar == &roundlimit)
+		{
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags);
+			trap_Cvar_Set("fraglimit", roundlimit.string);
+		}
+		else if (cv->vmCvar == &match_overtime)
+		{
+			const char* moStr;
+			if (g_gametype.integer == GT_TEAM)
+			{
+				moStr = "1";
+			}
+			else
+			{
+				moStr = "0";
+			}
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, moStr, cv->cvarFlags);
+		}
+		else
+		{
+			trap_Cvar_Register(cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags);
+		}
 		if (cv->vmCvar)
 			cv->modificationCount = cv->vmCvar->modificationCount;
 
@@ -715,12 +819,18 @@ void G_RegisterCvars(void)
 		{
 			remapped = qtrue;
 		}
+
 	}
 
 	if (remapped)
 	{
 		G_RemapTeamShaders();
 	}
+
+	trap_Cvar_Update(&server_promode);
+	trap_Cvar_Update(&server_cq3);
+	g_unk_33677();                                                                  /* Address : 0x449 Type : Interium */
+	g_unk_33dc1(0);                                                                 /* Address : 0x44e Type : Interium */
 
 	// check some things
 	if (g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE)

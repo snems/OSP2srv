@@ -305,3 +305,15 @@ void Cmd_Settings_f(const gentity_t* ent)
 }
 
 
+void g_unk_33677(void)
+{
+	OSP2_UNIMPLEMENTED_FUNCTION(g_unk_33677);
+}
+
+
+void g_unk_33dc1(qboolean flag)
+{
+	OSP2_UNIMPLEMENTED_FUNCTION(g_unk_33dc1);
+}
+
+

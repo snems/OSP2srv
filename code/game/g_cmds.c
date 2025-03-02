@@ -2736,16 +2736,6 @@ static void Cmd_PlayerList_f(const gentity_t* ent)
 		G_Printf("\n%2d total players\n\n", numberOfPlayers);
 	}
 }
-
-static qboolean G_IsGameTypeOSP(int gametype)
-{
-	return gametype >= GT_CA;
-}
-
-static qboolean IsGameTypeOSP(int gametype)
-{
-	return G_IsGameTypeOSP(gametype);                                           /* Address : 0x30dcb Type : Interium */
-}
 /*
 =================
 G_IsSpectator
@@ -2767,7 +2757,7 @@ static team_t G_GetSpectatorTeam(const gentity_t* ent)
 	{
 		return ent->client->viewTeam;
 	}
-	if (IsGameTypeOSP(g_gametype.integer) && ent->client->team != TEAM_SPECTATOR && ent->client->clanArenaSpectateForTeam != TEAM_SPECTATOR)
+	if (G_IsGameTypeOSP(g_gametype.integer) && ent->client->team != TEAM_SPECTATOR && ent->client->clanArenaSpectateForTeam != TEAM_SPECTATOR)
 	{
 		return ent->client->clanArenaSpectateForTeam;
 	}
@@ -2794,7 +2784,7 @@ static void Cmd_GetStatsInfo_f(gentity_t* ent)
 	intermission = level.intermissiontime || level.intermissionQueued;
 
 	if ((client->team != TEAM_SPECTATOR && g_gametype.integer == GT_TEAM && server_freezetag.integer && G_IsSpectator(client)) ||
-	        (intermission && IsGameTypeOSP(g_gametype.integer) && G_GetSpectatorTeam(ent) != TEAM_SPECTATOR))
+	        (intermission && G_IsGameTypeOSP(g_gametype.integer) && G_GetSpectatorTeam(ent) != TEAM_SPECTATOR))
 	{
 		playerID = ent - g_entities;
 	}

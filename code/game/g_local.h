@@ -759,6 +759,7 @@ void SendScoreboardMessageToAllClients(void);
 void QDECL G_Printf(const char* fmt, ...);
 void QDECL G_Error(const char* fmt, ...);
 void G_AdminLog(const char* text);
+qboolean G_IsGameTypeOSP(int gametype);
 
 //
 // g_client.c

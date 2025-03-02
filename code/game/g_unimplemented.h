@@ -51,3 +51,5 @@ void Cmd_VcFollow_f(const gentity_t* ent);
 void Cmd_Drop_f(const gentity_t* ent);
 void Cmd_ViewCam_f(const gentity_t* ent);
 void Cmd_Settings_f(const gentity_t* ent);
+void g_unk_33677(void);
+void g_unk_33dc1(qboolean flag);
