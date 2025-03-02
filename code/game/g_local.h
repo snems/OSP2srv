@@ -265,6 +265,33 @@ typedef struct
 } clientPersistant_t;
 
 
+typedef struct
+{
+	int         attacks;
+	int         hits;
+	int         kills;
+	int         deaths;
+} clientWeaponStats_t;
+
+typedef struct
+{
+	int         damageGiven;
+	int         damageRecieved;
+	int         deaths;
+	int         statUnknown1;
+	int         kills;
+	int         statUnknown2;
+	int         statUnknown3;
+	int         suicides;
+	int         mh;
+	int         ga;
+	int         ra;
+	int         ya;
+	int         damageTeam;
+	int         teamKills;
+} clientStats_t;
+
+
 // this structure is cleared on each ClientSpawn(),
 // except for 'client->pers' and 'client->sess'
 struct gclient_s
@@ -297,11 +324,9 @@ struct gclient_s
 	vec3_t      damage_from;        // origin for vector calculation
 	qboolean    damage_fromWorld;   // if true, don't use the damage_from vector
 
-	int         accurateCount;      // for "impressive" reward sound
-
-	int         accuracy_shots;     // total number of shots
-	int         accuracy_hits;      // total number of hits
-
+	int         tail3_25;
+	int         tail3_26;
+	int         tail3_27;
 	//
 	int         lastkilled_client;  // last client that this client killed
 	int         lasthurt_client;    // last client that damaged this client
@@ -319,9 +344,9 @@ struct gclient_s
 	int         lastKillTime;       // for multiple kill rewards
 
 	qboolean    fireHeld;           // used for hook
-	gentity_t*   hook;              // grapple hook if out
+	gentity_t*  hook;              // grapple hook if out
+	int         tail3_39;
 
-	int         switchTeamTime;     // time the player switched teams
 	qboolean    isFollowPowerUp;      //
 	qboolean    isHaveView;            //
 
@@ -348,12 +373,79 @@ struct gclient_s
 	int          isVcViewEnabled;
 	int          tail5[3];
 	team_t       team;
-	int          tail6[17];
+	int          tail6;
+	int          unknown3;
+	int          unknown4;
+	int          wins;
+	int          loses;
+	int          tail6_1;
+	int          tail6_2;
+	int          tail6_3;
+	int          tail6_4;
+	int          tail6_5;
+	int          tail6_6;
+	int          tail6_7;
+	int          tail6_8;
+	int          tail6_9;
+	int          tail6_10;
+	int          tail6_11;
+	int          clanArenaSpectateForTeam;
 	int          isReferee;
 	int          unknown2;
-	int          tail2[45];
-	qboolean     isViewDisabled;
-	int          tail3[60];
+	int          tail2_0;
+	clientWeaponStats_t clientWeaponStats[10];
+	int          tail2_1;
+	int          tail2_2;
+	int          tail2_3;
+	int          tail2_4;
+	team_t       viewTeam;
+	clientStats_t stats;
+	int          tail3_9;
+	int          tail3_10;
+	int          tail3_11;
+	int          tail3_12;
+	int          tail3_13;
+	int          tail3_14;
+	int          tail3_15;
+	int          tail3_16;
+	int          tail3_17;
+	int          tail3_18;
+	int          tail3_19;
+	int          tail3_20;
+	int          tail3_21;
+	int          tail3_22;
+	int          tail3_23;
+	int          tail3_24;
+	int          accurateCount;
+	int          accuracy_shots;
+	int          accuracy_hits;
+	int          tail3_28;
+	int          tail3_29;
+	int          tail3_30;
+	int          tail3_31;
+	int          tail3_32;
+	int          tail3_33;
+	int          tail3_34;
+	int          tail3_35;
+	int          tail3_36;
+	int          tail3_37;
+	int          tail3_38;
+	int          switchTeamTime;
+	int          tail3_40;
+	int          tail3_41;
+	int          tail3_42;
+	int          tail3_43;
+	int          tail3_44;
+	int          tail3_45;
+	int          tail3_46;
+	int          tail3_47;
+	int          tail3_48;
+	int          tail3_49;
+	int          tail3_50;
+	int          tail3_51;
+	int          tail3_52;
+	int          tail3_53;
+	int          tail3_54;
 };
 
 

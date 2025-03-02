@@ -3,7 +3,6 @@
 
 void G_OSPAuth(const gentity_t* ent);
 void Cmd_ViewList_f(const gentity_t* ent);
-void Cmd_GetStatsInfo_f(const gentity_t* ent);
 void Cmd_Stats_f(const gentity_t* ent, int arg);
 void Cmd_StatsAll_f(const gentity_t* ent, int arg);
 void Cmd_Acc_f(const gentity_t* ent, int arg);

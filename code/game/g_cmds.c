@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "g_unimplemented.h"
 
 #include "../../ui/menudef.h"           // for the voice chats
+#include "q_shared.h"
 //
 static const char* cmdHelp[] =
 {
@@ -2217,7 +2218,7 @@ static qboolean Cmd_OSPCommands_f(const gentity_t* ent, char* arg, qboolean isRe
 	}
 	else if (!Q_stricmp(arg, "viewall"))
 	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWALL) && !ent->client->isViewDisabled)
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWALL) && !ent->client->viewTeam)
 		{
 			Cmd_ViewAll_f(ent);
 		}
@@ -2225,7 +2226,7 @@ static qboolean Cmd_OSPCommands_f(const gentity_t* ent, char* arg, qboolean isRe
 	}
 	else if (!Q_stricmp(arg, "viewremove"))
 	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWREMOVE) && !ent->client->isViewDisabled)
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWREMOVE) && !ent->client->viewTeam)
 		{
 			Cmd_ViewerMove_f(ent);
 		}
@@ -2241,7 +2242,7 @@ static qboolean Cmd_OSPCommands_f(const gentity_t* ent, char* arg, qboolean isRe
 	}
 	else if (!Q_stricmp(arg, "viewnone"))
 	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWNONE) && !ent->client->isViewDisabled)
+		if (!Cmd_Help_f(ent, CMDHELP_VIEWNONE) && !ent->client->viewTeam)
 		{
 			Cmd_ViewNone_f(ent);
 			ent->client->isHaveView = qfalse;
@@ -2597,7 +2598,7 @@ static void Cmd_PlayerList_f(const gentity_t* ent)
 		readyStr[0] = 0;
 		if (level.warmupTime)
 		{
-			if (clientLocal->team == GT_TEAM && clientLocal->pers.connected == CON_CONNECTING)
+			if (clientLocal->team == TEAM_SPECTATOR && clientLocal->pers.connected == CON_CONNECTING)
 			{
 				if (ent)
 				{
@@ -2644,9 +2645,9 @@ static void Cmd_PlayerList_f(const gentity_t* ent)
 			refStr[0] = 0;
 		}
 		/* Client view */
-		if (clientLocal->isViewDisabled)
+		if (clientLocal->viewTeam)
 		{
-			team = clientLocal->isViewDisabled;
+			team = clientLocal->viewTeam;
 			if (ent)
 			{
 				viewStr = "^3C";
@@ -2736,6 +2737,152 @@ static void Cmd_PlayerList_f(const gentity_t* ent)
 	}
 }
 
+static qboolean G_IsGameTypeOSP(int gametype)
+{
+	return gametype >= GT_CA;
+}
+
+static qboolean IsGameTypeOSP(int gametype)
+{
+	return G_IsGameTypeOSP(gametype);                                           /* Address : 0x30dcb Type : Interium */
+}
+/*
+=================
+G_IsSpectator
+=================
+*/
+static qboolean G_IsSpectator(const gclient_t* client)
+{
+	return !(client->team != TEAM_SPECTATOR && client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR  && client->unknown3 != 2);
+}
+
+/*
+=================
+G_GetSpectatorTeam
+=================
+*/
+static team_t G_GetSpectatorTeam(const gentity_t* ent)
+{
+	if (ent->client->viewTeam)
+	{
+		return ent->client->viewTeam;
+	}
+	if (IsGameTypeOSP(g_gametype.integer) && ent->client->team != TEAM_SPECTATOR && ent->client->clanArenaSpectateForTeam != TEAM_SPECTATOR)
+	{
+		return ent->client->clanArenaSpectateForTeam;
+	}
+	return ent->client->team;
+}
+/*
+=================
+Cmd_GetStatsInfo_f
+=================
+*/
+static void Cmd_GetStatsInfo_f(gentity_t* ent)
+{
+	gclient_t* client;
+	char wstatsString[1024];
+	char wstatsHead[1024];
+	int weaponmask;
+	int playerID;
+	int team;
+	int wp;
+	int assists_plus;
+	qboolean intermission;
+	clientWeaponStats_t* ws;
+
+	intermission = level.intermissiontime || level.intermissionQueued;
+
+	if ((client->team != TEAM_SPECTATOR && g_gametype.integer == GT_TEAM && server_freezetag.integer && G_IsSpectator(client)) ||
+	        (intermission && IsGameTypeOSP(g_gametype.integer) && G_GetSpectatorTeam(ent) != TEAM_SPECTATOR))
+	{
+		playerID = ent - g_entities;
+	}
+	else
+	{
+		if (ent->client->unknown3 == 0x2 || ent->client->unknown3 == 0x5)
+		{
+			playerID = ent->client->unknown4;
+		}
+		else if (ent->client->unknown3 == 0x7 && ent->client->tail3_25)
+		{
+			//playerID = ent->client->tail3_39[ent->client->tail3_26];                      /* Address : 0x2f8a5 Type : Interium */
+		}
+		else
+		{
+			team_t st_team;
+			if (st_team != TEAM_RED && st_team != TEAM_BLUE && st_team != TEAM_SPECTATOR && g_gametype.integer == GT_TEAM && !server_freezetag.integer)
+			{
+				trap_SendServerCommand(ent - g_entities, "statsinfo 0");
+				return;
+			}
+			else
+			{
+				playerID = ent - g_entities;
+			}
+		}
+	}
+
+	client = &level.clients[playerID];
+
+	if (!client->ps.powerups[PW_REDFLAG] && !client->ps.powerups[PW_BLUEFLAG])
+	{
+		assists_plus = 0;
+	}
+	else
+	{
+		assists_plus = level.time - client->pers.teamState.lastfraggedcarrier;
+	}
+
+	if (g_gametype.integer != GT_CA)
+	{
+		team = client->team;                                                    /* Address : 0x2f937 Type : Interium */
+	}
+	else if (client->team == TEAM_SPECTATOR)
+	{
+		team = client->clanArenaSpectateForTeam;                                    /* Address : 0x2f947 Type : Interium */
+	}
+	else
+	{
+		team = client->team;                                                        /* Address : 0x2f950 Type : Interium */
+	}
+
+	strcpy(wstatsHead, va("%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i ",
+	                      1,
+	                      client->ps.persistant[PERS_SCORE],
+	                      team,
+	                      client->stats.kills,
+	                      client->stats.deaths,
+	                      client->stats.suicides,
+	                      client->stats.teamKills,
+	                      client->stats.damageTeam,
+	                      client->stats,
+	                      client->stats.damageRecieved,
+	                      client->wins,
+	                      client->loses,
+	                      client->pers.teamState.captures,
+	                      client->pers.teamState.lasthurtcarrier,
+	                      client->pers.teamState.basedefense + client->pers.teamState.carrierdefense,
+	                      client->pers.teamState.flagrecovery,
+	                      client->pers.teamState.assists + assists_plus,  // <<-------------------------
+	                      client->stats.mh,
+	                      client->stats.ga,
+	                      client->stats.ra,
+	                      client->stats.ya));
+
+	wstatsString[0] = 0;
+	weaponmask = 0;
+	for (wp = 1; wp < 10; ++wp)
+	{
+		ws = &client->clientWeaponStats[wp];
+		if (ws->attacks || ws->hits || ws->deaths)
+		{
+			weaponmask |= 1 << wp;
+			Q_strcat(wstatsString, MAX_STRING_CHARS, va(" %d %d %d %d", ws->hits, ws->attacks, ws->kills, ws->deaths));
+		}
+	}
+	trap_SendServerCommand(ent - g_entities, va("statsinfo %s %d%s", wstatsHead, weaponmask, wstatsString));
+}
 /*
 =================
 ClientCommand
