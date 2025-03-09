@@ -5,10 +5,7 @@ qa_asm = $(call srcs,$(QA_SRC),vm/game)
 cg_asm = $(call srcs,$(CG_SRC),vm/cgame)
 ui_asm = $(call srcs,$(UI_SRC),vm/ui)
 
-all: dirs $(PK3)
-
-dirs:
-	mkdir -p vm/game vm/cgame vm/ui
+all: $(PK3)
 
 .PHONY: all dirs
 
@@ -30,7 +27,9 @@ vm/qagame.qvm: $(qa_asm)
 #vm/ui.qvm: $(ui_asm)
 #	$(Q3ASM) -o $@ $(ui_asm)
 
-vm/game/%.asm: $(QADIR)/%.c; $(qa_cc)
+vm/game/%.asm: $(QADIR)/%.c
+	mkdir -p vm/game vm/cgame vm/ui
+	$(qa_cc)
 #vm/cgame/%.asm: $(QADIR)/%.c; $(cg_cc)
 #vm/cgame/%.asm: $(CGDIR)/%.c; $(cg_cc)
 #vm/cgame/%.asm: $(COMDIR)/%.c; $(cg_cc)
