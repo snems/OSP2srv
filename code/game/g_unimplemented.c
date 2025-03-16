@@ -3,6 +3,8 @@
 #define OSP2_UNIMPLEMENTED_FUNCTION(NAME)  trap_SendServerCommand(-1, va("print \"Unimplemented function %s called.\n\"", NAME));
 
 
+int global_17d6b0;
+int global_17d6bc;
 void G_OSPAuth(const gentity_t* ent)
 {
 	OSP2_UNIMPLEMENTED_FUNCTION(G_OSPAuth);
@@ -314,6 +316,20 @@ void g_unk_33677(void)
 void g_unk_33dc1(qboolean flag)
 {
 	OSP2_UNIMPLEMENTED_FUNCTION(g_unk_33dc1);
+}
+
+
+qboolean g_unk_1a66e(const gclient_t* client)
+{
+	OSP2_UNIMPLEMENTED_FUNCTION(g_unk_1a66e);
+	return (qboolean)0;
+}
+
+
+gentity_t* g_unk_2b5b0(float* origin, int unk)
+{
+	OSP2_UNIMPLEMENTED_FUNCTION(g_unk_2b5b0);
+	return (gentity_t*)0;
 }
 
 

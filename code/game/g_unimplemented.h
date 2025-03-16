@@ -1,6 +1,8 @@
 #include "g_local.h"
 
 
+extern int global_17d6b0;
+extern int global_17d6bc;
 void G_OSPAuth(const gentity_t* ent);
 void Cmd_ViewList_f(const gentity_t* ent);
 void Cmd_Stats_f(const gentity_t* ent, int arg);
@@ -53,3 +55,5 @@ void Cmd_ViewCam_f(const gentity_t* ent);
 void Cmd_Settings_f(const gentity_t* ent);
 void g_unk_33677(void);
 void g_unk_33dc1(qboolean flag);
+qboolean g_unk_1a66e(const gclient_t* client);
+gentity_t* g_unk_2b5b0(float* origin, int unk);

@@ -296,156 +296,128 @@ typedef struct
 // except for 'client->pers' and 'client->sess'
 struct gclient_s
 {
-	// ps MUST be the first element, because the server expects it
-	playerState_t   ps;             // communicated by server to clients
-
-	// the rest of the structure is private to game
-	clientPersistant_t  pers;
-	clientSession_t     sess;
-
-	qboolean    readyToExit;        // wishes to leave the intermission
-
-	qboolean    noclip;
-
-	int         lastCmdTime;        // level.time of last usercmd_t, for EF_CONNECTION
-	// we can't just use pers.lastCommand.time, because
-	// of the g_sycronousclients case
-	int         buttons;
-	int         oldbuttons;
-	int         latched_buttons;
-
-	vec3_t      oldOrigin;
-
-	// sum up damage over an entire frame, so
-	// shotgun blasts give a single big kick
-	int         damage_armor;       // damage absorbed by armor
-	int         damage_blood;       // damage taken out of health
-	int         damage_knockback;   // impact damage
-	vec3_t      damage_from;        // origin for vector calculation
-	qboolean    damage_fromWorld;   // if true, don't use the damage_from vector
-
-	int         tail3_25;
-	int         tail3_26;
-	int         tail3_27;
-	//
-	int         lastkilled_client;  // last client that this client killed
-	int         lasthurt_client;    // last client that damaged this client
-	int         lasthurt_mod;       // type of damage the client did
-
-	// timers
-	int         respawnTime;        // can respawn when time > this, force after g_forcerespwan
-	int         OSPAuth;                    //
-	int         inactivityTime;     // kick players when time > this
-	qboolean    inactivityWarning;  // qtrue if the five seoond warning has been given
-	int         rewardTime;         // clear the EF_AWARD_IMPRESSIVE, etc when time > this
-
-	int         airOutTime;
-
-	int         lastKillTime;       // for multiple kill rewards
-
-	qboolean    fireHeld;           // used for hook
-	gentity_t*  hook;              // grapple hook if out
-	int         tail3_39;
-
-	qboolean    isFollowPowerUp;      //
-	qboolean    isHaveView;            //
-
-	// timeResidual is used to handle events that happen every second
-	// like health / armor countdowns and regeneration
-	int         timeResidual;
-
-	char*        areabits;
-	int          tail1[19];
-	int          playerReady;
-	int          tail1_1[2];
-	int          maxPackets;
-	int          snaps;
-	int          timeNudge;
-	int          customLoc;
-	qboolean     followPowerup;
-	qboolean     followKiller;
-	qboolean     followViewCam;
-	int          autoAction;
-	qboolean     usingJPEG;
-	int          isVcInfoEnabled;
-	int          isVcFreeEnabled;
-	int          tail4[7];
-	int          isVcViewEnabled;
-	int          tail5[3];
-	team_t       team;
-	int          tail6;
-	int          unknown3;
-	int          unknown4;
-	int          wins;
-	int          loses;
-	int          tail6_1;
-	int          tail6_2;
-	int          tail6_3;
-	int          tail6_4;
-	int          tail6_5;
-	int          tail6_6;
-	int          tail6_7;
-	int          tail6_8;
-	int          tail6_9;
-	int          tail6_10;
-	int          tail6_11;
-	int          clanArenaSpectateForTeam;
-	int          isReferee;
-	int          unknown2;
-	int          tail2_0;
-	clientWeaponStats_t clientWeaponStats[10];
-	int          tail2_1;
-	int          tail2_2;
-	int          tail2_3;
-	int          tail2_4;
-	team_t       viewTeam;
-	clientStats_t stats;
-	int          tail3_9;
-	int          tail3_10;
-	int          tail3_11;
-	int          tail3_12;
-	int          tail3_13;
-	int          tail3_14;
-	int          tail3_15;
-	int          tail3_16;
-	int          tail3_17;
-	int          tail3_18;
-	int          tail3_19;
-	int          tail3_20;
-	int          tail3_21;
-	int          tail3_22;
-	int          tail3_23;
-	int          tail3_24;
-	int          accurateCount;
-	int          accuracy_shots;
-	int          accuracy_hits;
-	int          tail3_28;
-	int          tail3_29;
-	int          tail3_30;
-	int          tail3_31;
-	int          tail3_32;
-	int          tail3_33;
-	int          tail3_34;
-	int          tail3_35;
-	int          tail3_36;
-	int          tail3_37;
-	int          tail3_38;
-	int          switchTeamTime;
-	int          tail3_40;
-	int          tail3_41;
-	int          tail3_42;
-	int          tail3_43;
-	int          tail3_44;
-	int          tail3_45;
-	int          tail3_46;
-	int          tail3_47;
-	int          tail3_48;
-	int          tail3_49;
-	int          tail3_50;
-	int          tail3_51;
-	int          tail3_52;
-	int          tail3_53;
-	int          tail3_54;
+    playerState_t ps;
+    clientPersistant_t pers;
+    int tail5_5;
+    int tail5_6;
+    int tail5_7;
+    int OSPAuth;
+    int tail5_9;
+    int autoAction;
+    int tail3_12;
+    int tail3_13;
+    int tail3_14;
+    int tail3_15;
+    int tail3_18;
+    int isFollowKiller;
+    qboolean isFollowPowerUp;
+    qboolean isHaveView;
+    int isFollowViewCam;
+    int tail3_21;
+    int tail3_22;
+    int tail3_23;
+    int tail3_24;
+    int tail3_25;
+    int tail3_26;
+    int tail3_27;
+    int tail3_28;
+    int tail3_29;
+    int tail3_30;
+    int tail5_8;
+    int tail3_31;
+    int tail3_32;
+    int tail3_33;
+    int tail3_34;
+    int tail3_35;
+    int tail3_36;
+    int tail3_37;
+    int tail3_38;
+    int tail3_39;
+    int tail3_17;
+    int tail3_20;
+    int tail3_41;
+    char* areabits;
+    int tail1[19];
+    int tail3_9;
+    int tail1_1[2];
+    int playerReady;
+    int tail3_10;
+    int tail5_3;
+    int snaps;
+    int maxPackets;
+    int timeNudge;
+    int isUsingJPEG;
+    int isVcInfoEnabled;
+    int isVcFreeEnabled;
+    int tail4[8];
+    int isVcViewEnabled;
+    int tail5_1;
+    int tail5_2;
+    int isCustomLocEnabled;
+    clientSession_t sess;
+    int tail6_2;
+    int tail6_3;
+    int tail6_4;
+    int tail6_5;
+    int tail6_6;
+    int tail6_7;
+    int tail6_8;
+    int tail6_9;
+    int tail6_10;
+    int tail6_11;
+    int clanArenaSpectateForTeam;
+    qboolean isReferee;
+    int unknown2;
+    int tail2_0;
+    clientWeaponStats_t clientWeaponStats[10];
+    int tail2_1;
+    int tail2_2;
+    int tail2_3;
+    int tail2_4;
+    team_t viewTeam;
+    clientStats_t stats;
+    qboolean readyToExit;
+    qboolean noclip;
+    int lastCmdTime;
+    int buttons;
+    int oldbuttons;
+    int latched_buttons;
+    vec3_t oldOrigin;
+    int damage_armor;
+    int damage_blood;
+    int damage_knockback;
+    vec3_t damage_from;
+    qboolean damage_fromWorld;
+    int accurateCount;
+    int accuracy_shots;
+    int accuracy_hits;
+    int lastkilled_client;
+    int lasthurt_client;
+    int lasthurt_mod;
+    int respawnTime;
+    int inactivityTime;
+    qboolean inactivityWarning;
+    int rewardTime;
+    int airOutTime;
+    int lastKillTime;
+    qboolean fireHeld;
+    gentity_t	*hook;
+    int switchTeamTime;
+    int tail3_40;
+    int timeResidual;
+    int tail3_42;
+    int tail3_43;
+    int tail3_44;
+    int tail3_45;
+    int tail3_46;
+    int tail3_47;
+    int tail3_48;
+    int tail3_49;
+    int tail3_50;
+    int tail3_51;
+    int tail3_52;
+    int tail3_53;
+    int tail3_54;
 };
 
 
@@ -544,6 +516,7 @@ typedef struct
 	int unknown1;
 	int unknown2;
 	int unknown3;
+  int leveltail[512];
 } level_locals_t;
 
 
@@ -741,6 +714,7 @@ void DeathmatchScoreboardMessage(gentity_t* client);
 //
 // g_cmds.c
 //
+qboolean G_IsSpectator(const gclient_t* client);
 
 //
 // g_pweapon.c

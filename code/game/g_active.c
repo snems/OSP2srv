@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 #include "g_local.h"
+#include "g_unimplemented.h"
+#include "q_shared.h"
 
 
 /*
@@ -921,6 +923,14 @@ void SendPendingPredictableEvents(playerState_t* ps)
 		ps->externalEvent = extEvent;
 	}
 }
+qboolean G_IsAttackEnabled(void)
+{
+	if (g_gametype.integer == GT_CA && level.warmupTime && !match_cawarmupfire.integer)
+	{
+		return qfalse;
+	}
+	return qtrue;
+}
 
 /*
 ==============
@@ -933,7 +943,7 @@ If "g_synchronousClients 1" is set, this will be called exactly
 once for each server frame, which makes for smooth demo recording.
 ==============
 */
-void ClientThink_real(gentity_t* ent)
+void ClientThink_real_recovery(gentity_t* ent)
 {
 	gclient_t*   client;
 	pmove_t     pm;
@@ -975,33 +985,46 @@ void ClientThink_real(gentity_t* ent)
 		msec = 200;
 	}
 
-	if (pmove_msec.integer < 8)
+	if (pmove_fixed.integer)
 	{
-		trap_Cvar_Set("pmove_msec", "8");
-	}
-	else if (pmove_msec.integer > 33)
-	{
-		trap_Cvar_Set("pmove_msec", "33");
-	}
-
-	if (pmove_fixed.integer || client->pers.pmoveFixed)
-	{
-		ucmd->serverTime = ((ucmd->serverTime + pmove_msec.integer - 1) / pmove_msec.integer) * pmove_msec.integer;
-		//if (ucmd->serverTime - client->ps.commandTime <= 0)
-		//  return;
+		int pmoveMsec;
+		if (pmove_msec.integer < 8)
+		{
+			trap_Cvar_Set("pmove_msec", "8");
+			trap_Cvar_Update(&pmove_msec);
+			pmoveMsec = 8;
+		}
+		else if (pmove_msec.integer > 33)
+		{
+			trap_Cvar_Set("pmove_msec", "33");
+			trap_Cvar_Update(&pmove_msec);
+			pmoveMsec = 33;
+		}
+		else
+		{
+			pmoveMsec = pmove_msec.integer;
+		}
+		ucmd->serverTime = ((ucmd->serverTime + pmoveMsec - 1) / pmoveMsec) * pmoveMsec;
+		msec = ((msec + pmoveMsec - 1) / pmoveMsec) * pmoveMsec;
 	}
 
 	//
 	// check for exiting intermission
 	//
-	if (level.intermissiontime)
+	if (level.intermissiontime || level.intermissionQueued)
 	{
+		VectorCopy(ent->client->ps.origin, ent->r.currentOrigin);
+		VectorCopy(ent->client->ps.origin, ent->s.origin);
 		ClientIntermissionThink(client);
+		return;
+	}
+	if (qfalse && !g_unk_1a66e(client))
+	{
 		return;
 	}
 
 	// spectators don't do much
-	if (client->sess.sessionTeam == TEAM_SPECTATOR)
+	if (G_IsSpectator(client))
 	{
 		if (client->sess.spectatorState == SPECTATOR_SCOREBOARD)
 		{
@@ -1010,11 +1033,15 @@ void ClientThink_real(gentity_t* ent)
 		SpectatorThink(ent, ucmd);
 		return;
 	}
-
-	// check for inactivity timer, but never drop the local client of a non-dedicated server
-	if (!ClientInactivityTimer(client))
+	
+	if (qtrue || client->tail3_26)
 	{
-		return;
+		ClientSpawn(ent);
+		if (client->tail3_26 == 0)
+		{
+			gentity_t *x = g_unk_2b5b0 (ent->client->ps.origin, 0x2a);
+			x->s.clientNum = ent->s.clientNum;
+		}
 	}
 
 	// clear the rewards if time
@@ -1031,9 +1058,16 @@ void ClientThink_real(gentity_t* ent)
 	{
 		client->ps.pm_type = PM_DEAD;
 	}
+	else if (global_17d6bc)
+	{
+		client->ps.pm_type = PM_FREEZE;
+		client->ps.pm_flags |= PMF_FOLLOW;
+
+	}
 	else
 	{
 		client->ps.pm_type = PM_NORMAL;
+		client->ps.pm_flags &= ~(PMF_FOLLOW);
 	}
 
 	client->ps.gravity = g_gravity.value;
@@ -1041,23 +1075,9 @@ void ClientThink_real(gentity_t* ent)
 	// set speed
 	client->ps.speed = g_speed.value;
 
-#ifdef MISSIONPACK
-	if (bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT)
+	if (client->ps.powerups[PW_HASTE])
 	{
-		client->ps.speed *= 1.5;
-	}
-	else
-#endif
-		if (client->ps.powerups[PW_HASTE])
-		{
-			client->ps.speed *= 1.3;
-		}
-
-	// Let go of the hook if we aren't firing
-	if (client->ps.weapon == WP_GRAPPLING_HOOK &&
-	        client->hook && !(ucmd->buttons & BUTTON_ATTACK))
-	{
-		Weapon_HookFree(client->hook);
+		client->ps.speed *= 1.3;
 	}
 
 	// set up for pmove
@@ -1070,7 +1090,10 @@ void ClientThink_real(gentity_t* ent)
 	if (client->ps.weapon == WP_GAUNTLET && !(ucmd->buttons & BUTTON_TALK) &&
 	        (ucmd->buttons & BUTTON_ATTACK) && client->ps.weaponTime <= 0)
 	{
-		pm.gauntletHit = CheckGauntletAttack(ent);
+		if (G_IsAttackEnabled()) 
+		{
+			pm.gauntletHit = CheckGauntletAttack(ent);
+		}
 	}
 
 	if (ent->flags & FL_FORCE_GESTURE)
@@ -1078,36 +1101,6 @@ void ClientThink_real(gentity_t* ent)
 		ent->flags &= ~FL_FORCE_GESTURE;
 		ent->client->pers.cmd.buttons |= BUTTON_GESTURE;
 	}
-
-#ifdef MISSIONPACK
-	// check for invulnerability expansion before doing the Pmove
-	if (client->ps.powerups[PW_INVULNERABILITY])
-	{
-		if (!(client->ps.pm_flags & PMF_INVULEXPAND))
-		{
-			vec3_t mins = { -42, -42, -42 };
-			vec3_t maxs = { 42, 42, 42 };
-			vec3_t oldmins, oldmaxs;
-
-			VectorCopy(ent->r.mins, oldmins);
-			VectorCopy(ent->r.maxs, oldmaxs);
-			// expand
-			VectorCopy(mins, ent->r.mins);
-			VectorCopy(maxs, ent->r.maxs);
-			trap_LinkEntity(ent);
-			// check if this would get anyone stuck in this player
-			if (!StuckInOtherClient(ent))
-			{
-				// set flag so the expanded size will be set in PM_CheckDuck
-				client->ps.pm_flags |= PMF_INVULEXPAND;
-			}
-			// set back
-			VectorCopy(oldmins, ent->r.mins);
-			VectorCopy(oldmaxs, ent->r.maxs);
-			trap_LinkEntity(ent);
-		}
-	}
-#endif
 
 	pm.ps = &client->ps;
 	pm.cmd = *ucmd;
@@ -1122,41 +1115,37 @@ void ClientThink_real(gentity_t* ent)
 	else
 	{
 		pm.tracemask = MASK_PLAYERSOLID;
+		if (g_dmflags.integer & 0x200)
+		{
+			pm.tracemask &= ~(CONTENTS_PLAYERCLIP);
+		}
 	}
+
 	pm.trace = trap_Trace;
 	pm.pointcontents = trap_PointContents;
 	pm.debugLevel = g_debugMove.integer;
 	pm.noFootsteps = (g_dmflags.integer & DF_NO_FOOTSTEPS) > 0;
 
-	pm.pmove_fixed = pmove_fixed.integer | client->pers.pmoveFixed;
+	if (!(level.leveltail[504] & 1) && ((g_dmflags.integer & DF_NO_FOOTSTEPS) > 0))
+	{
+		pm.noFootsteps = qtrue;
+	}
+	else
+	{
+		pm.noFootsteps = qfalse;
+	}
+
+	pm.pmove_fixed = pmove_fixed.integer;
 	pm.pmove_msec = pmove_msec.integer;
 
 	VectorCopy(client->ps.origin, client->oldOrigin);
 
-#ifdef MISSIONPACK
-	if (level.intermissionQueued != 0 && g_singlePlayer.integer)
-	{
-		if (level.time - level.intermissionQueued >= 1000)
-		{
-			pm.cmd.buttons = 0;
-			pm.cmd.forwardmove = 0;
-			pm.cmd.rightmove = 0;
-			pm.cmd.upmove = 0;
-			if (level.time - level.intermissionQueued >= 2000 && level.time - level.intermissionQueued <= 2500)
-			{
-				trap_SendConsoleCommand(EXEC_APPEND, "centerview\n");
-			}
-			ent->client->ps.pm_type = PM_SPINTERMISSION;
-		}
-	}
 	Pmove(&pm);
-#else
-	Pmove(&pm);
-#endif
 
 	// save results of pmove
 	if (ent->client->ps.eventSequence != oldEventSequence)
 	{
+		ent->freeAfterEvent = level.time;
 		ent->eventTime = level.time;
 	}
 	if (g_smoothClients.integer)
@@ -1167,11 +1156,9 @@ void ClientThink_real(gentity_t* ent)
 	{
 		BG_PlayerStateToEntityState(&ent->client->ps, &ent->s, qtrue);
 	}
-	SendPendingPredictableEvents(&ent->client->ps);
-
-	if (!(ent->client->ps.eFlags & EF_FIRING))
+	if (hook_enable.integer)
 	{
-		client->fireHeld = qfalse;      // for grapple
+		//not recovered
 	}
 
 	// use the snapped origin for linking so it matches client predicted versions
@@ -1183,8 +1170,11 @@ void ClientThink_real(gentity_t* ent)
 	ent->waterlevel = pm.waterlevel;
 	ent->watertype = pm.watertype;
 
+	if (qtrue || global_17d6bc == 0)
+	{
 	// execute client events
-	ClientEvents(ent, oldEventSequence);
+		ClientEvents(ent, ent->s.number);
+	}
 
 	// link entity now, after any personal teleporters have been used
 	trap_LinkEntity(ent);
@@ -1205,7 +1195,8 @@ void ClientThink_real(gentity_t* ent)
 	// save results of triggers and client events
 	if (ent->client->ps.eventSequence != oldEventSequence)
 	{
-		ent->eventTime = level.time;
+		ent->freeAfterEvent = level.time;
+		ent->eventTime = 0;
 	}
 
 	// swap and latch button actions
@@ -1238,6 +1229,281 @@ void ClientThink_real(gentity_t* ent)
 
 	// perform once-a-second actions
 	ClientTimerActions(ent, msec);
+}
+
+/*
+==============
+ClientThink
+
+This will be called once for each client frame, which will
+usually be a couple times for each server frame on fast clients.
+
+If "g_synchronousClients 1" is set, this will be called exactly
+once for each server frame, which makes for smooth demo recording.
+==============
+*/
+void ClientThink_real( gentity_t *ent ) {
+	gclient_t	*client;
+	pmove_t		pm;
+	int			oldEventSequence;
+	int			msec;
+	usercmd_t	*ucmd;
+
+	client = ent->client;
+
+	// don't think if the client is not yet connected (and thus not yet spawned in)
+	if (client->pers.connected != CON_CONNECTED) {
+		return;
+	}
+	// mark the time, so the connection sprite can be removed
+	ucmd = &ent->client->pers.cmd;
+
+	// sanity check the command time to prevent speedup cheating
+	if ( ucmd->serverTime > level.time + 200 ) {
+		ucmd->serverTime = level.time + 200;
+//		G_Printf("serverTime <<<<<\n" );
+	}
+	if ( ucmd->serverTime < level.time - 1000 ) {
+		ucmd->serverTime = level.time - 1000;
+//		G_Printf("serverTime >>>>>\n" );
+	} 
+
+	msec = ucmd->serverTime - client->ps.commandTime;
+	// following others may result in bad times, but we still want
+	// to check for follow toggles
+	if ( msec < 1 && client->sess.spectatorState != SPECTATOR_FOLLOW ) {
+		return;
+	}
+	if ( msec > 200 ) {
+		msec = 200;
+	}
+
+	if ( pmove_msec.integer < 8 ) {
+		trap_Cvar_Set("pmove_msec", "8");
+	}
+	else if (pmove_msec.integer > 33) {
+		trap_Cvar_Set("pmove_msec", "33");
+	}
+
+	if ( pmove_fixed.integer || client->pers.pmoveFixed ) {
+		ucmd->serverTime = ((ucmd->serverTime + pmove_msec.integer-1) / pmove_msec.integer) * pmove_msec.integer;
+		//if (ucmd->serverTime - client->ps.commandTime <= 0)
+		//	return;
+	}
+
+	//
+	// check for exiting intermission
+	//
+	if ( level.intermissiontime ) {
+		ClientIntermissionThink( client );
+		return;
+	}
+
+	// spectators don't do much
+	if ( client->sess.sessionTeam == TEAM_SPECTATOR ) {
+		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
+			return;
+		}
+		SpectatorThink( ent, ucmd );
+		return;
+	}
+
+	// check for inactivity timer, but never drop the local client of a non-dedicated server
+	if ( !ClientInactivityTimer( client ) ) {
+		return;
+	}
+
+	// clear the rewards if time
+	if ( level.time > client->rewardTime ) {
+		client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
+	}
+
+	if ( client->noclip ) {
+		client->ps.pm_type = PM_NOCLIP;
+	} else if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
+		client->ps.pm_type = PM_DEAD;
+	} else {
+		client->ps.pm_type = PM_NORMAL;
+	}
+
+	client->ps.gravity = g_gravity.value;
+
+	// set speed
+	client->ps.speed = g_speed.value;
+
+#ifdef MISSIONPACK
+	if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT ) {
+		client->ps.speed *= 1.5;
+	}
+	else
+#endif
+	if ( client->ps.powerups[PW_HASTE] ) {
+		client->ps.speed *= 1.3;
+	}
+
+	// Let go of the hook if we aren't firing
+	if ( client->ps.weapon == WP_GRAPPLING_HOOK &&
+		client->hook && !( ucmd->buttons & BUTTON_ATTACK ) ) {
+		Weapon_HookFree(client->hook);
+	}
+
+	// set up for pmove
+	oldEventSequence = client->ps.eventSequence;
+
+	memset (&pm, 0, sizeof(pm));
+
+	// check for the hit-scan gauntlet, don't let the action
+	// go through as an attack unless it actually hits something
+	if ( client->ps.weapon == WP_GAUNTLET && !( ucmd->buttons & BUTTON_TALK ) &&
+		( ucmd->buttons & BUTTON_ATTACK ) && client->ps.weaponTime <= 0 ) {
+		pm.gauntletHit = CheckGauntletAttack( ent );
+	}
+
+	if ( ent->flags & FL_FORCE_GESTURE ) {
+		ent->flags &= ~FL_FORCE_GESTURE;
+		ent->client->pers.cmd.buttons |= BUTTON_GESTURE;
+	}
+
+#ifdef MISSIONPACK
+	// check for invulnerability expansion before doing the Pmove
+	if (client->ps.powerups[PW_INVULNERABILITY] ) {
+		if ( !(client->ps.pm_flags & PMF_INVULEXPAND) ) {
+			vec3_t mins = { -42, -42, -42 };
+			vec3_t maxs = { 42, 42, 42 };
+			vec3_t oldmins, oldmaxs;
+
+			VectorCopy (ent->r.mins, oldmins);
+			VectorCopy (ent->r.maxs, oldmaxs);
+			// expand
+			VectorCopy (mins, ent->r.mins);
+			VectorCopy (maxs, ent->r.maxs);
+			trap_LinkEntity(ent);
+			// check if this would get anyone stuck in this player
+			if ( !StuckInOtherClient(ent) ) {
+				// set flag so the expanded size will be set in PM_CheckDuck
+				client->ps.pm_flags |= PMF_INVULEXPAND;
+			}
+			// set back
+			VectorCopy (oldmins, ent->r.mins);
+			VectorCopy (oldmaxs, ent->r.maxs);
+			trap_LinkEntity(ent);
+		}
+	}
+#endif
+
+	pm.ps = &client->ps;
+	pm.cmd = *ucmd;
+	if ( pm.ps->pm_type == PM_DEAD ) {
+		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;
+	}
+	else if ( ent->r.svFlags & SVF_BOT ) {
+		pm.tracemask = MASK_PLAYERSOLID | CONTENTS_BOTCLIP;
+	}
+	else {
+		pm.tracemask = MASK_PLAYERSOLID;
+	}
+	pm.trace = trap_Trace;
+	pm.pointcontents = trap_PointContents;
+	pm.debugLevel = g_debugMove.integer;
+	pm.noFootsteps = ( g_dmflags.integer & DF_NO_FOOTSTEPS ) > 0;
+
+	pm.pmove_fixed = pmove_fixed.integer | client->pers.pmoveFixed;
+	pm.pmove_msec = pmove_msec.integer;
+
+	VectorCopy( client->ps.origin, client->oldOrigin );
+
+#ifdef MISSIONPACK
+		if (level.intermissionQueued != 0 && g_singlePlayer.integer) {
+			if ( level.time - level.intermissionQueued >= 1000  ) {
+				pm.cmd.buttons = 0;
+				pm.cmd.forwardmove = 0;
+				pm.cmd.rightmove = 0;
+				pm.cmd.upmove = 0;
+				if ( level.time - level.intermissionQueued >= 2000 && level.time - level.intermissionQueued <= 2500 ) {
+					trap_SendConsoleCommand( EXEC_APPEND, "centerview\n");
+				}
+				ent->client->ps.pm_type = PM_SPINTERMISSION;
+			}
+		}
+		Pmove (&pm);
+#else
+		Pmove (&pm);
+#endif
+
+	// save results of pmove
+	if ( ent->client->ps.eventSequence != oldEventSequence ) {
+		ent->eventTime = level.time;
+	}
+	if (g_smoothClients.integer) {
+		BG_PlayerStateToEntityStateExtraPolate( &ent->client->ps, &ent->s, ent->client->ps.commandTime, qtrue );
+	}
+	else {
+		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
+	}
+	SendPendingPredictableEvents( &ent->client->ps );
+
+	if ( !( ent->client->ps.eFlags & EF_FIRING ) ) {
+		client->fireHeld = qfalse;		// for grapple
+	}
+
+	// use the snapped origin for linking so it matches client predicted versions
+	VectorCopy( ent->s.pos.trBase, ent->r.currentOrigin );
+
+	VectorCopy (pm.mins, ent->r.mins);
+	VectorCopy (pm.maxs, ent->r.maxs);
+
+	ent->waterlevel = pm.waterlevel;
+	ent->watertype = pm.watertype;
+
+	// execute client events
+	ClientEvents( ent, oldEventSequence );
+
+	// link entity now, after any personal teleporters have been used
+	trap_LinkEntity (ent);
+	if ( !ent->client->noclip ) {
+		G_TouchTriggers( ent );
+	}
+
+	// NOTE: now copy the exact origin over otherwise clients can be snapped into solid
+	VectorCopy( ent->client->ps.origin, ent->r.currentOrigin );
+
+	//test for solid areas in the AAS file
+	BotTestAAS(ent->r.currentOrigin);
+
+	// touch other objects
+	ClientImpacts( ent, &pm );
+
+	// save results of triggers and client events
+	if (ent->client->ps.eventSequence != oldEventSequence) {
+		ent->eventTime = level.time;
+	}
+
+	// swap and latch button actions
+	client->oldbuttons = client->buttons;
+	client->buttons = ucmd->buttons;
+	client->latched_buttons |= client->buttons & ~client->oldbuttons;
+
+	// check for respawning
+	if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
+		// wait for the attack button to be pressed
+		if ( level.time > client->respawnTime ) {
+			// forcerespawn is to prevent users from waiting out powerups
+			if ( g_forcerespawn.integer > 0 && 
+				( level.time - client->respawnTime ) > g_forcerespawn.integer * 1000 ) {
+				respawn( ent );
+				return;
+			}
+		
+			// pressing attack or use is the normal respawn method
+			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) {
+				respawn( ent );
+			}
+		}
+		return;
+	}
+
+	// perform once-a-second actions
+	ClientTimerActions( ent, msec );
 }
 
 /*

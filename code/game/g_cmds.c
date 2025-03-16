@@ -2479,19 +2479,19 @@ void Cmd_Uinfo_f(gentity_t* ent)
 	ent->client->timeNudge = atoi(buf);
 
 	trap_Argv(4, buf, MAX_STRING_CHARS);
-	ent->client->customLoc = atoi(buf);
+	ent->client->isCustomLocEnabled = atoi(buf);
 
 	trap_Argv(5, buf, MAX_STRING_CHARS);
 	ui_flags = atoi(buf);
-	ent->client->followPowerup = ui_flags & 1;
-	ent->client->followKiller = ui_flags & 2;
-	ent->client->followViewCam = ui_flags & 4;
+	ent->client->isFollowPowerUp = ui_flags & 1;
+	ent->client->isFollowKiller = ui_flags & 2;
+	ent->client->isFollowViewCam = ui_flags & 4;
 
 	trap_Argv(6, buf, MAX_STRING_CHARS);
 	ent->client->autoAction = atoi(buf);
 
 	trap_Argv(7, buf, MAX_STRING_CHARS);
-	ent->client->usingJPEG = atoi(buf);
+	ent->client->isUsingJPEG = atoi(buf);
 }
 
 /*
@@ -2598,7 +2598,7 @@ static void Cmd_PlayerList_f(const gentity_t* ent)
 		readyStr[0] = 0;
 		if (level.warmupTime)
 		{
-			if (clientLocal->team == TEAM_SPECTATOR && clientLocal->pers.connected == CON_CONNECTING)
+			if (clientLocal->sess.sessionTeam == TEAM_SPECTATOR && clientLocal->pers.connected == CON_CONNECTING)
 			{
 				if (ent)
 				{
@@ -2659,7 +2659,7 @@ static void Cmd_PlayerList_f(const gentity_t* ent)
 		}
 		else
 		{
-			team = clientLocal->team;
+			team = clientLocal->sess.sessionTeam;
 			viewStr = " ";
 		}
 		/* Team */
@@ -2741,9 +2741,9 @@ static void Cmd_PlayerList_f(const gentity_t* ent)
 G_IsSpectator
 =================
 */
-static qboolean G_IsSpectator(const gclient_t* client)
+qboolean G_IsSpectator(const gclient_t* client)
 {
-	return !(client->team != TEAM_SPECTATOR && client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR  && client->unknown3 != 2);
+	return !(client->sess.sessionTeam != TEAM_SPECTATOR && client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR  && client->sess.spectatorState != SPECTATOR_FOLLOW);
 }
 
 /*
@@ -2757,11 +2757,11 @@ static team_t G_GetSpectatorTeam(const gentity_t* ent)
 	{
 		return ent->client->viewTeam;
 	}
-	if (G_IsGameTypeOSP(g_gametype.integer) && ent->client->team != TEAM_SPECTATOR && ent->client->clanArenaSpectateForTeam != TEAM_SPECTATOR)
+	if (G_IsGameTypeOSP(g_gametype.integer) && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->clanArenaSpectateForTeam != TEAM_SPECTATOR)
 	{
 		return ent->client->clanArenaSpectateForTeam;
 	}
-	return ent->client->team;
+	return ent->client->sess.sessionTeam;
 }
 /*
 =================
@@ -2783,18 +2783,18 @@ static void Cmd_GetStatsInfo_f(gentity_t* ent)
 
 	intermission = level.intermissiontime || level.intermissionQueued;
 
-	if ((client->team != TEAM_SPECTATOR && g_gametype.integer == GT_TEAM && server_freezetag.integer && G_IsSpectator(client)) ||
+	if ((client->sess.sessionTeam != TEAM_SPECTATOR && g_gametype.integer == GT_TEAM && server_freezetag.integer && G_IsSpectator(client)) ||
 	        (intermission && G_IsGameTypeOSP(g_gametype.integer) && G_GetSpectatorTeam(ent) != TEAM_SPECTATOR))
 	{
 		playerID = ent - g_entities;
 	}
 	else
 	{
-		if (ent->client->unknown3 == 0x2 || ent->client->unknown3 == 0x5)
+		if (ent->client->sess.spectatorState == 0x2 || ent->client->sess.spectatorState == 0x5)
 		{
-			playerID = ent->client->unknown4;
+			playerID = ent->client->sess.spectatorClient;
 		}
-		else if (ent->client->unknown3 == 0x7 && ent->client->tail3_25)
+		else if (ent->client->sess.spectatorState == 0x7 && ent->client->tail3_25)
 		{
 			//playerID = ent->client->tail3_39[ent->client->tail3_26];                      /* Address : 0x2f8a5 Type : Interium */
 		}
@@ -2826,15 +2826,15 @@ static void Cmd_GetStatsInfo_f(gentity_t* ent)
 
 	if (g_gametype.integer != GT_CA)
 	{
-		team = client->team;                                                    /* Address : 0x2f937 Type : Interium */
+		team = client->sess.sessionTeam;
 	}
-	else if (client->team == TEAM_SPECTATOR)
+	else if (client->sess.sessionTeam == TEAM_SPECTATOR)
 	{
-		team = client->clanArenaSpectateForTeam;                                    /* Address : 0x2f947 Type : Interium */
+		team = client->clanArenaSpectateForTeam;
 	}
 	else
 	{
-		team = client->team;                                                        /* Address : 0x2f950 Type : Interium */
+		team = client->sess.sessionTeam;
 	}
 
 	strcpy(wstatsHead, va("%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i ",
@@ -2848,8 +2848,8 @@ static void Cmd_GetStatsInfo_f(gentity_t* ent)
 	                      client->stats.damageTeam,
 	                      client->stats,
 	                      client->stats.damageRecieved,
-	                      client->wins,
-	                      client->loses,
+	                      client->sess.wins,
+	                      client->sess.losses,
 	                      client->pers.teamState.captures,
 	                      client->pers.teamState.lasthurtcarrier,
 	                      client->pers.teamState.basedefense + client->pers.teamState.carrierdefense,
