@@ -719,7 +719,7 @@ void G_RegisterCvars(void)
 	for (i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++)
 	{
 		//skip if not team game and cvar name start with Score_ but not gametype 1 and name "Score_Time"
-		if (g_gametype.integer < GT_TEAM && cv->cvarName == strstr(cv->cvarName, "Score_") && (g_gametype.integer != 1 || Q_stricmp(cv->cvarName, "Score_Time")))
+		if (g_gametype.integer < GT_TEAM && cv->cvarName == strstr(cv->cvarName, "Score_") && (g_gametype.integer != 1 || !Q_stricmp(cv->cvarName, "Score_Time")))
 		{
 			continue;
 		}
@@ -729,12 +729,12 @@ void G_RegisterCvars(void)
 			continue;
 		}
 		//skip if team game and name Players_Active
-		if (g_gametype.integer >= GT_TEAM && Q_stricmp(cv->cvarName, "Players_Active"))
+		if (g_gametype.integer >= GT_TEAM && !Q_stricmp(cv->cvarName, "Players_Active"))
 		{
 			continue;
 		}
 
-		if (Q_stricmp(cv->cvarName, "gamename"))
+		if (!Q_stricmp(cv->cvarName, "gamename"))
 		{
 			trap_Cvar_Register(cv->vmCvar, cv->cvarName, "baseq3", cv->cvarFlags);
 		}
