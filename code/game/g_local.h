@@ -715,6 +715,8 @@ void DeathmatchScoreboardMessage(gentity_t* client);
 // g_cmds.c
 //
 qboolean G_IsSpectator(const gclient_t* client);
+qboolean Cmd_CallVote_f(const gentity_t* ent, int unk);
+void SanitizeString(const char* in, char* out, qboolean toLower);
 
 //
 // g_pweapon.c
@@ -732,7 +734,6 @@ void QDECL G_LogPrintf(const char* fmt, ...);
 void SendScoreboardMessageToAllClients(void);
 void QDECL G_Printf(const char* fmt, ...);
 void QDECL G_Error(const char* fmt, ...);
-void G_AdminLog(const char* text);
 qboolean G_IsGameTypeOSP(int gametype);
 
 //

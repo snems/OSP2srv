@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 #include "g_local.h"
-#include "g_unimplemented.h"
+#include "osp_local.h"
 #include "q_shared.h"
 
 
@@ -923,14 +923,6 @@ void SendPendingPredictableEvents(playerState_t* ps)
 		ps->externalEvent = extEvent;
 	}
 }
-qboolean G_IsAttackEnabled(void)
-{
-	if (g_gametype.integer == GT_CA && level.warmupTime && !match_cawarmupfire.integer)
-	{
-		return qfalse;
-	}
-	return qtrue;
-}
 
 /*
 ==============
@@ -1039,7 +1031,7 @@ void ClientThink_real_recovery(gentity_t* ent)
 		ClientSpawn(ent);
 		if (client->tail3_26 == 0)
 		{
-			gentity_t *x = g_unk_2b5b0 (ent->client->ps.origin, 0x2a);
+			gentity_t *x = G_TempEntity(ent->client->ps.origin, 0x2a);
 			x->s.clientNum = ent->s.clientNum;
 		}
 	}

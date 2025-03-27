@@ -21,99 +21,23 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 #include "g_local.h"
-#include "g_unimplemented.h"
+#include "osp_local.h"
 
 #include "../../ui/menudef.h"           // for the voice chats
 #include "q_shared.h"
-//
-static const char* cmdHelp[] =
-{
-	":^7 Locks/unlocks a player's team"
-	, ":^7 Locks/unlocks a player's team from spectators"
-	, ":^7 Toggles option to stay as a spectator in 1v1"
-	, ":^7 Sets your status to ^5ready^7 to start a match"
-	, ":^7 Lists all active players and their IDs/information"
-	, " <player_ID>:^7 Invites a player to join a team"
-	, ":^7 Invites a player to spectate a spec-locked team"
-	, " <player_ID>:^7 Invites a player to coach team"
-	, ":^7 Declines coach invitation or resigns coach status"
-	, " <player_ID>:^7 Kicks active coach from team"
-	, ":^7 Accepts coach invitation/restarts coach view"
-	, " <player_ID>:^7 Removes a player from the team"
-	, " [player_ID]:^7 Resigns captainship.  Can optionally be given to another teammate"
-	, ":^7 Sets an entire team's status to ^5ready^7 to start a match"
-	, ":^7 Shows team captains"
-	, ":^7 Pause the match or issue a team timeout/timein"
-	, " [player_ID]:^7 Shows weapon accuracy stats for a player"
-	, " [player_ID]:^7 Shows player stats + match info saved locally to a file"
-	, " [password]:^7 Shows/sets team joincode or used to join a locked team"
-	, " <item>:^7 Drops available weapon/ammo/flag"
-	, ":^7 Shows BEST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon"
-	, ":^7 Creates a demo with a consistant naming scheme (OSP clients only)"
-	, ":^7 Creates a screenshot with a consistant naming scheme (OSP clients only)"
-	, ":^7 Shows WORST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon"
-	, " <password>:^7 Become a referee (admin access)"
-	, ":^7 Switches to cinematic camera mode"
-	, " [player_ID]:^7 Puts viewcam in follow mode.  Can optionally to follow a specific player"
-	, ":^7 Toggle viewcam between manual/automatic change"
-	, ":^7 Toggle ViewCam between static/dynamic views"
-	, " <player_ID>:^7 Adds a player to multi-screen view"
-	, ":^7 Adds all active players to a multi-screen view"
-	, " [player_ID]:^7 Removes current selected or specific player from multi-screen view"
-	, ":^7 Disables multiview mode and goes back to spectator mode"
-	, ":^7 Moves through active screen in a multi-screen display"
-	, ":^7 Cycles through players in current view"
-	, ":^7 Follows current highlighted view"
-	, ": ^7 Views entire red/blue team"
-	, " <r|b|s|none>:^7 Chooses a team or shows current team (s = spectator mode)"
-	, " <player_ID|red|blue>:^7 Spectates a particular player or team"
-	, ":^7 Sets player's status to ^5not ready^7 to start a match"
-	, " <params>:^7 Calls a vote"
-	, ":^7 Gives a list of most OSP commands"
-};
 
-#define CMDHELP_0   0
-#define CMDHELP_1   1
-#define CMDHELP_SPECONLY   2
-#define CMDHELP_3   3
-#define CMDHELP_PLAYER_LIST 4
-#define CMDHELP_5   5
-#define CMDHELP_6   6
-#define CMDHELP_7   7
-#define CMDHELP_8   8
-#define CMDHELP_9   9
-#define CMDHELP_10  10 //0a
-#define CMDHELP_11  11 //0b
-#define CMDHELP_12  12 //0c
-#define CMDHELP_13  13 //0d
-#define CMDHELP_14  14 //0e
-#define CMDHELP_15  15 //0f
-#define CMDHELP_16  16 //10
-#define CMDHELP_17  17 //11
-#define CMDHELP_18  18 //12
-#define CMDHELP_19  19 //13
-#define CMDHELP_20  20 //14
-#define CMDHELP_AUTORECORD  21
-#define CMDHELP_AUTOSCREENSHOT  22
-#define CMDHELP_23  23 //17
-#define CMDHELP_REF  24 //18
-#define CMDHELP_VIEWCAM  25 //19
-#define CMDHELP_VCFOLLOW  26 //1a
-#define CMDHELP_VCFREE  27 //1b
-#define CMDHELP_VCVIEW  28 //1c
-#define CMDHELP_VIEWADD  29 //1d
-#define CMDHELP_VIEWALL  30 //1e
-#define CMDHELP_VIEWREMOVE  31 //1f
-#define CMDHELP_VIEWNONE  32 //20
-#define CMDHELP_VIEWNEXT  33 //21
-#define CMDHELP_VIEWCYCLENEXT  34 //22
-#define CMDHELP_VIEWFOLLOW  35 //23
-#define CMDHELP_VIEWTEAM  36 //24
-#define CMDHELP_TEAM  37 //25
-#define CMDHELP_FOLLOW  38 //26
-#define CMDHELP_39  39 //27
-#define CMDHELP_CALLVOTE  40 //28
-#define CMDHELP_MOST  41 //29
+static const char* gameNames[] =
+{
+	"Free For All",
+	"Tournament",
+	"Single Player",
+	"Team Deathmatch",
+	"Capture the Flag",
+	"One Flag CTF",
+	"Overload",
+	"Harvester"
+};
+//
 
 /*
 ==================
@@ -264,7 +188,7 @@ SanitizeString
 Remove case and control characters
 ==================
 */
-static void SanitizeString(const char* in, char* out, qboolean toLower)
+void SanitizeString(const char* in, char* out, qboolean toLower)
 {
 	char tmp;
 	while (*in)
@@ -1508,49 +1432,38 @@ void Cmd_Where_f(gentity_t* ent)
 	trap_SendServerCommand(ent - g_entities, va("print \"%s\n\"", vtos(ent->s.origin)));
 }
 
-static const char* gameNames[] =
-{
-	"Free For All",
-	"Tournament",
-	"Single Player",
-	"Team Deathmatch",
-	"Capture the Flag",
-	"One Flag CTF",
-	"Overload",
-	"Harvester"
-};
-
 /*
 ==================
 Cmd_CallVote_f
 ==================
 */
-void Cmd_CallVote_f(gentity_t* ent)
+qboolean Cmd_CallVote_f(const gentity_t* ent, int unk)
 {
 	int     i;
 	char    arg1[MAX_STRING_TOKENS];
 	char    arg2[MAX_STRING_TOKENS];
+	qboolean rez = qfalse;
 
 	if (!g_allowVote.integer)
 	{
 		trap_SendServerCommand(ent - g_entities, "print \"Voting not allowed here.\n\"");
-		return;
+		return rez;
 	}
 
 	if (level.voteTime)
 	{
 		trap_SendServerCommand(ent - g_entities, "print \"A vote is already in progress.\n\"");
-		return;
+		return rez;
 	}
 	if (ent->client->pers.voteCount >= MAX_VOTE_COUNT)
 	{
 		trap_SendServerCommand(ent - g_entities, "print \"You have called the maximum number of votes.\n\"");
-		return;
+		return rez;
 	}
 	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR)
 	{
 		trap_SendServerCommand(ent - g_entities, "print \"Not allowed to call a vote as spectator.\n\"");
-		return;
+		return rez;
 	}
 
 	// make sure it is a valid command to vote on
@@ -1560,7 +1473,7 @@ void Cmd_CallVote_f(gentity_t* ent)
 	if (strchr(arg1, ';') || strchr(arg2, ';'))
 	{
 		trap_SendServerCommand(ent - g_entities, "print \"Invalid vote string.\n\"");
-		return;
+		return rez;
 	}
 
 	if (!Q_stricmp(arg1, "map_restart"))
@@ -1594,7 +1507,7 @@ void Cmd_CallVote_f(gentity_t* ent)
 	{
 		trap_SendServerCommand(ent - g_entities, "print \"Invalid vote string.\n\"");
 		trap_SendServerCommand(ent - g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>.\n\"");
-		return;
+		return rez;
 	}
 
 	// if there is still a vote to be executed
@@ -1611,7 +1524,7 @@ void Cmd_CallVote_f(gentity_t* ent)
 		if (i == GT_SINGLE_PLAYER || i < GT_FFA || i >= GT_MAX_GAME_TYPE)
 		{
 			trap_SendServerCommand(ent - g_entities, "print \"Invalid gametype.\n\"");
-			return;
+			return rez;
 		}
 
 		Com_sprintf(level.voteString, sizeof(level.voteString), "%s %d", arg1, i);
@@ -1642,7 +1555,7 @@ void Cmd_CallVote_f(gentity_t* ent)
 		if (!*s)
 		{
 			trap_SendServerCommand(ent - g_entities, "print \"nextmap not set.\n\"");
-			return;
+			return rez;
 		}
 		Com_sprintf(level.voteString, sizeof(level.voteString), "vstr nextmap");
 		Com_sprintf(level.voteDisplayString, sizeof(level.voteDisplayString), "%s", level.voteString);
@@ -1670,7 +1583,10 @@ void Cmd_CallVote_f(gentity_t* ent)
 	trap_SetConfigstring(CS_VOTE_STRING, level.voteDisplayString);
 	trap_SetConfigstring(CS_VOTE_YES, va("%i", level.voteYes));
 	trap_SetConfigstring(CS_VOTE_NO, va("%i", level.voteNo));
+	return rez;
 }
+
+
 
 /*
 ==================
@@ -1960,784 +1876,6 @@ void Cmd_SetViewpos_f(gentity_t* ent)
 
 /*
 =================
-Cmd_Help_f
-=================
-*/
-static qboolean Cmd_Help_f(const gentity_t* ent, int cmdNumber)
-{
-	int rc;
-	char text[MAX_STRING_CHARS];
-
-	if (!ent)
-	{
-		return qfalse;
-	}
-
-	trap_Argv(1, text, MAX_STRING_CHARS);
-
-	if (Q_stricmp(text, "?") == 0)
-	{
-		trap_Argv(0, text, MAX_STRING_CHARS);
-		trap_SendServerCommand(ent - g_entities, va("print \"\n^3%s%s\n\n\"", text, cmdHelp[cmdNumber]));
-		return qtrue;
-	}
-	return qfalse;
-}
-
-/*
-=================
-Cmd_HelpAvailOspGameCommands_f
-=================
-\help
-^5
-Available OSP Game-Commands:
-----------------------------
-^3autorecord       invite           specinvite       vc_free
-^3autoscreenshot   joincode         speclock         vc_view
-^3bottomshots      lock/unlock      speconly         viewcam
-^3callvote         menu             specunlock       viewadd
-^3captains         ready            stats            viewblue
-^3coach            notready         statsall         viewred
-^3coachdecline     players          statsblue        viewfollow
-^3coachinvite      readyteam        statsdump        viewnext
-^3coachkick        ref/admin        statsred         viewnone
-^3credits          remove           time/pause       viewprev
-^3currenttime      resign           timein/unpause   viewremove
-^3drop             scores           topshots         viewcyclenext
-^3help/commands    settings         vc_follow        viewcycleprev
-
-Type: ^3\command_name ?^7 for more information
-
-^6OSP Tourney DM for Quake3 v(1.03a)
-^5http://www.OrangeSmoothie.org/^7
-*/
-
-static void Cmd_HelpAvailOspGameCommands_f(const gentity_t* ent)
-{
-	static const char* availOspGameCommands[] =
-	{
-		"autorecord", "autoscreenshot", "bottomshots", "callvote",
-		"captains", "coach", "coachdecline", "coachinvite",
-		"coachkick", "credits", "currenttime", "drop",
-		"help/commands", "invite", "joincode", "lock/unlock",
-		"menu", "ready", "notready", "players",
-		"readyteam", "ref/admin", "remove", "resign",
-		"scores", "settings", "specinvite", "speclock",
-		"speconly", "specunlock", "stats", "statsall",
-		"statsblue", "statsdump", "statsred", "time/pause",
-		"timein/unpause", "topshots", "vc_follow", "vc_free",
-		"vc_view", "viewcam", "viewadd", "viewblue",
-		"viewred", "viewfollow", "viewnext", "viewnone",
-		"viewprev", "viewremove", "viewcyclenext", "viewcycleprev",
-	};
-
-	static const int numberOfCommands = sizeof(availOspGameCommands) / sizeof(char*);
-	static const int numberOfColums = 4;
-	const int numberOfRows = (numberOfCommands / 4) + ((numberOfCommands % 4) ? 1 : 0);
-	int i = 0;
-	const char* c1;
-	const char* c2;
-	const char* c3;
-	const char* c4;
-
-	trap_SendServerCommand(ent - g_entities, "print \"^5\nAvailable OSP Game-Commands:\n----------------------------\n\"");
-
-	while (i < numberOfRows)
-	{
-		c1 = availOspGameCommands[i];
-		c2 = (i + numberOfRows < numberOfCommands) ? availOspGameCommands[i + numberOfRows] : "";
-		c3 = (i + numberOfRows * 2 < numberOfCommands) ? availOspGameCommands[i + numberOfRows * 2] : "";
-		c4 = (i + numberOfRows * 3 < numberOfCommands) ? availOspGameCommands[i + numberOfRows * 3] : "";
-
-		trap_SendServerCommand(ent - g_entities, va("print \"^3%-17s%-17s%-17s%-17s\n\"", c1, c2, c3, c4));
-		++i;
-	}
-
-	trap_SendServerCommand(ent - g_entities, "print \"\nType: ^3\ncommand_name ?^7 for more information\n\"");
-	trap_SendServerCommand(ent - g_entities, va("print \"\n^6OSP Tourney DM for Quake3 %s\n\"", OSP_VERSION_STR));
-	trap_SendServerCommand(ent - g_entities, "print \"^5http://www.OrangeSmoothie.org/^7\n\n\"");
-
-
-	if (level.serverMode & 1)
-	{
-		trap_SendServerCommand(ent - g_entities, "print \"^3ProMode^7 settings provided by:\n\"");
-		trap_SendServerCommand(ent - g_entities, "print \"Challenge ProMode - http://www.promode.org\n\"");
-	}
-	else
-	{
-		if (level.serverMode & 2)
-		{
-			trap_SendServerCommand(ent - g_entities, "print \"^3CQ3^7 settings provided by:\n\"");
-			trap_SendServerCommand(ent - g_entities, "print \"Challenge Q3 - http://www.promode.org\n\"");
-		}
-	}
-}
-
-/*
-=================
-Cmd_RefCommand_f
-=================
-*/
-static qboolean Cmd_OSPCommands_f(const gentity_t* ent, char* arg, qboolean isReferee)
-{
-	if (g_gametype.integer >= GT_TEAM)
-	{
-		if (!Q_stricmp(arg, "lock") || !Q_stricmp(arg, "unlock"))
-		{
-			Cmd_Lock_f(ent, arg);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "lock") || !Q_stricmp(arg, "unlock"))
-		{
-			Cmd_SpecLock_f(ent, arg);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "teamready") || !Q_stricmp(arg, "readyteam"))
-		{
-			Cmd_TeamReady_f(ent);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "invite") || !Q_stricmp(arg, "pickplayer"))
-		{
-			Cmd_Invite_f(ent);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "specinvite") || !Q_stricmp(arg, "invitespec"))
-		{
-			Cmd_SpecInvite_f(ent);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "remove") || !Q_stricmp(arg, "kickplayer"))
-		{
-			Cmd_Remove_f(ent);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "capitans"))
-		{
-			Cmd_Capitans_f(ent);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "resign"))
-		{
-			Cmd_Resign_f(ent);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "joincode"))
-		{
-			Cmd_JoinCode_f(ent);
-			return qtrue;
-		}
-	}
-
-	if (g_gametype.integer != GT_SINGLE_PLAYER)
-	{
-		if (!Q_stricmp(arg, "ready"))
-		{
-			Cmd_Ready_f(ent, qtrue);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "notready") || !Q_stricmp(arg, "unready"))
-		{
-			Cmd_Ready_f(ent, qfalse);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "time") || !Q_stricmp(arg, "pause") || !Q_stricmp(arg, "timeout"))
-		{
-			Cmd_Pause_f(ent, qtrue);
-			return qtrue;
-		}
-		else if (!Q_stricmp(arg, "timein") || !Q_stricmp(arg, "unpause"))
-		{
-			Cmd_Pause_f(ent, qfalse);
-			return qtrue;
-		}
-	}
-
-	if (!Q_stricmp(arg, "help") || !Q_stricmp(arg, "commands") || !Q_stricmp(arg, "?"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_MOST))
-		{
-			Cmd_HelpAvailOspGameCommands_f(ent);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "followpowerup"))
-	{
-		ent->client->isFollowPowerUp = !ent->client->isFollowPowerUp;
-		trap_SendServerCommand(ent - g_entities, va("print \"\nAuto-follow of powerup pickups is: ^3%s\n\n\"", ent->client->isFollowPowerUp ? "ENABLED" : "DISABLED"));
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "speconly"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_SPECONLY))
-		{
-			Cmd_SpecOnly_f(ent);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "autorecord"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_AUTORECORD))
-		{
-			Cmd_AutoScreenshot_f(ent - g_entities, qtrue, qtrue);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "maplist"))
-	{
-		Cmd_MapList_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "mapload"))
-	{
-		Cmd_MapLoad_f(qtrue);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "range"))
-	{
-		Cmd_Range_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "snapshot"))
-	{
-		Cmd_Snapshot_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "snapshotdump"))
-	{
-		Cmd_SnapshotDump_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewadd"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWADD))
-		{
-			Cmd_ViewAdd_f(ent);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewall"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWALL) && !ent->client->viewTeam)
-		{
-			Cmd_ViewAll_f(ent);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewremove"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWREMOVE) && !ent->client->viewTeam)
-		{
-			Cmd_ViewerMove_f(ent);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewfollow"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWFOLLOW))
-		{
-			Cmd_ViewFollow(ent);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewnone"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWNONE) && !ent->client->viewTeam)
-		{
-			Cmd_ViewNone_f(ent);
-			ent->client->isHaveView = qfalse;
-			ClientUserinfoChanged(ent - g_entities);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewframe"))
-	{
-		Cmd_ViewFrame_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewnext"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWNEXT))
-		{
-			Cmd_ViewNext_f(ent, 1);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewprev"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWNEXT))
-		{
-			Cmd_ViewNext_f(ent, -1);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewcyclenext"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWCYCLENEXT))
-		{
-			Cmd_ViewCycleNext_f(ent, 1);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewcycleprev"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWCYCLENEXT))
-		{
-			Cmd_ViewCycleNext_f(ent, -1);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewred"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWTEAM))
-		{
-			Cmd_ViewTeam_f(ent, 0, 0);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewblue"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWTEAM))
-		{
-			Cmd_ViewTeam_f(ent, 2, 1);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "coach"))
-	{
-		Cmd_Coach_f(ent, qtrue);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "coachinvite"))
-	{
-		Cmd_CoachInvite_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "coachdecline"))
-	{
-		Cmd_CoachDecline_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "coachkick"))
-	{
-		Cmd_CoachKick_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "vc_proximity"))
-	{
-		Cmd_VcProximity_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "vc_info"))
-	{
-		ent->client->isVcInfoEnabled = !ent->client->isVcInfoEnabled;
-		trap_SendServerCommand(ent - g_entities, va("print \"ViewCam info is ^5%s\n\"", ent->client->isVcInfoEnabled ? "ENABLED" : "DISABLED"));
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "vc_follw"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VCFOLLOW))
-		{
-			Cmd_ViewTeam_f(ent, 0, 0);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "vc_free"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VCFREE))
-		{
-			ent->client->isVcFreeEnabled = !ent->client->isVcFreeEnabled;
-			trap_SendServerCommand(ent - g_entities, va("print \"ViewCam is now ^5%s\n\"", ent->client->isVcFreeEnabled ? "ENABLED" : "DISABLED"));
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "vc_view"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VCVIEW))
-		{
-			ent->client->isVcViewEnabled = !ent->client->isVcViewEnabled;
-			trap_SendServerCommand(ent - g_entities, va("print \"ViewCam is now ^5%s\n\"", ent->client->isVcViewEnabled ? "ENABLED" : "DISABLED"));
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "drop"))
-	{
-		Cmd_Drop_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "viewcam"))
-	{
-		if (!Cmd_Help_f(ent, CMDHELP_VIEWCAM))
-		{
-			Cmd_ViewCam_f(ent);
-		}
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "settings"))
-	{
-		Cmd_Settings_f(ent);
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "rhea") || !Q_stricmp(arg, "osp")  || !Q_stricmp(arg, "dess") || !Q_stricmp(arg, "shod"))
-	{
-		trap_SendServerCommand(ent - g_entities, va("print \"OSP2 Tourney DM for Quake3!\n\""));
-		trap_SendServerCommand(ent - g_entities, "print \"^5https://github.com/snems/osp2^7\n\n\"");
-		return qtrue;
-	}
-	else if (!Q_stricmp(arg, "arqon"))
-	{
-		trap_SendServerCommand(ent - g_entities, "print \"\n^3 OSP2 > OSP > CPMA !!!\n\n\"");
-		return qtrue;
-	}
-
-	return qfalse;
-}
-/*
-=================
-Cmd_RefCommand_f
-=================
-*/
-static void Cmd_RefCommand_f(const gentity_t* ent, qboolean skipOSPCommands)
-{
-	char text[MAX_STRING_CHARS];
-	if (ent->client->isReferee)
-	{
-		if (!skipOSPCommands)
-		{
-			trap_Argv(1, &text[0], MAX_STRING_CHARS);
-			if (Cmd_OSPCommands_f(ent, &text[0], qtrue) && Cmd_RefCommandArg_f(ent, &text[0], 1) && !Cmd_CallVote2_f(ent, 1))
-			{
-				Cmd_RefHelp(ent);
-			}
-		}
-	}
-	else
-	{
-		if (Q_stricmp(ref_password.string, "none") == 0 || ref_password.string[0] == 0)
-		{
-			trap_SendServerCommand(ent - g_entities, "print \"Sorry, referee status disabled on this server.\n\"");
-			return;
-		}
-
-		if (trap_Argc() < 2)
-		{
-			trap_SendServerCommand(ent - g_entities, "print \"Usage: ref [password]\n\"");
-		}
-		else
-		{
-			trap_Argv(1, &text[0], 0x400);
-			if (Q_stricmp(&text[0], ref_password.string))
-			{
-				trap_SendServerCommand(ent - g_entities, "print \"Invalid referee password!\n\"");
-				G_AdminLog(va("Referee_Attempt_Fail\t%s\t(%s)", ent->client->pers.netname, &text[0]));
-			}
-			else
-			{
-				ent->client->isReferee = qtrue;
-				ent->client->unknown2 = 3;
-				trap_SendServerCommand(ent - g_entities, "print \"Type: ^3ref ?^7 for a list of referee commands.\n\"");
-				trap_SendServerCommand(-1, va("cp \"%s\n^3has become a referee\n\"", ent->client->pers.netname));
-				G_AdminLog(va("Referee_Attempt_Success\t%s\t(%s)", ent->client->pers.netname, text));
-			}
-		}
-	}
-}
-
-/*
-=================
-Cmd_Uinfo_f
-
-There is eight values:
-
-- cl_maxpackets.integer
-- snaps.integer
-- cl_timenudge.integer
-- customLocationsEnabled
-- flags (follow mode)
-- cg_autoAction.integer
-- using_jpeg
-
-=================
-*/
-void Cmd_Uinfo_f(gentity_t* ent)
-{
-	char buf[MAX_STRING_CHARS];
-	int ui_flags;
-
-	if (trap_Argc() < 8)
-	{
-		return;
-	}
-
-	trap_Argv(1, buf, MAX_STRING_CHARS);
-	ent->client->maxPackets = atoi(buf);
-
-	trap_Argv(2, buf, MAX_STRING_CHARS);
-	ent->client->snaps = atoi(buf);
-
-	trap_Argv(3, buf, MAX_STRING_CHARS);
-	ent->client->timeNudge = atoi(buf);
-
-	trap_Argv(4, buf, MAX_STRING_CHARS);
-	ent->client->isCustomLocEnabled = atoi(buf);
-
-	trap_Argv(5, buf, MAX_STRING_CHARS);
-	ui_flags = atoi(buf);
-	ent->client->isFollowPowerUp = ui_flags & 1;
-	ent->client->isFollowKiller = ui_flags & 2;
-	ent->client->isFollowViewCam = ui_flags & 4;
-
-	trap_Argv(6, buf, MAX_STRING_CHARS);
-	ent->client->autoAction = atoi(buf);
-
-	trap_Argv(7, buf, MAX_STRING_CHARS);
-	ent->client->isUsingJPEG = atoi(buf);
-}
-
-/*
-=================
-Cmd_PlayerList_f
-=================
-]\players
-
-^3Status^1   : ^3ID^1 : ^3Player                    Nudge  Rate  MaxPkts  Snaps
-^1---------------------------------------------------------------------^7
-^3(READY)^1  :^1R^7 5 ^1:^7 Grunt                     ^7[BOT] -----       --     --  ^3
-^3(READY)^1  :^4B^7 1 ^1:^7 Grunt                     ^7[BOT] -----       --     --  ^3
-^3(READY)^1  :^1R^7 6 ^1:^7 Major                     ^7[BOT] -----       --     --  ^3
-^3(READY)^1  :^4B^7 2 ^1:^7 Major                     ^7[BOT] -----       --     --  ^3
-^3(READY)^1  :^1R^7 4 ^1:^7 Sarge                     ^7[BOT] -----       --     --  ^3
-^3(READY)^1  :^1R^7 7 ^1:^7 Visor                     ^7[BOT] -----       --     --  ^3
-^3(READY)^1  :^4B^7 3 ^1:^7 Visor                     ^7[BOT] -----       --     --  ^3
-NOTREADY^1 :^4B^7 0 ^1:^7 snems                     ^7    0 25000      125     40  ^3
-
-^3 8^7 total players
-
-]quit
-*/
-static void Cmd_PlayerList_f(const gentity_t* ent)
-{
-	const gclient_t* clientLocal;
-	int clientID;
-	char readyStr[16];
-	char refStr[16];
-	const char* viewStr;
-	const char* colorStr;
-	const gentity_t* clientEntity;
-	char* teamStr = NULL;
-	int maxRate;
-	int i;
-	int numberOfPlayers;
-	char playerNameSanitized[MAX_NETNAME];
-	char tmp[256];
-	char userinfo[MAX_INFO_STRING];
-	int clientRate;
-	qboolean isBot;
-	int team;
-
-	if (ent && Cmd_Help_f(ent, CMDHELP_PLAYER_LIST)) return;
-
-	maxRate =   trap_Cvar_VariableIntegerValue("sv_maxrate");
-
-	if (level.warmupTime)
-	{
-		if (ent)
-		{
-			trap_SendServerCommand(ent - g_entities, "print \"\n^3Status^1   : ^3ID^1 : ^3Player                    Nudge  Rate  MaxPkts  Snaps\n\"");
-			trap_SendServerCommand(ent - g_entities, "print \"^1---------------------------------------------------------------------^7\n\"");
-		}
-		else
-		{
-			G_Printf("Status   : ID : Player                    Nudge  Rate  MaxPkts  Snaps\n");
-			G_Printf("---------------------------------------------------------------------\n");
-		}
-	}
-	else
-	{
-		if (ent)
-		{
-			trap_SendServerCommand(ent - g_entities, "print \"\n^3 ID^1 : ^3Player                    Nudge  Rate  MaxPkts  Snaps\n\"");
-			trap_SendServerCommand(ent - g_entities, "print \"^1-----------------------------------------------------------^7\n\"");
-		}
-		else
-		{
-			G_Printf(" ID : Player                    Nudge  Rate  MaxPkts  Snaps\n");
-			G_Printf("-----------------------------------------------------------\n");
-		}
-	}
-	for (i = 0, numberOfPlayers = 0; i < level.numConnectedClients; ++i, ++numberOfPlayers)
-	{
-		clientID = level.sortedClients[i];
-		clientLocal = &level.clients[clientID];
-		clientEntity = &g_entities[clientID];
-		isBot = clientEntity->r.svFlags & SVF_BOT;
-
-		G_Printf("netname before %s\n", clientLocal->pers.netname);
-		SanitizeString(clientLocal->pers.netname, playerNameSanitized, qfalse);
-		G_Printf("netname after %s\n", playerNameSanitized);
-
-		if (isBot)
-		{
-			strcpy(tmp, va("%s%s%s%s", "[BOT]", " -----", "       --", "     --"));
-		}
-		else if (clientLocal->pers.connected == CON_CONNECTING)
-		{
-			strcpy(tmp, va("%s", "^3>>> CONNECTING <<<"));
-		}
-		else
-		{
-			trap_GetUserinfo(clientID, userinfo, sizeof(userinfo));
-			clientRate = atoi(Info_ValueForKey(userinfo, "rate"));
-			if (maxRate && clientRate > maxRate)
-			{
-				clientRate = maxRate;
-			}
-			strcpy(tmp, va("%5d%6d%9d%7d", clientLocal->timeNudge, clientRate, clientLocal->maxPackets, clientLocal->snaps));
-		}
-		/* Ready status */
-		readyStr[0] = 0;
-		if (level.warmupTime)
-		{
-			if (clientLocal->sess.sessionTeam == TEAM_SPECTATOR && clientLocal->pers.connected == CON_CONNECTING)
-			{
-				if (ent)
-				{
-					strcpy(readyStr, "^5--------^1 :");
-				}
-				else
-				{
-					strcpy(readyStr, "-------- :");
-				}
-			}
-			else
-			{
-				if (clientLocal->playerReady || isBot)
-				{
-					if (ent)
-					{
-						strcpy(readyStr, "^3(READY)^1  :");
-					}
-					else
-					{
-						strcpy(readyStr, "(READY)  :");
-					}
-				}
-				else
-				{
-					if (ent)
-					{
-						strcpy(readyStr, "NOTREADY^1 :");
-					}
-					else
-					{
-						strcpy(readyStr, "NOTREADY :");
-					}
-				}
-			}
-		}
-		/* Ref */
-		if (clientLocal->isReferee != 0)
-		{
-			strcpy(refStr, "REF");
-		}
-		else
-		{
-			refStr[0] = 0;
-		}
-		/* Client view */
-		if (clientLocal->viewTeam)
-		{
-			team = clientLocal->viewTeam;
-			if (ent)
-			{
-				viewStr = "^3C";
-			}
-			else
-			{
-				viewStr = "C";
-			}
-		}
-		else
-		{
-			team = clientLocal->sess.sessionTeam;
-			viewStr = " ";
-		}
-		/* Team */
-		if (g_gametype.integer < GT_TEAM)
-		{
-			if (ent)
-			{
-				teamStr = "^7 ";
-			}
-			else
-			{
-				teamStr = " ";
-			}
-		}
-		else if (team == TEAM_RED)
-		{
-			if (ent)
-			{
-				teamStr = "^1R^7";
-			}
-			else
-			{
-				teamStr = "R";
-			}
-		}
-		else if (team == TEAM_RED)
-		{
-			if (ent)
-			{
-				teamStr = "^4B^7";
-			}
-			else
-			{
-				teamStr = "B";
-			}
-		}
-		else
-		{
-			if (ent)
-			{
-				teamStr = "^7 ";
-			}
-			else
-			{
-				teamStr = " ";
-			}
-		}
-
-		if (ent)
-		{
-			if (refStr[0])
-			{
-				colorStr = "^3";
-			}
-			else
-			{
-				colorStr = "^7";
-			}
-			trap_SendServerCommand(ent - g_entities, va("print \"%s%s%2d%s^1:%s %-26s^7%s  ^3%s\n\"", readyStr, teamStr, clientID, viewStr, colorStr, playerNameSanitized, tmp, refStr));
-		}
-		else
-		{
-			G_Printf("%s%s%2d%s: %-26s%s  %s\n", readyStr, teamStr, clientID, viewStr, playerNameSanitized, tmp, refStr);
-		}
-	}
-
-
-	if (ent)
-	{
-		trap_SendServerCommand(ent - g_entities, va("print \"\n^3%2d^7 total players\n\n\"", numberOfPlayers));
-	}
-	else
-	{
-		G_Printf("\n%2d total players\n\n", numberOfPlayers);
-	}
-}
-/*
-=================
 G_IsSpectator
 =================
 */
@@ -2746,133 +1884,6 @@ qboolean G_IsSpectator(const gclient_t* client)
 	return !(client->sess.sessionTeam != TEAM_SPECTATOR && client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR  && client->sess.spectatorState != SPECTATOR_FOLLOW);
 }
 
-/*
-=================
-G_GetSpectatorTeam
-=================
-*/
-static team_t G_GetSpectatorTeam(const gentity_t* ent)
-{
-	if (ent->client->viewTeam)
-	{
-		return ent->client->viewTeam;
-	}
-	if (G_IsGameTypeOSP(g_gametype.integer) && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->clanArenaSpectateForTeam != TEAM_SPECTATOR)
-	{
-		return ent->client->clanArenaSpectateForTeam;
-	}
-	return ent->client->sess.sessionTeam;
-}
-/*
-=================
-Cmd_GetStatsInfo_f
-=================
-*/
-static void Cmd_GetStatsInfo_f(gentity_t* ent)
-{
-	gclient_t* client;
-	char wstatsString[1024];
-	char wstatsHead[1024];
-	int weaponmask;
-	int playerID;
-	int team;
-	int wp;
-	int assists_plus;
-	qboolean intermission;
-	clientWeaponStats_t* ws;
-
-	intermission = level.intermissiontime || level.intermissionQueued;
-
-	if ((client->sess.sessionTeam != TEAM_SPECTATOR && g_gametype.integer == GT_TEAM && server_freezetag.integer && G_IsSpectator(client)) ||
-	        (intermission && G_IsGameTypeOSP(g_gametype.integer) && G_GetSpectatorTeam(ent) != TEAM_SPECTATOR))
-	{
-		playerID = ent - g_entities;
-	}
-	else
-	{
-		if (ent->client->sess.spectatorState == 0x2 || ent->client->sess.spectatorState == 0x5)
-		{
-			playerID = ent->client->sess.spectatorClient;
-		}
-		else if (ent->client->sess.spectatorState == 0x7 && ent->client->tail3_25)
-		{
-			//playerID = ent->client->tail3_39[ent->client->tail3_26];                      /* Address : 0x2f8a5 Type : Interium */
-		}
-		else
-		{
-			team_t st_team;
-			if (st_team != TEAM_RED && st_team != TEAM_BLUE && st_team != TEAM_SPECTATOR && g_gametype.integer == GT_TEAM && !server_freezetag.integer)
-			{
-				trap_SendServerCommand(ent - g_entities, "statsinfo 0");
-				return;
-			}
-			else
-			{
-				playerID = ent - g_entities;
-			}
-		}
-	}
-
-	client = &level.clients[playerID];
-
-	if (!client->ps.powerups[PW_REDFLAG] && !client->ps.powerups[PW_BLUEFLAG])
-	{
-		assists_plus = 0;
-	}
-	else
-	{
-		assists_plus = level.time - client->pers.teamState.lastfraggedcarrier;
-	}
-
-	if (g_gametype.integer != GT_CA)
-	{
-		team = client->sess.sessionTeam;
-	}
-	else if (client->sess.sessionTeam == TEAM_SPECTATOR)
-	{
-		team = client->clanArenaSpectateForTeam;
-	}
-	else
-	{
-		team = client->sess.sessionTeam;
-	}
-
-	strcpy(wstatsHead, va("%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i ",
-	                      1,
-	                      client->ps.persistant[PERS_SCORE],
-	                      team,
-	                      client->stats.kills,
-	                      client->stats.deaths,
-	                      client->stats.suicides,
-	                      client->stats.teamKills,
-	                      client->stats.damageTeam,
-	                      client->stats,
-	                      client->stats.damageRecieved,
-	                      client->sess.wins,
-	                      client->sess.losses,
-	                      client->pers.teamState.captures,
-	                      client->pers.teamState.lasthurtcarrier,
-	                      client->pers.teamState.basedefense + client->pers.teamState.carrierdefense,
-	                      client->pers.teamState.flagrecovery,
-	                      client->pers.teamState.assists + assists_plus,  // <<-------------------------
-	                      client->stats.mh,
-	                      client->stats.ga,
-	                      client->stats.ra,
-	                      client->stats.ya));
-
-	wstatsString[0] = 0;
-	weaponmask = 0;
-	for (wp = 1; wp < 10; ++wp)
-	{
-		ws = &client->clientWeaponStats[wp];
-		if (ws->attacks || ws->hits || ws->deaths)
-		{
-			weaponmask |= 1 << wp;
-			Q_strcat(wstatsString, MAX_STRING_CHARS, va(" %d %d %d %d", ws->hits, ws->attacks, ws->kills, ws->deaths));
-		}
-	}
-	trap_SendServerCommand(ent - g_entities, va("statsinfo %s %d%s", wstatsHead, weaponmask, wstatsString));
-}
 /*
 =================
 ClientCommand
@@ -2934,7 +1945,7 @@ void ClientCommand(int clientNum)
 	{
 		if (!Cmd_Help_f(ent, CMDHELP_REF))
 		{
-			Cmd_RefCommand_f(ent, 0);
+			Cmd_RefCommand_f(ent, qfalse);
 		}
 	}
 	else if ((Q_stricmp(cmd, "players") == 0) || (Q_stricmp(cmd, "playerslist") == 0))
@@ -2981,7 +1992,7 @@ void ClientCommand(int clientNum)
 	{
 		if (!Cmd_Help_f(ent, CMDHELP_AUTOSCREENSHOT))
 		{
-			Cmd_RefCommand_f(ent, 0);
+			Cmd_RefCommand_f(ent, qfalse);
 			Cmd_AutoScreenshot_f(ent - g_entities, 0, 1);
 		}
 	}
@@ -3025,7 +2036,7 @@ void ClientCommand(int clientNum)
 	else if ((Q_stricmp(cmd, "callvote") == 0) || (Q_stricmp(cmd, "vote") == 0))
 	{
 		Cmd_Help_f(ent, CMDHELP_CALLVOTE);
-		Cmd_CallVote2_f(ent, 0);
+		Cmd_CallVote_f(ent, 0);
 	}
 	else if (Q_stricmp(cmd, "vote") == 0)
 	{

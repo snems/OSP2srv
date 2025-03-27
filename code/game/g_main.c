@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 #include "q_shared.h"
-#include "g_unimplemented.h"
+#include "osp_local.h"
 
 level_locals_t  level;
 
@@ -506,11 +506,6 @@ void G_ShutdownGame(int restart);
 void CheckExitRules(void);
 
 
-static const char* monthName[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-static fileHandle_t adminLogHandle;
-static qboolean adminLogDisabled;
-
 
 /*
 ================
@@ -582,42 +577,6 @@ void QDECL G_Error(const char* fmt, ...)
 	va_end(argptr);
 
 	trap_Error(text);
-}
-
-/*
-================
-G_AdminLog
-================
-*/
-void G_AdminLog(const char* text)
-{
-	qtime_t localTime;
-	const char* tmp;
-	char textToWrite[MAX_STRING_CHARS];
-	if (!admin_log.string[0] || Q_stricmp(admin_log.string, "none"))
-	{
-		adminLogDisabled = qtrue;
-		return;
-	}
-
-	(void)trap_FS_FOpenFile(admin_log.string, &adminLogHandle, FS_WRITE | FS_APPEND);
-	if (!adminLogHandle)
-	{
-		adminLogDisabled = qtrue;
-		G_Printf("*** ERROR: Couldn't open admin log \"%s\"\n\n", admin_log.string);
-	}
-	else
-	{
-		trap_RealTime(&localTime);
-		tmp = va("%02d %s %d (%02d:%02d:%02d)\t%s\n", localTime.tm_mday, monthName[localTime.tm_mon], localTime.tm_year + 1900, localTime.tm_hour, localTime.tm_min, localTime.tm_sec, text);
-		Q_strncpyz(textToWrite, tmp, MAX_STRING_CHARS);
-		trap_FS_Write(textToWrite, strlen(textToWrite), adminLogHandle);
-		trap_FS_FCloseFile(adminLogHandle);
-		if (g_dedicated.integer)
-		{
-			G_Printf("%s\n", textToWrite);
-		}
-	}
 }
 
 /*
@@ -829,8 +788,8 @@ void G_RegisterCvars(void)
 
 	trap_Cvar_Update(&server_promode);
 	trap_Cvar_Update(&server_cq3);
-	g_unk_33677();                                                                  /* Address : 0x449 Type : Interium */
-	g_unk_33dc1(0);                                                                 /* Address : 0x44e Type : Interium */
+	osp_cmds_33677();
+	osp_cmds_33dc1(0);
 
 	// check some things
 	if (g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE)
@@ -1081,7 +1040,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 
 	ClearRegisteredItems();
 
-	OSP_UNK_CODE("g_unk_3285c()");
+	osp_cmds_3285c();
 	if (Q_stricmp(G_GetMapName(), "ospdm4") == 0)
 	{
 		level.unknown_flag1 |= 1;
@@ -1122,7 +1081,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 	}
 
 	G_RemapTeamShaders();
-	OSP_UNK_CODE("g_unk_30dd4()");
+	osp_cmds_30dd4();
 	G_UpdateCvars();
 }
 
