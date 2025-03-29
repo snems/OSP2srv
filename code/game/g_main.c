@@ -32,6 +32,8 @@ level_locals_t  level;
 #define TIMENUDGEMIN -200
 #define TIMENUDGEMAX 200
 
+extern char* BotMapTitle(void);
+
 typedef struct
 {
 	vmCvar_t*   vmCvar;
@@ -659,10 +661,10 @@ void G_RemapTeamShaders()
 G_IsGameTypeOSP
 =================
 */
-qboolean G_IsGameTypeOSP(int gametype)
-{
-	return gametype >= GT_CA;
-}
+//qboolean G_IsGameTypeOSP(int gametype)
+//{
+//	return gametype >= GT_CA;
+//}
 
 /*
 =================
@@ -845,17 +847,6 @@ void G_UpdateCvars(void)
 	{
 		G_RemapTeamShaders();
 	}
-}
-
-static const char* G_GetMapName(void)
-{
-	char    serverinfo[MAX_INFO_STRING];
-	static char mapname[128];
-
-	trap_GetServerinfo(serverinfo, sizeof(serverinfo));
-	strncpy(mapname, Info_ValueForKey(serverinfo, "mapname"), 127);
-
-	return mapname;
 }
 
 /*
@@ -1041,11 +1032,11 @@ void G_InitGame(int levelTime, int randomSeed, int restart)
 	ClearRegisteredItems();
 
 	osp_cmds_3285c();
-	if (Q_stricmp(G_GetMapName(), "ospdm4") == 0)
+	if (Q_stricmp(BotMapTitle(), "ospdm4") == 0)
 	{
 		level.unknown_flag1 |= 1;
 	}
-	if (Q_stricmp(G_GetMapName(), "ospdm2") == 0)
+	if (Q_stricmp(BotMapTitle(), "ospdm2") == 0)
 	{
 		level.unknown_flag1 |= 2;
 	}
@@ -1267,30 +1258,6 @@ void RemoveTournamentWinner(void)
 	SetTeam(&g_entities[ clientNum ], "s");
 }
 
-/*
-=======================
-AdjustTournamentScores
-=======================
-*/
-void AdjustTournamentScores(void)
-{
-	int         clientNum;
-
-	clientNum = level.sortedClients[0];
-	if (level.clients[ clientNum ].pers.connected == CON_CONNECTED)
-	{
-		level.clients[ clientNum ].sess.wins++;
-		ClientUserinfoChanged(clientNum);
-	}
-
-	clientNum = level.sortedClients[1];
-	if (level.clients[ clientNum ].pers.connected == CON_CONNECTED)
-	{
-		level.clients[ clientNum ].sess.losses++;
-		ClientUserinfoChanged(clientNum);
-	}
-
-}
 
 /*
 =============
@@ -1628,11 +1595,11 @@ void BeginIntermission(void)
 		return;     // already active
 	}
 
-	// if in tournement mode, change the wins / losses
-	if (g_gametype.integer == GT_TOURNAMENT)
-	{
-		AdjustTournamentScores();
-	}
+	///// if in tournement mode, change the wins / losses
+	///if (g_gametype.integer == GT_TOURNAMENT)
+	///{ removed in osp1
+	///	AdjustTournamentScores();
+	///}
 
 	level.intermissiontime = level.time;
 	FindIntermissionPoint();
@@ -2101,6 +2068,8 @@ void CheckExitRules(void)
 	}
 }
 
+                                                          
+void osp_g_main_01cb0(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_main_01cb0);}
 
 
 /*
@@ -2346,102 +2315,6 @@ void SetLeader(int team, int client)
 
 /*
 ==================
-CheckTeamLeader
-==================
-*/
-void CheckTeamLeader(int team)
-{
-	int i;
-
-	for (i = 0 ; i < level.maxclients ; i++)
-	{
-		if (level.clients[i].sess.sessionTeam != team)
-			continue;
-		if (level.clients[i].sess.teamLeader)
-			break;
-	}
-	if (i >= level.maxclients)
-	{
-		for (i = 0 ; i < level.maxclients ; i++)
-		{
-			if (level.clients[i].sess.sessionTeam != team)
-				continue;
-			if (!(g_entities[i].r.svFlags & SVF_BOT))
-			{
-				level.clients[i].sess.teamLeader = qtrue;
-				break;
-			}
-		}
-		for (i = 0 ; i < level.maxclients ; i++)
-		{
-			if (level.clients[i].sess.sessionTeam != team)
-				continue;
-			level.clients[i].sess.teamLeader = qtrue;
-			break;
-		}
-	}
-}
-
-/*
-==================
-CheckTeamVote
-==================
-*/
-void CheckTeamVote(int team)
-{
-	int cs_offset;
-
-	if (team == TEAM_RED)
-		cs_offset = 0;
-	else if (team == TEAM_BLUE)
-		cs_offset = 1;
-	else
-		return;
-
-	if (!level.teamVoteTime[cs_offset])
-	{
-		return;
-	}
-	if (level.time - level.teamVoteTime[cs_offset] >= VOTE_TIME)
-	{
-		trap_SendServerCommand(-1, "print \"Team vote failed.\n\"");
-	}
-	else
-	{
-		if (level.teamVoteYes[cs_offset] > level.numteamVotingClients[cs_offset] / 2)
-		{
-			// execute the command, then remove the vote
-			trap_SendServerCommand(-1, "print \"Team vote passed.\n\"");
-			//
-			if (!Q_strncmp("leader", level.teamVoteString[cs_offset], 6))
-			{
-				//set the team leader
-				SetLeader(team, atoi(level.teamVoteString[cs_offset] + 7));
-			}
-			else
-			{
-				trap_SendConsoleCommand(EXEC_APPEND, va("%s\n", level.teamVoteString[cs_offset]));
-			}
-		}
-		else if (level.teamVoteNo[cs_offset] >= level.numteamVotingClients[cs_offset] / 2)
-		{
-			// same behavior as a timeout
-			trap_SendServerCommand(-1, "print \"Team vote failed.\n\"");
-		}
-		else
-		{
-			// still waiting for a majority
-			return;
-		}
-	}
-	level.teamVoteTime[cs_offset] = 0;
-	trap_SetConfigstring(CS_TEAMVOTE_TIME + cs_offset, "");
-
-}
-
-
-/*
-==================
 CheckCvars
 ==================
 */
@@ -2624,8 +2497,8 @@ void G_RunFrame(int levelTime)
 	CheckVote();
 
 	// check team votes
-	CheckTeamVote(TEAM_RED);
-	CheckTeamVote(TEAM_BLUE);
+	//CheckTeamVote(TEAM_RED);
+	//CheckTeamVote(TEAM_BLUE);
 
 	// for tracking changes
 	CheckCvars();

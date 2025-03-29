@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 #include "g_local.h"
+#include "osp_unimpl.h"
 
 /*
 
@@ -43,6 +44,28 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define RESPAWN_MEGAHEALTH  35//120
 #define RESPAWN_POWERUP     120
 
+void osp_g_item_222f8(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_222f8);}
+void osp_g_item_22394(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22394);}
+void osp_g_item_223d4(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_223d4);}
+void osp_g_item_22469(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22469);}
+void osp_g_item_2248e(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_2248e);}
+void osp_g_item_22697(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22697);}
+void osp_g_item_22907(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22907);}
+void osp_g_item_22a38(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22a38);}
+void osp_g_item_22a9f(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22a9f);}
+void osp_g_item_22c19(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22c19);}
+void osp_g_item_22c53(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22c53);}
+void osp_g_item_22c70(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22c70);}
+void osp_g_item_22dff(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22dff);}
+void osp_g_item_22e9d(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22e9d);}
+void osp_g_item_22f12(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22f12);}
+void osp_g_item_22f6c(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_22f6c);}
+void osp_g_item_2305d(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_2305d);}
+void osp_g_item_23207(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_23207);}
+void osp_g_item_23386(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_23386);}
+void osp_g_item_2339c(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_2339c);}
+void osp_g_item_23404(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_23404);}
+void osp_g_item_2355c(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_2355c);}
 
 //======================================================================
 

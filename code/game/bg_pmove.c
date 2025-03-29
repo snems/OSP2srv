@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // bg_pmove.c -- both games player movement code
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
+#include "osp_unimpl.h"
 #include "q_shared.h"
 #include "bg_public.h"
 #include "bg_local.h"
@@ -2410,4 +2411,10 @@ void Pmove(pmove_t* pmove)
 	//PM_CheckStuck();
 
 }
+
+void osp_bg_pmove_06ea1(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_pmove_06ea1); }
+void osp_bg_pmove_0770c(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_pmove_0770c); }
+void osp_bg_pmove_077e2(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_pmove_077e2); }
+void osp_bg_pmove_0782d(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_pmove_0782d); }
+	
 

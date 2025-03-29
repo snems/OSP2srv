@@ -605,10 +605,8 @@ qboolean G_RadiusDamage(vec3_t origin, gentity_t* attacker, float damage, float 
 int G_InvulnerabilityEffect(gentity_t* targ, vec3_t dir, vec3_t point, vec3_t impactpoint, vec3_t bouncedir);
 void body_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath);
 void TossClientItems(gentity_t* self);
-#ifdef MISSIONPACK
-void TossClientPersistantPowerups(gentity_t* self);
-#endif
 void TossClientCubes(gentity_t* self);
+qboolean G_IsSpectator(const gclient_t* client);
 
 // damage flags
 #define DAMAGE_RADIUS               0x00000001  // damage was indirect
@@ -714,7 +712,6 @@ void DeathmatchScoreboardMessage(gentity_t* client);
 //
 // g_cmds.c
 //
-qboolean G_IsSpectator(const gclient_t* client);
 qboolean Cmd_CallVote_f(const gentity_t* ent, int unk);
 void SanitizeString(const char* in, char* out, qboolean toLower);
 

@@ -32,6 +32,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 #include "g_local.h"
+#include "osp_local.h"
 #include "botlib.h"
 #include "be_aas.h"
 #include "be_ea.h"
@@ -1752,6 +1753,16 @@ int BotSynonymContext(bot_state_t* bs)
 	}
 #endif
 	return context;
+}
+
+void osp_ai_dmq3_0e3c7(void)
+{
+	OSP2_UNIMPLEMENTED_FUNCTION(osp_ai_dmq3_0e3c7);
+}
+
+void osp_ai_dmq3_0e505(void)
+{
+	OSP2_UNIMPLEMENTED_FUNCTION(osp_ai_dmq3_0e505);
 }
 
 /*
@@ -6144,3 +6155,14 @@ void BotShutdownDeathmatchAI(void)
 {
 	altroutegoals_setup = qfalse;
 }
+
+void osp_ai_dmq3_127a2(void)
+{
+	OSP2_UNIMPLEMENTED_FUNCTION(osp_ai_dmq3_127a2);
+}
+
+void osp_ai_dmq3_128ca(void)
+{
+	OSP2_UNIMPLEMENTED_FUNCTION(osp_ai_dmq3_128ca);
+}
+

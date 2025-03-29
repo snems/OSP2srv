@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // perform the server side effects of a weapon firing
 
 #include "g_local.h"
+#include "osp_unimpl.h"
 
 static  float   s_quadFactor;
 static  vec3_t  forward, right, up;
@@ -893,6 +894,8 @@ void CalcMuzzlePointOrigin(gentity_t* ent, vec3_t origin, vec3_t forward, vec3_t
 }
 
 
+void osp_g_weapons_2c6d3 (void) { OSP2_UNIMPLEMENTED_FUNCTION(osp_g_weapons_2c6d3); }
+void osp_g_weapons_2c7a9 (void) { OSP2_UNIMPLEMENTED_FUNCTION(osp_g_weapons_2c7a9); }
 
 /*
 ===============

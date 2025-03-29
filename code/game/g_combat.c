@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // g_combat.c
 
 #include "g_local.h"
+#include "osp_unimpl.h"
 
 
 /*
@@ -1373,4 +1374,15 @@ qboolean G_RadiusDamage(vec3_t origin, gentity_t* attacker, float damage, float 
 	}
 
 	return hitClient;
+}
+
+void osp_g_item_222a5(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_g_item_222a5);}
+/*
+=================
+G_IsSpectator
+=================
+*/
+qboolean G_IsSpectator(const gclient_t* client)
+{
+	return !(client->sess.sessionTeam != TEAM_SPECTATOR && client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR  && client->sess.spectatorState != SPECTATOR_FOLLOW);
 }

@@ -1134,11 +1134,14 @@ void osp_cmds_30c9d(void)
 	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_30c9d);
 }
 
-
-qboolean IsGameTypeOSP(void)
+/*
+=================
+G_IsGameTypeOSP
+=================
+*/
+qboolean G_IsGameTypeOSP(int gametype)
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(IsGameTypeOSP);
-	return (qboolean)0;
+	return gametype >= GT_CA;
 }
 
 

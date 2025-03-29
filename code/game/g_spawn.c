@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 #include "g_local.h"
+#include "osp_unimpl.h"
 
 qboolean    G_SpawnString(const char* key, const char* defaultString, char** out)
 {
@@ -75,6 +76,8 @@ qboolean    G_SpawnVector(const char* key, const char* defaultString, float* out
 	sscanf(s, "%f %f %f", &out[0], &out[1], &out[2]);
 	return present;
 }
+
+void osp_g_spawn_2800e(void) { OSP2_UNIMPLEMENTED_FUNCTION(osp_g_spawn_2800e);}
 
 
 

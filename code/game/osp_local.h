@@ -109,7 +109,7 @@ void Cmd_Settings_f(const gentity_t* ent);
 void osp_cmds_30b09(void);
 void osp_cmds_30c10(void);
 void osp_cmds_30c9d(void);
-qboolean IsGameTypeOSP(void);
+qboolean G_IsGameTypeOSP(int gametype);
 void osp_cmds_30dd4(void);
 void osp_cmds_30f4f(void);
 void osp_cmds_30f90(void);
@@ -310,6 +310,5 @@ void osp_unsorted_3d4d9(void);
 void osp_unsorted_3d5da(void);
 void osp_unsorted_3d61f(void);
 
-#define OSP2_UNIMPLEMENTED_FUNCTION(NAME)  trap_SendServerCommand(-1, va("print \"Unimplemented function %s called.\n\"", NAME));
-
+#include "osp_unimpl.h"
 #endif

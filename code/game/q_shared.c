@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // q_shared.c -- stateless support routines that are included in each code dll
 #include "q_shared.h"
+#include "osp_unimpl.h"
 
 float Com_Clamp(float min, float max, float value)
 {
@@ -128,6 +129,15 @@ qint64  LittleLong64 (qint64 l) {return _LittleLong64(l);}
 float   BigFloat (const float *l) {return _BigFloat(l);}
 float   LittleFloat (const float *l) {return _LittleFloat(l);}
 */
+
+void osp_unk_q_shared_192b0(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_unk_q_shared_192b0);}
+void osp_unk_q_shared_192c4(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_unk_q_shared_192c4);}
+void osp_unk_q_shared_192d8(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_unk_q_shared_192d8);}
+void osp_unk_q_shared_192e6(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_unk_q_shared_192e6);}
+void osp_unk_q_shared_192f4(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_unk_q_shared_192f4);}
+void osp_unk_q_shared_19304(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_unk_q_shared_19304);}
+void osp_unk_q_shared_19314(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_unk_q_shared_19314);}
+void osp_unk_q_shared_19322(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_unk_q_shared_19322);}
 
 short   ShortSwap(short l)
 {

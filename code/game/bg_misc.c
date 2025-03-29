@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // bg_misc.c -- both games misc functions, all completely stateless
 
+#include "osp_unimpl.h"
 #include "q_shared.h"
 #include "bg_public.h"
 
@@ -1025,6 +1026,19 @@ gitem_t bg_itemlist[] =
 
 int     bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
 
+void osp_bg_misc_027ba(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_027ba);}
+void osp_bg_misc_027f9(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_027f9);}
+void osp_bg_misc_02801(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_02801);}
+void osp_bg_misc_02816(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_02816);}
+void osp_bg_misc_0285f(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_0285f);}
+void osp_bg_misc_0288f(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_0288f);}
+void osp_bg_misc_028bd(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_028bd);}
+void osp_bg_misc_0296f(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_0296f);}
+void osp_bg_misc_029c9(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_029c9);}
+void osp_bg_misc_033d7(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_033d7);}
+void osp_bg_misc_03444(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_03444);}
+void osp_bg_misc_03498(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_03498);}
+void osp_bg_misc_034b7(void){ OSP2_UNIMPLEMENTED_FUNCTION(osp_bg_misc_034b7);}
 
 /*
 ==============

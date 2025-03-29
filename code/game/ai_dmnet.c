@@ -50,6 +50,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //data file headers
 #include "chars.h"          //characteristics
 #include "inv.h"            //indexes into the inventory
+#include "osp_local.h"
 #include "syn.h"            //synonyms
 #include "match.h"          //string matching types and vars
 
@@ -2099,6 +2100,10 @@ int AINode_Seek_NBG(bot_state_t* bs)
 	return qtrue;
 }
 
+void osp_ai_dmnet_0c6a3(void)
+{
+	OSP2_UNIMPLEMENTED_FUNCTION(osp_ai_dmnet_0c6a3);
+}
 /*
 ==================
 AIEnter_Seek_LTG

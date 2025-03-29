@@ -649,7 +649,7 @@ ForceClientSkin
 Forces a client's skin (for teamplay)
 ===========
 */
-/*
+
 static void ForceClientSkin( gclient_t *client, char *model, const char *skin ) {
     char *p;
 
@@ -660,7 +660,6 @@ static void ForceClientSkin( gclient_t *client, char *model, const char *skin ) 
     Q_strcat(model, MAX_QPATH, "/");
     Q_strcat(model, MAX_QPATH, skin);
 }
-*/
 
 /*
 ===========
