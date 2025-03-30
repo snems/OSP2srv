@@ -122,7 +122,7 @@ void osp_cmds_3145e(void);
 void osp_cmds_31607(void);
 void osp_cmds_3189f(void);
 void osp_cmds_319ba(void);
-void osp_cmds_31cd6(void);
+void G_RegisterWeapon(void);
 void osp_cmds_31deb(void);
 void osp_cmds_3213d(void);
 void osp_cmds_321e7(void);

@@ -1,3 +1,4 @@
+#include "g_local.h"
 #include "osp_local.h"
 
 static const char* cmdHelp[] =
@@ -1217,9 +1218,48 @@ void osp_cmds_319ba(void)
 }
 
 
-void osp_cmds_31cd6(void)
+void G_RegisterWeapon(void)
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_31cd6);
+	if (weapon_have.integer & 1 || weapon_start.integer & 1)
+	{
+		RegisterItem(BG_FindItemForWeapon(WP_MACHINEGUN));
+	}
+
+	RegisterItem(BG_FindItem("Bullets"));
+
+  /*	WP_SHOTGUN */
+	if (weapon_have.integer & 2 || weapon_start.integer & 2)
+	{
+		RegisterItem(BG_FindItemForWeapon(WP_MACHINEGUN));
+	}
+
+	if (weapon_have.integer & 4 || weapon_start.integer & 4)
+	{
+		RegisterItem(BG_FindItemForWeapon(WP_GRENADE_LAUNCHER));
+	}
+
+	if (weapon_have.integer & 8 || weapon_start.integer & 8)
+	{
+		RegisterItem(BG_FindItemForWeapon(WP_ROCKET_LAUNCHER));
+	}
+
+	if (weapon_have.integer & 0x10 || weapon_start.integer & 0x10)
+	{
+		RegisterItem(BG_FindItemForWeapon(WP_LIGHTNING));
+	}
+
+	if (weapon_have.integer & 0x40 || weapon_start.integer & 0x40)
+	{
+		RegisterItem(BG_FindItemForWeapon(WP_PLASMAGUN));
+	}
+
+	if (weapon_have.integer & 0x80 || weapon_start.integer & 0x80)
+	{
+		RegisterItem(BG_FindItemForWeapon(WP_BFG));
+	}
+
+	RegisterItem(BG_FindItemForWeapon(WP_GRAPPLING_HOOK));
+	RegisterItem(BG_FindItemForWeapon(WP_RAILGUN));
 }
 
 

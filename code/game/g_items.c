@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 #include "g_local.h"
+#include "osp_local.h"
 #include "osp_unimpl.h"
 
 /*
@@ -934,16 +935,8 @@ void ClearRegisteredItems(void)
 {
 	memset(itemRegistered, 0, sizeof(itemRegistered));
 
-	// players always start with the base weapon
-	RegisterItem(BG_FindItemForWeapon(WP_MACHINEGUN));
 	RegisterItem(BG_FindItemForWeapon(WP_GAUNTLET));
-#ifdef MISSIONPACK
-	if (g_gametype.integer == GT_HARVESTER)
-	{
-		RegisterItem(BG_FindItem("Red Cube"));
-		RegisterItem(BG_FindItem("Blue Cube"));
-	}
-#endif
+	G_RegisterWeapon();
 }
 
 /*
