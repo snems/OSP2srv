@@ -791,7 +791,7 @@ void G_RegisterCvars(void)
 	trap_Cvar_Update(&server_promode);
 	trap_Cvar_Update(&server_cq3);
 	osp_cmds_33677();
-	osp_cmds_33dc1(0);
+	osp_cmds_33dc1(qfalse);
 
 	// check some things
 	if (g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE)
@@ -813,6 +813,12 @@ void G_UpdateCvars(void)
 	int         i;
 	cvarTable_t* cv;
 	qboolean remapped = qfalse;
+	qboolean flag = qfalse;
+
+	if (level.warmupTime)
+	{
+		osp_cmds_33d12(0);                                                           		/* Address : 0x47b Type : Interium */
+	}
 
 	for (i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++)
 	{
@@ -828,6 +834,142 @@ void G_UpdateCvars(void)
 			if (cv->modificationCount != cv->vmCvar->modificationCount)
 			{
 				cv->modificationCount = cv->vmCvar->modificationCount;
+
+				if (cv->vmCvar == &roundlimit)
+				{
+					trap_Cvar_Set("fraglimit", va("%d", roundlimit.integer));
+				}
+				else if (!Q_stricmp(cv->cvarName, "g_password") || !Q_stricmp(cv->cvarName, "sv_maxclients"))
+				{
+					level.leveltail490 = 1;
+				}
+				else if ((server_record.integer & 0x10) && !Q_stricmp(cv->cvarName, "sv_hostname"))
+				{
+					trap_Cvar_Set("sv_dcount", "0");
+				}
+				else if (cv->vmCvar == &admin_log)
+				{
+					adminLogDisabled = qfalse;
+				}
+				else if (cv->vmCvar == &instagib_reload)
+				{
+					if (instagib_reload.integer < 100 || instagib_reload.integer > 5000)
+					{
+						trap_Cvar_Set("instagib_reload", "1500");
+					}
+				}
+				else if (cv->vmCvar == &match_poweruprespawn)
+				{
+					int mpr = match_poweruprespawn.integer;
+					if (mpr <= 60)
+					{
+						mpr = 60;
+					}
+					else if (mpr < 120)
+					{
+						mpr = 90;
+					}
+					else
+					{
+						mpr = 120;
+					}
+					trap_Cvar_Set("match_poweruprespawn", va("%d", mpr));
+					if ((level.leveltail504 & 1) == 0)
+					{
+						global_var_27c8 = 120;
+					}
+					else
+					{
+						if (g_gametype.integer != GT_CTF)
+						{
+							global_var_27c8 = mpr;
+						}
+						else
+						{
+							global_var_27d0 = mpr;
+						}
+					}
+				}
+				else if (cv->vmCvar == &match_instagib)
+				{
+					osp_cmds_33dc1(qtrue);
+				}
+				else if (cv->vmCvar == &server_promode || cv->vmCvar == &server_cq3 || cv->vmCvar == &server_fastrail || cv->vmCvar == &server_lgcooldown)
+				{
+					osp_cmds_33677();
+				}
+				else if (cv->vmCvar == &server_maxpacketsmin)
+				{
+					if (server_maxpacketsmin.integer > 15)
+					{
+						trap_SetConfigstring(CS_OSP_MAXPACKETS_MIN, va("%d", server_maxpacketsmin.integer));
+					}
+					else
+					{
+						trap_SetConfigstring(CS_OSP_MAXPACKETS_MIN, va("%s", cv->defaultString));
+					}
+				}
+				else if (cv->vmCvar == &server_maxpacketsmax)
+				{
+					if (server_maxpacketsmin.integer < 125)
+					{
+						trap_SetConfigstring(CS_OSP_MAXPACKETS_MAX, va("%d", server_maxpacketsmax.integer));                    										/* Address : 0x5c5 Type : Interium */
+					}
+					else
+					{
+						trap_SetConfigstring(CS_OSP_MAXPACKETS_MAX, va("%s", cv->defaultString));                    										/* Address : 0x5c5 Type : Interium */
+					}
+				}
+				else if (cv->vmCvar == &server_timenudgemin)
+				{
+					if (server_timenudgemin.integer > -200)
+					{
+						trap_SetConfigstring(CS_OSP_TIMENUDGE_MIN, va("%d", server_timenudgemin.integer));                    										/* Address : 0x5c5 Type : Interium */
+					}
+					else
+					{
+						trap_SetConfigstring(CS_OSP_TIMENUDGE_MIN, va("%s", cv->defaultString));                    										/* Address : 0x5c5 Type : Interium */
+					}
+				}
+				else if (cv->vmCvar == &server_timenudgemax)
+				{
+					if (server_timenudgemax.integer < 200)
+					{
+						trap_SetConfigstring(CS_OSP_TIMENUDGE_MAX, va("%d", server_timenudgemax.integer));
+					}
+					else
+					{
+						trap_SetConfigstring(CS_OSP_TIMENUDGE_MAX, va("%s", cv->defaultString));
+					}
+				}
+				else if (cv->vmCvar == &server_customclient)
+				{
+					trap_SetConfigstring(CS_OSP_CUSTOM_CLIENT, va("%d", server_customclient.integer));
+				}
+				else if (cv->vmCvar == &pmove_fixed)
+				{
+					trap_SetConfigstring(CS_OSP_ALLOW_PMOVE, va("%d", pmove_fixed.integer));
+				}
+				else if (cv->vmCvar == &server_ospauth)
+				{
+					trap_SetConfigstring(CS_OSP_AUTH, va("%d", server_ospauth.integer));
+				}
+				else if (cv->vmCvar == &server_freezetag)
+				{
+					int ft = server_freezetag.integer;
+					if (ft != 0 && ft != 1 && ft != 2)
+					{
+						ft = 1;
+					}
+					trap_SetConfigstring(CS_OSP_FREEZE_GAME_TYPE, va("%d", ft));
+				}
+				else if (level.leveltail486 == 2)
+				{
+					if (cv->vmCvar == &g_fraglimit || cv->vmCvar == &g_capturelimit || cv->vmCvar == &g_timelimit || cv->vmCvar == &g_dmflags || cv->vmCvar == &g_gametype)
+					{
+						flag = qtrue;
+					}
+				}
 
 				if (cv->trackChange)
 				{
@@ -846,6 +988,11 @@ void G_UpdateCvars(void)
 	if (remapped)
 	{
 		G_RemapTeamShaders();
+	}
+
+	if (flag || level.warmupTime)
+	{
+		osp_cmds_33d12(0);                                                             	/* Address : 0x703 Type : Interium */
 	}
 }
 
@@ -2389,6 +2536,15 @@ void G_RunFrame(int levelTime)
 	level.previousTime = level.time;
 	level.time = levelTime;
 	msec = level.time - level.previousTime;
+
+	if (game_paused == 0)
+	{
+		time_in_game = levelTime - time_in_pause;
+	}
+	else
+	{
+		time_in_pause = levelTime - time_in_game;
+	}
 
 	// get any cvar changes
 	G_UpdateCvars();

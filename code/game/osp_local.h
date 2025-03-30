@@ -121,10 +121,10 @@ void osp_cmds_3114c(void);
 void osp_cmds_3145e(void);
 void osp_cmds_31607(void);
 void osp_cmds_3189f(void);
-void osp_cmds_319ba(void);
+qboolean G_IsItemAllowed(const gentity_t* ent);
 void G_RegisterWeapon(void);
-void osp_cmds_31deb(void);
-void osp_cmds_3213d(void);
+void osp_cmds_31deb(const gentity_t* ent);
+void osp_cmds_3213d(const gentity_t* ent);
 void osp_cmds_321e7(void);
 qboolean G_IsAttackEnabled(void);
 void osp_cmds_32212(void);
@@ -167,7 +167,7 @@ void osp_cmds_33b68(void);
 void osp_cmds_33c18(void);
 void osp_cmds_33c92(void);
 void osp_cmds_33cc5(void);
-void osp_cmds_33d12(void);
+void osp_cmds_33d12(qboolean arg);
 void osp_cmds_33d90(void);
 void osp_cmds_33dc1(qboolean flag);
 void osp_cmds_33fa0(void);
@@ -283,8 +283,11 @@ void Cmd_VcFollow_f(const gentity_t* ent);
 //
 // osp_unsorted.c
 //
-extern int global_17d6b0;
-extern int global_17d6bc;
+extern int time_in_game;
+extern int game_paused;
+extern int time_in_pause;
+extern int global_var_27c8;
+extern int global_var_27d0;
 
 void osp_unsorted_3aa10(void);
 void osp_unsorted_3abd0(void);

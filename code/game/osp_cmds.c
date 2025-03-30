@@ -1,5 +1,6 @@
 #include "g_local.h"
 #include "osp_local.h"
+#include "q_shared.h"
 
 static const char* cmdHelp[] =
 {
@@ -1212,9 +1213,10 @@ void osp_cmds_3189f(void)
 }
 
 
-void osp_cmds_319ba(void)
+qboolean G_IsItemAllowed(const gentity_t* ent)
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_319ba);
+	OSP2_UNIMPLEMENTED_FUNCTION(G_IsItemAllowed);
+	return qfalse;
 }
 
 
@@ -1263,13 +1265,13 @@ void G_RegisterWeapon(void)
 }
 
 
-void osp_cmds_31deb(void)
+void osp_cmds_31deb(const gentity_t* ent)
 {
 	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_31deb);
 }
 
 
-void osp_cmds_3213d(void)
+void osp_cmds_3213d(const gentity_t* ent)
 {
 	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_3213d);
 }
@@ -1532,7 +1534,7 @@ void osp_cmds_33cc5(void)
 }
 
 
-void osp_cmds_33d12(void)
+void osp_cmds_33d12(qboolean arg)
 {
 	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_33d12);
 }
@@ -1546,7 +1548,83 @@ void osp_cmds_33d90(void)
 
 void osp_cmds_33dc1(qboolean flag)
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_33dc1);
+	char* instagibPrefix;
+	int i;
+	gentity_t* ent;
+
+	instagibPrefix = match_instagib.integer > 0 ? "EN" : "DIS";
+
+	if ((time_in_game - level.startTime) > 10000)
+	{
+		trap_SendServerCommand(-1, va("cp \"^1Instagib %sABLED!\n\"", instagibPrefix));
+		trap_SendServerCommand(-1, va("print \"^1Instagib %sABLED!\n\"", instagibPrefix));
+	}
+
+	G_Printf("Instagib %sABLED!\n", instagibPrefix);
+
+	if (match_instagib.integer > 0)
+	{
+		int i;
+		gentity_t* ent;
+		for (i = level.maxclients, ent = &g_entities[level.maxclients]; i < level.num_entities; ++i, ++ent)
+		{
+			if (ent->inuse && ent->tail0 && !G_IsItemAllowed(ent))
+			{
+					if (!(ent->s.eFlags & EF_NODRAW) && ent->r.contents)
+					{
+							ent->r.svFlags |= SVF_NOCLIENT;
+							ent->s.eFlags |= EF_NODRAW;
+
+							ent->r.contents = 0;
+							trap_LinkEntity(ent);
+							if (ent->targetShaderName != 0)
+							{
+								RespawnItem(ent);
+							}
+					}
+					else
+					{
+						if (ent->think && ent->reached && !ent->targetShaderName)
+						{
+							ent->think = 0;
+							ent->reached = 0;
+							trap_LinkEntity(ent);
+						}
+					}
+
+			}
+		}
+	}
+	else if (flag)
+	{
+		osp_cmds_32a7e();
+		for (i = level.maxclients, ent = &g_entities[level.maxclients]; i < level.num_entities; ++i, ++ent)
+		{
+			if (ent->inuse && ent->tail0 && G_IsItemAllowed(ent))
+			{
+				ent->r.contents = CONTENTS_TRIGGER;
+				ent->s.eFlags &= ~SVF_NOCLIENT;
+				ent->r.svFlags &= ~EF_NODRAW;
+				FinishSpawningItem(ent);
+			}
+		}
+	}
+	if (flag)
+	{
+		for (i = 0, ent = &g_entities[level.maxclients]; i < level.maxclients; ++i, ++ent)
+		{
+			if (ent->inuse && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->ps.pm_type != PM_DEAD)
+			{
+				int p;
+				osp_cmds_31deb(ent);
+				osp_cmds_3213d(ent);
+				for (p = 0; p < 16; ++p)
+				{
+					ent->client->ps.powerups[p] = 0;
+				}
+			}
+		}
+	}
 }
 
 

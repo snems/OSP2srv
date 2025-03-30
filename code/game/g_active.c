@@ -1053,7 +1053,7 @@ void ClientThink_real_recovery(gentity_t* ent)
 	{
 		client->ps.pm_type = PM_DEAD;
 	}
-	else if (global_17d6bc)
+	else if (game_paused)
 	{
 		client->ps.pm_type = PM_FREEZE;
 		client->ps.pm_flags |= PMF_FOLLOW;
@@ -1121,7 +1121,7 @@ void ClientThink_real_recovery(gentity_t* ent)
 	pm.debugLevel = g_debugMove.integer;
 	pm.noFootsteps = (g_dmflags.integer & DF_NO_FOOTSTEPS) > 0;
 
-	if (!(level.leveltail[504] & 1) && ((g_dmflags.integer & DF_NO_FOOTSTEPS) > 0))
+	if (!(level.leveltail504 & 1) && ((g_dmflags.integer & DF_NO_FOOTSTEPS) > 0))
 	{
 		pm.noFootsteps = qtrue;
 	}
@@ -1165,7 +1165,7 @@ void ClientThink_real_recovery(gentity_t* ent)
 	ent->waterlevel = pm.waterlevel;
 	ent->watertype = pm.watertype;
 
-	if (qtrue || global_17d6bc == 0)
+	if (qtrue || game_paused == 0)
 	{
 	// execute client events
 		ClientEvents(ent, ent->s.number);
