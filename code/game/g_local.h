@@ -411,17 +411,8 @@ struct gclient_s
     int timeResidual;
     int tail3_42;
     int tail3_43;
-    int tail3_44;
-    int tail3_45;
-    int tail3_46;
-    int tail3_47;
-    int tail3_48;
-    int tail3_49;
-    int tail3_50;
-    int tail3_51;
-    int tail3_52;
-    int tail3_53;
-    int tail3_54;
+
+    qboolean weaponHave[11];
 };
 
 

@@ -1265,9 +1265,139 @@ void G_RegisterWeapon(void)
 }
 
 
-void osp_cmds_31deb(const gentity_t* ent)
+qboolean armorDefaultYellow = qfalse;
+qboolean weaponHave[11];
+
+enum armorType
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_31deb);
+	ARMOR_GREEN = 0,
+	ARMOR_YELLOW = 1,
+	ARMOR_RED = 2,
+};
+
+#define OSP_WEAPON_MASK_MACHINEGUN       1
+#define OSP_WEAPON_MASK_SHOTGUN          2
+#define OSP_WEAPON_MASK_GRENADE_LAUNCHER 4
+#define OSP_WEAPON_MASK_ROCKET_LAUNCHER  8
+#define OSP_WEAPON_MASK_LIGHTNING        16
+#define OSP_WEAPON_MASK_RAILGUN          32
+#define OSP_WEAPON_MASK_PLASMAGUN        64
+#define OSP_WEAPON_MASK_BFG              128
+#define OSP_WEAPON_MASK_GAUNTLET         256
+
+void osp_cmds_31deb(gentity_t* ent)
+{
+	gclient_t* cli = ent->client;
+	if (level.leveltail504 == 0)
+	{
+		cli->ps.stats[STAT_HEALTH] = start_health.integer;
+		ent->takedamage = (qboolean)start_health.integer;
+	}
+	else
+	{
+		cli->ps.stats[STAT_HEALTH] = atoi("100"); /* TODO: make define for 100 */
+		ent->takedamage = (qboolean)cli->ps.stats[STAT_HEALTH];
+	}
+	cli->ps.stats[STAT_WEAPONS] = 0;
+	cli->ps.ammo[WP_MACHINEGUN] = 0;
+	cli->ps.ammo[WP_GRAPPLING_HOOK] = -1;
+
+	if (match_instagib.integer > 0)
+	{
+		cli->ps.ammo[WP_RAILGUN] = 999;
+		cli->ps.ammo[WP_GAUNTLET] = -1;
+		cli->ps.stats[STAT_WEAPONS] |= (1 << WP_RAILGUN) | (1 << WP_GAUNTLET);
+		cli->weaponHave[WP_RAILGUN] = qtrue;
+		cli->weaponHave[WP_GAUNTLET] = qtrue;
+	}
+
+	if (g_gametype.integer != GT_CA && level.warmupTime && !game_paused)
+	{
+		cli->ps.stats[STAT_ARMOR] = warmup_armor.integer;
+		if (warmup_armor.integer)
+		{
+			cli->ps.stats[STAT_ARMOR_TYPE] = armorDefaultYellow ? ARMOR_RED : ARMOR_YELLOW;
+		}
+		cli->ps.ammo[WP_MACHINEGUN]       = z_m_current.integer == 2 ? 100 : 50;
+		cli->ps.ammo[WP_SHOTGUN]          = 30;
+		cli->ps.ammo[WP_GRENADE_LAUNCHER] = 50;
+		cli->ps.ammo[WP_ROCKET_LAUNCHER]  = 50;
+		cli->ps.ammo[WP_LIGHTNING]        = 150;
+		cli->ps.ammo[WP_RAILGUN]          = 50;
+		cli->ps.ammo[WP_PLASMAGUN]        = 150;
+		cli->ps.ammo[WP_BFG]              = 0;
+	}
+	else
+	{
+		cli->ps.stats[STAT_ARMOR] = start_armor.integer;
+		if (start_armor.integer)
+		{
+			cli->ps.stats[STAT_ARMOR_TYPE] = armorDefaultYellow ? ARMOR_RED : ARMOR_YELLOW;
+		}
+		cli->ps.ammo[WP_MACHINEGUN]       = start_bullets.integer;
+		cli->ps.ammo[WP_SHOTGUN]          = start_shells.integer;
+		cli->ps.ammo[WP_GRENADE_LAUNCHER] = start_grenades.integer;
+		cli->ps.ammo[WP_ROCKET_LAUNCHER]  = start_rockets.integer;
+		cli->ps.ammo[WP_LIGHTNING]        = start_lightning.integer;
+		cli->ps.ammo[WP_RAILGUN]          = start_slugs.integer;
+		cli->ps.ammo[WP_PLASMAGUN]        = start_cells.integer;
+		cli->ps.ammo[WP_BFG]              = start_bfg.integer;
+	}
+
+	if (!gauntlet_disable.integer || weapon_have.integer & OSP_WEAPON_MASK_GAUNTLET || weapon_start.integer & OSP_WEAPON_MASK_GAUNTLET || level.warmupTime || game_paused || weaponHave[WP_GAUNTLET])
+	{
+		cli->ps.stats[STAT_WEAPONS] |= 1 << WP_GAUNTLET;
+		cli->weaponHave[WP_GAUNTLET] = qtrue;
+		cli->ps.ammo[WP_GAUNTLET] = -1;
+	}
+
+	if (weapon_have.integer & OSP_WEAPON_MASK_MACHINEGUN || weapon_start.integer & OSP_WEAPON_MASK_MACHINEGUN || level.warmupTime || game_paused || weaponHave[WP_MACHINEGUN])
+	{
+		cli->ps.stats[STAT_WEAPONS] |= 1 << WP_MACHINEGUN;
+		cli->weaponHave[WP_MACHINEGUN] = qtrue;
+	}
+
+	if (weapon_have.integer & OSP_WEAPON_MASK_SHOTGUN || weapon_start.integer & OSP_WEAPON_MASK_SHOTGUN || level.warmupTime || game_paused || weaponHave[WP_SHOTGUN])
+	{
+		cli->ps.stats[STAT_WEAPONS] |= 1 << WP_SHOTGUN;
+		cli->weaponHave[WP_SHOTGUN] = 1;
+	}
+
+	if (weapon_have.integer & OSP_WEAPON_MASK_GRENADE_LAUNCHER || weapon_start.integer & OSP_WEAPON_MASK_GRENADE_LAUNCHER || level.warmupTime || game_paused || weaponHave[WP_GRENADE_LAUNCHER])
+	{
+		cli->ps.stats[STAT_WEAPONS] |= 1 << WP_GRENADE_LAUNCHER;
+		cli->weaponHave[WP_GRENADE_LAUNCHER] = 1;
+	}
+
+	if (weapon_have.integer & OSP_WEAPON_MASK_ROCKET_LAUNCHER || weapon_start.integer & OSP_WEAPON_MASK_ROCKET_LAUNCHER || level.warmupTime || game_paused || weaponHave[WP_ROCKET_LAUNCHER])
+	{
+		cli->ps.stats[STAT_WEAPONS] |= 1 << WP_ROCKET_LAUNCHER;
+		cli->weaponHave[WP_ROCKET_LAUNCHER] = 1;
+	}
+
+	if (weapon_have.integer & OSP_WEAPON_MASK_LIGHTNING || weapon_start.integer & OSP_WEAPON_MASK_LIGHTNING || level.warmupTime || game_paused || weaponHave[WP_LIGHTNING])
+	{
+		cli->ps.stats[STAT_WEAPONS] |= 1 << WP_LIGHTNING;
+		cli->weaponHave[WP_LIGHTNING] = 1;
+	}
+
+	if (weapon_have.integer & OSP_WEAPON_MASK_RAILGUN || weapon_start.integer & OSP_WEAPON_MASK_RAILGUN || level.warmupTime || game_paused || weaponHave[WP_RAILGUN])
+	{
+		cli->ps.stats[STAT_WEAPONS] |= 1 << WP_RAILGUN;
+		cli->weaponHave[WP_RAILGUN] = 1;
+	}
+
+	if (weapon_have.integer & OSP_WEAPON_MASK_PLASMAGUN || weapon_start.integer & OSP_WEAPON_MASK_PLASMAGUN || level.warmupTime || game_paused || weaponHave[WP_PLASMAGUN])
+	{
+		cli->ps.stats[STAT_WEAPONS] |= 1 << WP_PLASMAGUN;
+		cli->weaponHave[WP_PLASMAGUN] = 1;
+	}
+
+	if (weapon_have.integer & OSP_WEAPON_MASK_BFG || weapon_start.integer & OSP_WEAPON_MASK_BFG || level.warmupTime || game_paused || weaponHave[WP_BFG])
+	{
+		cli->ps.stats[STAT_WEAPONS] |= 1 << WP_BFG;
+		cli->weaponHave[WP_BFG] = 1;
+	}
 }
 
 

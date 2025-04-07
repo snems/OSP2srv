@@ -230,16 +230,18 @@ void Pmove(pmove_t* pmove);
 // NOTE: may not have more than 16
 typedef enum
 {
-	STAT_HEALTH,
-	STAT_HOLDABLE_ITEM,
-#ifdef MISSIONPACK
-	STAT_PERSISTANT_POWERUP,
-#endif
-	STAT_WEAPONS,                   // 16 bit fields
-	STAT_ARMOR,
-	STAT_DEAD_YAW,                  // look this direction when dead (FIXME: get rid of?)
-	STAT_CLIENTS_READY,             // bit mask of clients wishing to exit the intermission (FIXME: configstring?)
-	STAT_MAX_HEALTH                 // health / armor limit, changable by handicap
+	STAT_HEALTH = 0,
+	STAT_HOLDABLE_ITEM = 1,
+	STAT_WEAPONS = 2,                   // 16 bit fields
+	STAT_ARMOR = 3,
+	STAT_DEAD_YAW = 4,                  // look this direction when dead (FIXME: get rid of?)
+	STAT_CLIENTS_READY = 5,             // bit mask of clients wishing to exit the intermission (FIXME: configstring?)
+	STAT_MAX_HEALTH = 6,                // health / armor limit, changable by handicap
+	STAT_OSP_PHYS = 7,
+	STAT_RAIL_DELAY = 8,
+	STAT_ARMOR_TYPE = 9,                //aromor: red/green/yellow
+	STAT_OSP_10 = 10,
+	STAT_WEAPON_DELAY = 11,
 } statIndex_t;
 
 
@@ -347,12 +349,6 @@ typedef enum
 	WP_PLASMAGUN,
 	WP_BFG,
 	WP_GRAPPLING_HOOK,
-#ifdef MISSIONPACK
-	WP_NAILGUN,
-	WP_PROX_LAUNCHER,
-	WP_CHAINGUN,
-#endif
-
 	WP_NUM_WEAPONS
 } weapon_t;
 
