@@ -1219,10 +1219,19 @@ qboolean G_IsItemAllowed(const gentity_t* ent)
 	return qfalse;
 }
 
+#define OSP_WEAPON_MASK_MACHINEGUN       1
+#define OSP_WEAPON_MASK_SHOTGUN          2
+#define OSP_WEAPON_MASK_GRENADE_LAUNCHER 4
+#define OSP_WEAPON_MASK_ROCKET_LAUNCHER  8
+#define OSP_WEAPON_MASK_LIGHTNING        16
+#define OSP_WEAPON_MASK_RAILGUN          32
+#define OSP_WEAPON_MASK_PLASMAGUN        64
+#define OSP_WEAPON_MASK_BFG              128
+#define OSP_WEAPON_MASK_GAUNTLET         256
 
 void G_RegisterWeapon(void)
 {
-	if (weapon_have.integer & 1 || weapon_start.integer & 1)
+	if (weapon_have.integer & OSP_WEAPON_MASK_MACHINEGUN || weapon_start.integer & OSP_WEAPON_MASK_MACHINEGUN)
 	{
 		RegisterItem(BG_FindItemForWeapon(WP_MACHINEGUN));
 	}
@@ -1230,32 +1239,32 @@ void G_RegisterWeapon(void)
 	RegisterItem(BG_FindItem("Bullets"));
 
   /*	WP_SHOTGUN */
-	if (weapon_have.integer & 2 || weapon_start.integer & 2)
+	if (weapon_have.integer & OSP_WEAPON_MASK_SHOTGUN || weapon_start.integer & OSP_WEAPON_MASK_SHOTGUN)
 	{
 		RegisterItem(BG_FindItemForWeapon(WP_MACHINEGUN));
 	}
 
-	if (weapon_have.integer & 4 || weapon_start.integer & 4)
+	if (weapon_have.integer & OSP_WEAPON_MASK_GRENADE_LAUNCHER || weapon_start.integer & OSP_WEAPON_MASK_GRENADE_LAUNCHER)
 	{
 		RegisterItem(BG_FindItemForWeapon(WP_GRENADE_LAUNCHER));
 	}
 
-	if (weapon_have.integer & 8 || weapon_start.integer & 8)
+	if (weapon_have.integer & OSP_WEAPON_MASK_ROCKET_LAUNCHER || weapon_start.integer & OSP_WEAPON_MASK_ROCKET_LAUNCHER)
 	{
 		RegisterItem(BG_FindItemForWeapon(WP_ROCKET_LAUNCHER));
 	}
 
-	if (weapon_have.integer & 0x10 || weapon_start.integer & 0x10)
+	if (weapon_have.integer & OSP_WEAPON_MASK_LIGHTNING || weapon_start.integer & OSP_WEAPON_MASK_LIGHTNING)
 	{
 		RegisterItem(BG_FindItemForWeapon(WP_LIGHTNING));
 	}
 
-	if (weapon_have.integer & 0x40 || weapon_start.integer & 0x40)
+	if (weapon_have.integer & OSP_WEAPON_MASK_PLASMAGUN || weapon_start.integer & OSP_WEAPON_MASK_PLASMAGUN)
 	{
 		RegisterItem(BG_FindItemForWeapon(WP_PLASMAGUN));
 	}
 
-	if (weapon_have.integer & 0x80 || weapon_start.integer & 0x80)
+	if (weapon_have.integer & OSP_WEAPON_MASK_BFG || weapon_start.integer & OSP_WEAPON_MASK_BFG)
 	{
 		RegisterItem(BG_FindItemForWeapon(WP_BFG));
 	}
@@ -1275,15 +1284,6 @@ enum armorType
 	ARMOR_RED = 2,
 };
 
-#define OSP_WEAPON_MASK_MACHINEGUN       1
-#define OSP_WEAPON_MASK_SHOTGUN          2
-#define OSP_WEAPON_MASK_GRENADE_LAUNCHER 4
-#define OSP_WEAPON_MASK_ROCKET_LAUNCHER  8
-#define OSP_WEAPON_MASK_LIGHTNING        16
-#define OSP_WEAPON_MASK_RAILGUN          32
-#define OSP_WEAPON_MASK_PLASMAGUN        64
-#define OSP_WEAPON_MASK_BFG              128
-#define OSP_WEAPON_MASK_GAUNTLET         256
 
 void osp_cmds_31deb(gentity_t* ent)
 {
