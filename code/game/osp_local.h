@@ -124,7 +124,7 @@ void osp_cmds_3189f(void);
 qboolean G_IsItemAllowed(const gentity_t* ent);
 void G_RegisterWeapon(void);
 void osp_cmds_31deb(gentity_t* ent);
-void osp_cmds_3213d(const gentity_t* ent);
+void osp_cmds_3213d(gentity_t* ent);
 void osp_cmds_321e7(void);
 qboolean G_IsAttackEnabled(void);
 void osp_cmds_32212(void);

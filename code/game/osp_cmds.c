@@ -1401,9 +1401,67 @@ void osp_cmds_31deb(gentity_t* ent)
 }
 
 
-void osp_cmds_3213d(const gentity_t* ent)
+#define OSP_WEAPON_MASK_MACHINEGUN       1
+#define OSP_WEAPON_MASK_SHOTGUN          2
+#define OSP_WEAPON_MASK_GRENADE_LAUNCHER 4
+#define OSP_WEAPON_MASK_ROCKET_LAUNCHER  8
+#define OSP_WEAPON_MASK_LIGHTNING        16
+#define OSP_WEAPON_MASK_RAILGUN          32
+#define OSP_WEAPON_MASK_PLASMAGUN        64
+#define OSP_WEAPON_MASK_BFG              128
+#define OSP_WEAPON_MASK_GAUNTLET         256
+
+void osp_cmds_3213d(gentity_t* ent)
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_3213d);
+	gclient_t* cli = ent->client;
+
+	if (match_instagib.integer > 0)
+	{
+		cli->ps.weapon = WP_RAILGUN;
+	}
+	else if (weapon_start.integer & OSP_WEAPON_MASK_BFG)
+	{
+		cli->ps.weapon = WP_BFG;
+	}
+	else if (weapon_start.integer & OSP_WEAPON_MASK_PLASMAGUN)
+	{
+		cli->ps.weapon = WP_PLASMAGUN;
+	}
+	else if (weapon_start.integer & OSP_WEAPON_MASK_RAILGUN)
+	{
+		cli->ps.weapon = WP_RAILGUN;
+	}
+	else if (weapon_start.integer & OSP_WEAPON_MASK_LIGHTNING)
+	{
+		cli->ps.weapon = WP_LIGHTNING;
+	}
+	else if (weapon_start.integer & OSP_WEAPON_MASK_ROCKET_LAUNCHER)
+	{
+		cli->ps.weapon = WP_ROCKET_LAUNCHER;
+	}
+	else if (weapon_start.integer & OSP_WEAPON_MASK_GRENADE_LAUNCHER)
+	{
+		cli->ps.weapon = WP_GRENADE_LAUNCHER;
+	}
+	else if (weapon_start.integer & OSP_WEAPON_MASK_SHOTGUN)
+	{
+		cli->ps.weapon = WP_SHOTGUN;
+	}
+	else if (weapon_start.integer & OSP_WEAPON_MASK_MACHINEGUN)
+	{
+		cli->ps.weapon = WP_MACHINEGUN;
+	}
+	else if (weapon_start.integer & OSP_WEAPON_MASK_GAUNTLET)
+	{
+		cli->ps.weapon = WP_GAUNTLET;
+	}
+	else
+	{
+		cli->ps.weapon = 0;
+	}
+
+	ent->s.weapon = cli->ps.weapon;
+	cli->ps.weaponstate = 0;
 }
 
 
