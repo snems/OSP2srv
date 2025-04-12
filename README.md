@@ -264,8 +264,8 @@
 - [ ] `powerup_disable <powerup_mask>`
 - [ ] `railgun_damage <value>`
 - [ ] `replace_*: <replace_mask>`
-- [ ] `start_*: <value>`
+- [X] `start_*: <value>`
 - [ ] `weapon_deaddrop <0|1>`
-- [ ] `weapon_have <weapon_mask>`
-- [ ] `weapon_start <weapon_mask>`
+- [X] `weapon_have <weapon_mask>`
+- [X] `weapon_start <weapon_mask>`
 
