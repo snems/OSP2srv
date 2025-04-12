@@ -1182,7 +1182,7 @@ void ClientSpawn(gentity_t* ent)
 	clientSession_t     savedSess;
 	int     persistant[MAX_PERSISTANT];
 	int     events[MAX_PS_EVENTS];
-	gentity_t*   spawnPoint;
+	gentity_t*   spawnPoint = NULL;
 	int     flags;
 	int     savedPing;
 //	char *savedAreaBits;
@@ -1203,12 +1203,16 @@ void ClientSpawn(gentity_t* ent)
 	// ranging doesn't count this client
 	if (client->sess.sessionTeam == TEAM_SPECTATOR || level.intermissionQueued || level.intermissiontime)
 	{
-		spawnPoint = SelectSpectatorSpawnPoint( spawn_origin, spawn_angles);
-	}
-	else if (client->sess.spectatorState < 4  && !level.intermissionQueued && !level.intermissiontime) /* TODO: investigate what 4 means */
-	{
-		VectorCopy(viewcams[client->viewcamIndex].origin, spawn_origin); 
-		VectorCopy(viewcams[client->viewcamIndex].angles, spawn_angles); 
+		if (client->sess.spectatorState < 4 || level.intermissionQueued || level.intermissiontime)
+		{
+			spawnPoint = SelectSpectatorSpawnPoint( spawn_origin, spawn_angles);
+		}
+		else
+		{
+			spawnPoint = NULL;
+			VectorCopy(viewcams[client->viewcamIndex].origin, spawn_origin); 
+			VectorCopy(viewcams[client->viewcamIndex].angles, spawn_angles); 
+		}
 	}
 	else if (g_gametype.integer >= GT_CTF)
 	{
@@ -1367,10 +1371,9 @@ void ClientSpawn(gentity_t* ent)
 	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 	if (level.warmupTime)
 	{
-		osp_cmds_3294d();                                                          			/* Address : 0x1e4d2 Type : Interium */
+		G_UpdateReadyStatus();
 	}
 
-	ent->s.groundEntityNum = ENTITYNUM_NONE;
 	ent->client = &level.clients[index];
 	ent->takedamage = qtrue;
 	ent->inuse = qtrue;
@@ -1387,7 +1390,7 @@ void ClientSpawn(gentity_t* ent)
 
 	client->ps.clientNum = index;
 
-	osp_cmds_31deb(ent);
+	G_ClientSpawnHPAndGuns(ent);
 
 	G_SetOrigin(ent, spawn_origin);
 
@@ -1461,7 +1464,6 @@ void ClientSpawn(gentity_t* ent)
 	BG_PlayerStateToEntityState(&client->ps, &ent->s, qtrue, qfalse);
 
 }
-
 
 /*
 ===========

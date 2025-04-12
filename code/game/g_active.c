@@ -898,8 +898,8 @@ void SendPendingPredictableEvents(playerState_t* ps)
 	gentity_t* t;
 	int event, seq;
 	int extEvent, number;
-
-	OSP2_DEPRECATED_FUNCTION(SendPendingPredictableEvents);
+	/* TODO: remove this function!!!!!!!!!!!!!!!!!!!!*/
+	// OSP2_DEPRECATED_FUNCTION(SendPendingPredictableEvents);
 
 	// if there are still events pending
 	if (ps->entityEventSequence < ps->eventSequence)

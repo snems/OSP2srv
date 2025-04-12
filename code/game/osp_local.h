@@ -1,6 +1,11 @@
 #ifndef OSP_LOCAL
 #define OSP_LOCAL
 #include "g_local.h"
+#define NYAN_POINT()      G_Printf( "%s:%d: DEBUG point reached\n", __FILE__, __LINE__)
+#define NYAN_INT(VALUE)   G_Printf( "%s:%d: %s = %i\n", __FILE__, __LINE__, #VALUE, (int)VALUE)
+#define NYAN_FLOAT(VALUE) G_Printf( "%s:%d: %s = %f\n", __FILE__, __LINE__, #VALUE, (float)VALUE)
+#define NYAN_VEC4(VALUE) G_Printf( "%s:%d: %s = %f,%f,%f,%f\n", __FILE__, __LINE__, #VALUE, VALUE[0], VALUE[1], VALUE[2], VALUE[3])
+#define NYAN_MSG(VALUE)   G_Printf( "%s:%d: %s\n", __FILE__, __LINE__, VALUE)
 //
 // osp_admin.c
 //
@@ -144,7 +149,7 @@ void osp_cmds_31607(void);
 void osp_cmds_3189f(void);
 qboolean G_IsItemAllowed(const gentity_t* ent);
 void G_RegisterWeapon(void);
-void osp_cmds_31deb(gentity_t* ent);
+void G_ClientSpawnHPAndGuns(gentity_t* ent);
 void osp_cmds_3213d(gentity_t* ent);
 void osp_cmds_321e7(void);
 qboolean G_IsAttackEnabled(void);
@@ -161,7 +166,7 @@ void osp_cmds_32776(void);
 void osp_cmds_32854(void);
 void osp_cmds_3285c(void);
 void osp_cmds_328fb(void);
-void osp_cmds_3294d(void);
+void G_UpdateReadyStatus(void);
 void osp_cmds_329e9(void);
 void osp_cmds_32a7e(void);
 void osp_cmds_32d19(void);

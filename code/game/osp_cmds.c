@@ -6,6 +6,7 @@ viewcam_t viewcams[256];
 
 qboolean armorDefaultYellow = qfalse;
 qboolean weaponHave[11];
+int currentRound;
 
 enum armorType
 {
@@ -1290,18 +1291,18 @@ void G_RegisterWeapon(void)
 
 
 
-void osp_cmds_31deb(gentity_t* ent)
+void G_ClientSpawnHPAndGuns(gentity_t* ent)
 {
 	gclient_t* cli = ent->client;
 	if (level.leveltail504 == 0)
 	{
 		cli->ps.stats[STAT_HEALTH] = start_health.integer;
-		ent->takedamage = (qboolean)start_health.integer;
+		ent->health = start_health.integer;
 	}
 	else
 	{
 		cli->ps.stats[STAT_HEALTH] = atoi("100"); /* TODO: make define for 100 */
-		ent->takedamage = (qboolean)cli->ps.stats[STAT_HEALTH];
+		ent->health = cli->ps.stats[STAT_HEALTH];
 	}
 	cli->ps.stats[STAT_WEAPONS] = 0;
 	cli->ps.ammo[WP_MACHINEGUN] = 0;
@@ -1564,10 +1565,42 @@ void osp_cmds_328fb(void)
 	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_328fb);
 }
 
-
-void osp_cmds_3294d(void)
+void G_UpdateReadyStatus(void)
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_3294d);
+	int readyMask = 0;
+	int i;
+	gclient_t *cli;
+	if (level.warmupTime)
+	{
+		for (i = 0; i < g_maxclients.integer; ++i)
+		{
+			cli = &level.clients[i];
+			if (cli->pers.connected == CON_CONNECTED)
+			{
+				if (i < 16 && ( !G_IsGameTypeOSP(g_gametype.integer) || currentRound || level.warmupTime))
+				{
+			 		if (g_entities[i].r.svFlags & SVF_BOT)
+			 		{
+			 			readyMask |= 1 << i;
+					}
+			  }
+				if (i < 16 && cli->playerReady)
+				{
+			 		readyMask |= 1 << i;
+				}
+			}
+
+		}
+	}
+
+	for (i = 0; i < g_maxclients.integer; ++i)
+	{
+		cli = &level.clients[i];
+		if (cli->pers.connected == CON_CONNECTED)
+		{
+			cli->ps.stats[STAT_CLIENTS_READY] = readyMask;
+		}
+	}
 }
 
 
@@ -1886,7 +1919,7 @@ void osp_cmds_33dc1(qboolean flag)
 			if (ent->inuse && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->ps.pm_type != PM_DEAD)
 			{
 				int p;
-				osp_cmds_31deb(ent);
+				G_ClientSpawnHPAndGuns(ent);
 				osp_cmds_3213d(ent);
 				for (p = 0; p < 16; ++p)
 				{
