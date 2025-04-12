@@ -1708,25 +1708,70 @@ void osp_cmds_33b68(void)
 	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_33b68);
 }
 
-
-void osp_cmds_33c18(void)
+/*
+================
+G_GetClientVersion
+================
+returns true if version >= 1.27l
+save version string to the arg
+*/
+qboolean G_GetClientVersion(char *version, unsigned int size)
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_33c18);
+	char cs[MAX_INFO_STRING];
+	if (version != 0)
+	{
+		strncpy(version, "unknown", size);
+	}
+	trap_GetConfigstring(0, cs, MAX_INFO_STRING);
+	if (cs[0])
+	{
+		char* versVal;
+		char* begin;
+		char* end;
+
+		versVal = Info_ValueForKey(cs, "version");
+		if(!versVal || !versVal[0])
+		{
+			return qfalse;
+		}
+		begin = strchr(versVal, ' ');
+		++begin;
+		end = strchr(begin, ' ');
+		if (version)
+		{
+			strncpy(version, begin, size);
+		}
+		return Q_stricmp(begin, "1.27l") >= 0;
+	}
+	return qfalse;
 }
 
 
 void osp_cmds_33c92(gentity_t* self)
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_33c92);
+	char version[MAX_QPATH];
+	if (G_GetClientVersion(version, MAX_QPATH))
+	{
+		level.leveltail486 = 0x2;                                                  		/* Address : 0x33c9d Type : Interium */
+		level.leveltail509 = 0x320;                                                		/* Address : 0x33ca0 Type : Interium */
+	}
+	else
+	{
+		level.leveltail486 = 1;                                                    		/* Address : 0x33ca5 Type : Interium */
+	}
+	osp_cmds_33d12(self->s.modelindex);                                          	/* Address : 0x33cae Type : Interium */
+	self->nextthink = 0;                                                         	/* Address : 0x33cb1 Type : Interium */
+	self->think = 0;                                                             	/* Address : 0x33cb7 Type : Interium */
+	G_FreeEntity(self);                                                            	/* Address : 0x33cc0 Type : Interium */
 }
 
-void osp_cmds_33cc5 (int var, qboolean arg) 
+void osp_cmds_33cc5 (int var, int modelindex) 
 {
 	gentity_t* ent = G_Spawn();
 	ent->s.eType = ET_ITEM;
 	ent->r.svFlags |= SVF_NOCLIENT;
 	ent->s.eFlags |= EF_NODRAW;
-	ent->s.modelindex = arg;
+	ent->s.modelindex = modelindex;
 	ent->classname = "delay_broadcastcheck";
 	ent->nextthink = var;
 	ent->think = &osp_cmds_33c92;
@@ -1734,14 +1779,14 @@ void osp_cmds_33cc5 (int var, qboolean arg)
 }
 
 
-void osp_cmds_33d12(qboolean arg)
+void osp_cmds_33d12(int modelindex)
 {
 	int var_tmp;
 	if (!level.leveltail486 && (level.time - level.startTime) < 2500)
 	{
 		if (!var_4c54)
 		{
-			osp_cmds_33cc5(level.time + 1000, arg);
+			osp_cmds_33cc5(level.time + 1000, modelindex);
 			var_4c54 = qtrue;
 		}
 	}
@@ -1750,9 +1795,7 @@ void osp_cmds_33d12(qboolean arg)
 		int i;
 		for (i = 0; i < level.maxclients; ++i)
 		{
-			// 35c48
-			//
-			if (!arg && level.clients[i].pers.connected && !level.warmupTime && level.intermissionQueued && level.intermissiontime)
+			if (!modelindex && level.clients[i].pers.connected && !level.warmupTime && level.intermissionQueued && level.intermissiontime)
 			{
 				g_entities[i].r.svFlags |= SVF_NOSERVERINFO;
 			}
