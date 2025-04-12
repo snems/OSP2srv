@@ -1485,7 +1485,7 @@ This will be called on every client connect, begin, disconnect, death,
 and team change.
 ============
 */
-void CalculateRanks(void)
+void CalculateRanks(qboolean unknown)
 {
 	int     i;
 	int     rank;

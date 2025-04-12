@@ -19,6 +19,27 @@ void osp_bot_2ca58(void);
 //
 // osp_cmds.c
 //
+struct viewcam_s
+{
+    float unk1;
+    float ind;
+    float unk2;
+    float unk3;
+    float unk4;
+    float len;
+    float unk5;
+    float unk6;
+    float unk7;
+    float unk8;
+    float unk9;
+    float unk10;
+    float unk11;
+    vec3_t origin;
+    vec3_t angles;
+};
+
+typedef struct viewcam_s viewcam_t;
+extern viewcam_t viewcams[256];
 
 #define CMDHELP_0   0
 #define CMDHELP_1   1
@@ -165,8 +186,8 @@ void osp_cmds_339ff(void);
 void osp_cmds_33aa6(void);
 void osp_cmds_33b68(void);
 void osp_cmds_33c18(void);
-void osp_cmds_33c92(void);
-void osp_cmds_33cc5(void);
+void osp_cmds_33c92(gentity_t* self);
+void osp_cmds_33cc5(int arg1, qboolean arg2);
 void osp_cmds_33d12(qboolean arg);
 void osp_cmds_33d90(void);
 void osp_cmds_33dc1(qboolean flag);

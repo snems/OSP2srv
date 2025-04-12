@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 #include "g_local.h"
+#include "osp_local.h"
+#include "q_shared.h"
 
 // g_client.c -- client functions that don't happen every frame
 
@@ -1089,7 +1091,7 @@ char* ClientConnect(int clientNum, qboolean firstTime, qboolean isBot)
 	}
 
 	// count current clients and rank for scoreboard
-	CalculateRanks();
+	CalculateRanks(qfalse);
 
 	// for statistics
 //	client->areabits = areabits;
@@ -1158,7 +1160,7 @@ void ClientBegin(int clientNum)
 	G_LogPrintf("ClientBegin: %i\n", clientNum);
 
 	// count current clients and rank for scoreboard
-	CalculateRanks();
+	CalculateRanks(qfalse);
 }
 
 /*
@@ -1179,6 +1181,7 @@ void ClientSpawn(gentity_t* ent)
 	clientPersistant_t  saved;
 	clientSession_t     savedSess;
 	int     persistant[MAX_PERSISTANT];
+	int     events[MAX_PS_EVENTS];
 	gentity_t*   spawnPoint;
 	int     flags;
 	int     savedPing;
@@ -1186,17 +1189,26 @@ void ClientSpawn(gentity_t* ent)
 	int     accuracy_hits, accuracy_shots;
 	int     eventSequence;
 	char    userinfo[MAX_INFO_STRING];
+	int     clientReady;
+	int     awardImpressive;
+	int     tail3_43;
+	int     inactivityTime;
 
 	index = ent - g_entities;
 	client = ent->client;
+	client->ps.generic1 = 0;
 
 	// find a spawn point
 	// do it before setting health back up, so farthest
 	// ranging doesn't count this client
-	if (client->sess.sessionTeam == TEAM_SPECTATOR)
+	if (client->sess.sessionTeam == TEAM_SPECTATOR || level.intermissionQueued || level.intermissiontime)
 	{
-		spawnPoint = SelectSpectatorSpawnPoint(
-		                 spawn_origin, spawn_angles);
+		spawnPoint = SelectSpectatorSpawnPoint( spawn_origin, spawn_angles);
+	}
+	else if (client->sess.spectatorState < 4  && !level.intermissionQueued && !level.intermissiontime) /* TODO: investigate what 4 means */
+	{
+		VectorCopy(viewcams[client->viewcamIndex].origin, spawn_origin); 
+		VectorCopy(viewcams[client->viewcamIndex].angles, spawn_angles); 
 	}
 	else if (g_gametype.integer >= GT_CTF)
 	{
@@ -1215,34 +1227,65 @@ void ClientSpawn(gentity_t* ent)
 			{
 				client->pers.initialSpawn = qtrue;
 				spawnPoint = SelectInitialSpawnPoint(spawn_origin, spawn_angles);
+				if (spawnPoint == NULL)
+				{
+					client->pers.initialSpawn = qfalse;
+				}
 			}
-			else
+			else if (g_gametype.integer == GT_TEAM && server_freezetag.integer)
+			{
+				int i;
+				gentity_t* gentLocal;
+
+				for (i = 0; i < level.numConnectedClients; ++i)
+				{
+					gentLocal = &g_entities[level.sortedEntities[i]];
+					if(!G_IsSpectator(gentLocal->client) && !gentLocal->tail3)
+					{
+						if (gentLocal->client->sess.sessionTeam != ent->client->sess.sessionTeam)
+						{
+							spawnPoint = SelectSpawnPoint(gentLocal->client->ps.origin, spawn_origin, spawn_angles);
+							break;
+						}
+					}
+				}
+
+
+			}
+
+			if(!spawnPoint) 
 			{
 				// don't spawn near existing origin if possible
-				spawnPoint = SelectSpawnPoint(
-				                 client->ps.origin,
-				                 spawn_origin, spawn_angles);
+				spawnPoint = SelectSpawnPoint( client->ps.origin, spawn_origin, spawn_angles);
 			}
 
-			// Tim needs to prevent bots from spawning at the initial point
-			// on q3dm0...
-			if ((spawnPoint->flags & FL_NO_BOTS) && (ent->r.svFlags & SVF_BOT))
+			if (spawnPoint)
 			{
-				continue;   // try again
+				// Tim needs to prevent bots from spawning at the initial point
+				// on q3dm0...
+				if ((spawnPoint->flags & FL_NO_BOTS) && (ent->r.svFlags & SVF_BOT))
+				{
+					continue;   // try again
+				}
+				// just to be symetric, we have a nohumans option...
+				if ((spawnPoint->flags & FL_NO_HUMANS) && !(ent->r.svFlags & SVF_BOT))
+				{
+					continue;   // try again
+				}
+				break;
 			}
-			// just to be symetric, we have a nohumans option...
-			if ((spawnPoint->flags & FL_NO_HUMANS) && !(ent->r.svFlags & SVF_BOT))
-			{
-				continue;   // try again
-			}
-
-			break;
-
 		}
 		while (1);
 	}
-	client->pers.teamState.state = TEAM_ACTIVE;
 
+	if (!spawnPoint && !G_IsSpectator(client))
+	{
+		client->tail3_26 = qtrue;
+		return;
+	}
+
+	client->tail3_26 = qfalse;
+	client->pers.teamState.state = TEAM_ACTIVE;
 	// always clear the kamikaze flag
 	ent->s.eFlags &= ~EF_KAMIKAZE;
 
@@ -1259,13 +1302,30 @@ void ClientSpawn(gentity_t* ent)
 //	savedAreaBits = client->areabits;
 	accuracy_hits = client->accuracy_hits;
 	accuracy_shots = client->accuracy_shots;
+	if (!level.warmupTime && !level.intermissiontime)
+	{
+		clientReady = 0;	
+	}
+	else
+	{
+		clientReady = client->ps.stats[STAT_CLIENTS_READY];
+	}
+
+	awardImpressive = client->ps.eFlags & EF_AWARD_IMPRESSIVE;
+	tail3_43 = client->tail3_43;
+	inactivityTime = client->inactivityTime;
+
 	for (i = 0 ; i < MAX_PERSISTANT ; i++)
 	{
 		persistant[i] = client->ps.persistant[i];
 	}
+	for (i = 0 ; i < MAX_PS_EVENTS ; i++)
+	{
+		events[i] = client->ps.events[i];
+	}
 	eventSequence = client->ps.eventSequence;
 
-	memset(client, 0, sizeof(*client));  // bk FIXME: Com_Memset?
+	memset(client, 0, sizeof(*client));
 
 	client->pers = saved;
 	client->sess = savedSess;
@@ -1275,9 +1335,18 @@ void ClientSpawn(gentity_t* ent)
 	client->accuracy_shots = accuracy_shots;
 	client->lastkilled_client = -1;
 
+	client->ps.eFlags = awardImpressive | flags;
+	client->tail3_43 = tail3_43;
+	client->inactivityWarning = 0;                                             		/* Address : 0x1e41a Type : Interium */
+	client->inactivityTime = inactivityTime;                                   		/* Address : 0x1e420 Type : Interium */
+
 	for (i = 0 ; i < MAX_PERSISTANT ; i++)
 	{
 		client->ps.persistant[i] = persistant[i];
+	}
+	for (i = 0 ; i < MAX_PS_EVENTS ; i++)
+	{
+		client->ps.events[i] = events[i];
 	}
 	client->ps.eventSequence = eventSequence;
 	// increment the spawncount so the client will detect the respawn
@@ -1293,9 +1362,13 @@ void ClientSpawn(gentity_t* ent)
 	{
 		client->pers.maxHealth = 100;
 	}
+
 	// clear entity values
 	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
-	client->ps.eFlags = flags;
+	if (level.warmupTime)
+	{
+		osp_cmds_3294d();                                                          			/* Address : 0x1e4d2 Type : Interium */
+	}
 
 	ent->s.groundEntityNum = ENTITYNUM_NONE;
 	ent->client = &level.clients[index];
@@ -1314,24 +1387,10 @@ void ClientSpawn(gentity_t* ent)
 
 	client->ps.clientNum = index;
 
-	client->ps.stats[STAT_WEAPONS] = (1 << WP_MACHINEGUN);
-	if (g_gametype.integer == GT_TEAM)
-	{
-		client->ps.ammo[WP_MACHINEGUN] = 50;
-	}
-	else
-	{
-		client->ps.ammo[WP_MACHINEGUN] = 100;
-	}
-
-	client->ps.stats[STAT_WEAPONS] |= (1 << WP_GAUNTLET);
-	client->ps.ammo[WP_GAUNTLET] = -1;
-	client->ps.ammo[WP_GRAPPLING_HOOK] = -1;
-
-	// health will count down towards max_health
-	ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] + 25;
+	osp_cmds_31deb(ent);
 
 	G_SetOrigin(ent, spawn_origin);
+
 	VectorCopy(spawn_origin, client->ps.origin);
 
 	// the respawned flag will be cleared after the attack and jump keys come up
@@ -1340,7 +1399,7 @@ void ClientSpawn(gentity_t* ent)
 	trap_GetUsercmd(client - level.clients, &ent->client->pers.cmd);
 	SetClientViewAngle(ent, spawn_angles);
 
-	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR)
+	if (G_IsSpectator(client))
 	{
 
 	}
@@ -1348,11 +1407,6 @@ void ClientSpawn(gentity_t* ent)
 	{
 		G_KillBox(ent);
 		trap_LinkEntity(ent);
-
-		// force the base weapon up
-		client->ps.weapon = WP_MACHINEGUN;
-		client->ps.weaponstate = WEAPON_READY;
-
 	}
 
 	// don't allow full run speed for a bit
@@ -1360,7 +1414,6 @@ void ClientSpawn(gentity_t* ent)
 	client->ps.pm_time = 100;
 
 	client->respawnTime = level.time;
-	client->inactivityTime = level.time + g_inactivity.integer * 1000;
 	client->latched_buttons = 0;
 
 	// set default animations
@@ -1375,18 +1428,7 @@ void ClientSpawn(gentity_t* ent)
 	{
 		// fire the targets of the spawn point
 		G_UseTargets(spawnPoint, ent);
-
-		// select the highest weapon number available, after any
-		// spawn given items have fired
-		client->ps.weapon = 1;
-		for (i = WP_NUM_WEAPONS - 1 ; i > 0 ; i--)
-		{
-			if (client->ps.stats[STAT_WEAPONS] & (1 << i))
-			{
-				client->ps.weapon = i;
-				break;
-			}
-		}
+		osp_cmds_3213d(ent);                                                       			/* Address : 0x1e5cb Type : Interium */
 	}
 
 	// run a client frame to drop exactly to the floor,
@@ -1396,18 +1438,28 @@ void ClientSpawn(gentity_t* ent)
 	ClientThink(ent - g_entities);
 
 	// positively link the client, even if the command times are weird
-	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+	if (!G_IsSpectator(client))
 	{
-		BG_PlayerStateToEntityState(&client->ps, &ent->s, qtrue);
+		BG_PlayerStateToEntityState(&client->ps, &ent->s, qtrue, qfalse);
 		VectorCopy(ent->client->ps.origin, ent->r.currentOrigin);
 		trap_LinkEntity(ent);
+		if (log_stat.integer && !level.warmupTime && !game_paused)
+		{
+			G_LogPrintf("PS: %i %i %i -1 RESPAWN\n", ent->s.number, ent->health, ent->client->ps.stats[STAT_ARMOR]);
+		}
 	}
 
 	// run the presend to set anything else
 	ClientEndFrame(ent);
 
+	if (g_gametype.integer == GT_TEAM && server_freezetag.integer)
+	{
+		CalculateRanks(qtrue);
+	}
+
 	// clear entity state values
-	BG_PlayerStateToEntityState(&client->ps, &ent->s, qtrue);
+	BG_PlayerStateToEntityState(&client->ps, &ent->s, qtrue, qfalse);
+
 }
 
 
@@ -1491,7 +1543,7 @@ void ClientDisconnect(int clientNum)
 
 	trap_SetConfigstring(CS_PLAYERS + clientNum, "");
 
-	CalculateRanks();
+	CalculateRanks(qfalse);
 
 	if (ent->r.svFlags & SVF_BOT)
 	{

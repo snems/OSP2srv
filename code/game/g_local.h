@@ -353,7 +353,14 @@ struct gclient_s
     int isUsingJPEG;
     int isVcInfoEnabled;
     int isVcFreeEnabled;
-    int tail4[8];
+	  int tail4_1;
+	  int tail4_2;
+	  int tail4_3;
+	  int tail4_4;
+	  int tail4_5;
+	  int tail4_6;
+	  int viewcamIndex;
+	  int tail4_8;
     int isVcViewEnabled;
     int tail5_1;
     int tail5_2;
@@ -454,6 +461,7 @@ typedef struct
 	int         numConnectedClients;
 	int         numNonSpectatorClients; // includes connecting clients
 	int         numPlayingClients;      // connected, non-spectators
+	int         sortedEntities[MAX_CLIENTS];     // sorted by score
 	int         sortedClients[MAX_CLIENTS];     // sorted by score
 	int         follow1, follow2;       // clientNums for auto-follow spectators
 
@@ -1190,7 +1198,7 @@ void InitBodyQue(void);
 void ClientSpawn(gentity_t* ent);
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int mod);
 void AddScore(gentity_t* ent, vec3_t origin, int score);
-void CalculateRanks(void);
+void CalculateRanks(qboolean unknown);
 qboolean SpotWouldTelefrag(gentity_t* spot);
 
 //

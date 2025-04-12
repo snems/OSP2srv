@@ -913,7 +913,7 @@ int Team_TouchOurFlag(gentity_t* ent, gentity_t* other, int team)
 	}
 	Team_ResetFlags();
 
-	CalculateRanks();
+	CalculateRanks(qfalse);
 
 	return 0; // Do not respawn this automatically
 }

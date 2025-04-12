@@ -914,7 +914,7 @@ void SendPendingPredictableEvents(playerState_t* ps)
 		// create temporary entity for event
 		t = G_TempEntity(ps->origin, event);
 		number = t->s.number;
-		BG_PlayerStateToEntityState(ps, &t->s, qtrue);
+		BG_PlayerStateToEntityState(ps, &t->s, qtrue, qfalse);
 		t->s.number = number;
 		t->s.eType = ET_EVENTS + event;
 		t->s.eFlags |= EF_PLAYER_EVENT;
@@ -1149,7 +1149,7 @@ void ClientThink_real_recovery(gentity_t* ent)
 	}
 	else
 	{
-		BG_PlayerStateToEntityState(&ent->client->ps, &ent->s, qtrue);
+		BG_PlayerStateToEntityState(&ent->client->ps, &ent->s, qtrue, qfalse);
 	}
 	if (hook_enable.integer)
 	{
@@ -1433,7 +1433,7 @@ void ClientThink_real( gentity_t *ent ) {
 		BG_PlayerStateToEntityStateExtraPolate( &ent->client->ps, &ent->s, ent->client->ps.commandTime, qtrue );
 	}
 	else {
-		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
+		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue, qfalse );
 	}
 	SendPendingPredictableEvents( &ent->client->ps );
 
@@ -1696,7 +1696,7 @@ void ClientEndFrame(gentity_t* ent)
 	}
 	else
 	{
-		BG_PlayerStateToEntityState(&ent->client->ps, &ent->s, qtrue);
+		BG_PlayerStateToEntityState(&ent->client->ps, &ent->s, qtrue, qfalse);
 	}
 	SendPendingPredictableEvents(&ent->client->ps);
 

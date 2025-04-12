@@ -72,7 +72,7 @@ void UpdateTournamentInfo(void)
 	}
 	playerClientNum = i;
 
-	CalculateRanks();
+	CalculateRanks(qfalse);
 
 	if (level.clients[playerClientNum].sess.sessionTeam == TEAM_SPECTATOR)
 	{

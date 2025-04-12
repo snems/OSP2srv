@@ -2,6 +2,20 @@
 #include "osp_local.h"
 #include "q_shared.h"
 
+viewcam_t viewcams[256];
+
+qboolean armorDefaultYellow = qfalse;
+qboolean weaponHave[11];
+
+enum armorType
+{
+	ARMOR_GREEN = 0,
+	ARMOR_YELLOW = 1,
+	ARMOR_RED = 2,
+};
+
+qboolean var_4c54 = qfalse;
+
 static const char* cmdHelp[] =
 {
 	":^7 Locks/unlocks a player's team"
@@ -1274,15 +1288,6 @@ void G_RegisterWeapon(void)
 }
 
 
-qboolean armorDefaultYellow = qfalse;
-qboolean weaponHave[11];
-
-enum armorType
-{
-	ARMOR_GREEN = 0,
-	ARMOR_YELLOW = 1,
-	ARMOR_RED = 2,
-};
 
 
 void osp_cmds_31deb(gentity_t* ent)
@@ -1710,21 +1715,55 @@ void osp_cmds_33c18(void)
 }
 
 
-void osp_cmds_33c92(void)
+void osp_cmds_33c92(gentity_t* self)
 {
 	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_33c92);
 }
 
-
-void osp_cmds_33cc5(void)
+void osp_cmds_33cc5 (int var, qboolean arg) 
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_33cc5);
+	gentity_t* ent = G_Spawn();
+	ent->s.eType = ET_ITEM;
+	ent->r.svFlags |= SVF_NOCLIENT;
+	ent->s.eFlags |= EF_NODRAW;
+	ent->s.modelindex = arg;
+	ent->classname = "delay_broadcastcheck";
+	ent->nextthink = var;
+	ent->think = &osp_cmds_33c92;
+	trap_LinkEntity(ent);
 }
 
 
 void osp_cmds_33d12(qboolean arg)
 {
-	OSP2_UNIMPLEMENTED_FUNCTION(osp_cmds_33d12);
+	int var_tmp;
+	if (!level.leveltail486 && (level.time - level.startTime) < 2500)
+	{
+		if (!var_4c54)
+		{
+			osp_cmds_33cc5(level.time + 1000, arg);
+			var_4c54 = qtrue;
+		}
+	}
+	else if (!level.leveltail486)
+	{
+		int i;
+		for (i = 0; i < level.maxclients; ++i)
+		{
+			// 35c48
+			//
+			if (!arg && level.clients[i].pers.connected && !level.warmupTime && level.intermissionQueued && level.intermissiontime)
+			{
+				g_entities[i].r.svFlags |= SVF_NOSERVERINFO;
+			}
+			else
+			{
+				g_entities[i].r.svFlags &= ~(SVF_NOSERVERINFO);
+			}
+
+		}
+
+	}
 }
 
 

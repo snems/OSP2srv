@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
+#include "q_shared.h"
 #define GAME_VERSION        "baseq3-1"
 
 #define DEFAULT_GRAVITY     800
@@ -739,7 +740,7 @@ void    BG_AddPredictableEventToPlayerstate(int newEvent, int eventParm, playerS
 
 void    BG_TouchJumpPad(playerState_t* ps, entityState_t* jumppad);
 
-void    BG_PlayerStateToEntityState(playerState_t* ps, entityState_t* s, qboolean snap);
+void    BG_PlayerStateToEntityState(playerState_t* ps, entityState_t* s, qboolean snap, qboolean unknown);
 void    BG_PlayerStateToEntityStateExtraPolate(playerState_t* ps, entityState_t* s, int time, qboolean snap);
 
 qboolean    BG_PlayerTouchesItem(playerState_t* ps, entityState_t* item, int atTime);
