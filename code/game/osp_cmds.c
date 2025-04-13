@@ -1,19 +1,12 @@
 #include "g_local.h"
 #include "osp_local.h"
 #include "q_shared.h"
+#include "bg_local.h"
 
 viewcam_t viewcams[256];
 
-qboolean armorDefaultYellow = qfalse;
 qboolean weaponHave[11];
 int currentRound;
-
-enum armorType
-{
-	ARMOR_GREEN = 0,
-	ARMOR_YELLOW = 1,
-	ARMOR_RED = 2,
-};
 
 qboolean var_4c54 = qfalse;
 
@@ -1322,7 +1315,7 @@ void G_ClientSpawnHPAndGuns(gentity_t* ent)
 		cli->ps.stats[STAT_ARMOR] = warmup_armor.integer;
 		if (warmup_armor.integer)
 		{
-			cli->ps.stats[STAT_ARMOR_TYPE] = armorDefaultYellow ? ARMOR_RED : ARMOR_YELLOW;
+			cli->ps.stats[STAT_ARMOR_TYPE] = pm_armorPromode ? OSP_ARMOR_RED : OSP_ARMOR_YELLOW;
 		}
 		cli->ps.ammo[WP_MACHINEGUN]       = z_m_current.integer == 2 ? 100 : 50;
 		cli->ps.ammo[WP_SHOTGUN]          = 30;
@@ -1338,7 +1331,7 @@ void G_ClientSpawnHPAndGuns(gentity_t* ent)
 		cli->ps.stats[STAT_ARMOR] = start_armor.integer;
 		if (start_armor.integer)
 		{
-			cli->ps.stats[STAT_ARMOR_TYPE] = armorDefaultYellow ? ARMOR_RED : ARMOR_YELLOW;
+			cli->ps.stats[STAT_ARMOR_TYPE] = pm_armorPromode ? OSP_ARMOR_RED : OSP_ARMOR_YELLOW;
 		}
 		cli->ps.ammo[WP_MACHINEGUN]       = start_bullets.integer;
 		cli->ps.ammo[WP_SHOTGUN]          = start_shells.integer;

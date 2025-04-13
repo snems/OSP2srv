@@ -139,6 +139,7 @@ void TossClientItems(gentity_t* self)
 			}
 		}
 	}
+
 }
 
 #ifdef MISSIONPACK

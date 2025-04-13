@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 #include "g_local.h"
+#include "bg_local.h"
 #include "q_shared.h"
 #include "osp_local.h"
 
@@ -876,17 +877,17 @@ void G_UpdateCvars(void)
 					trap_Cvar_Set("match_poweruprespawn", va("%d", mpr));
 					if ((level.leveltail504 & 1) == 0)
 					{
-						global_var_27c8 = 120;
+						modeOSP24 = 120;
 					}
 					else
 					{
 						if (g_gametype.integer != GT_CTF)
 						{
-							global_var_27c8 = mpr;
+							modeOSP24 = mpr;
 						}
 						else
 						{
-							global_var_27d0 = mpr;
+							modeOSP26 = mpr;
 						}
 					}
 				}

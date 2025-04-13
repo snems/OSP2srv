@@ -312,8 +312,6 @@ void Cmd_VcFollow_f(const gentity_t* ent);
 extern int time_in_game;
 extern int game_paused;
 extern int time_in_pause;
-extern int global_var_27c8;
-extern int global_var_27d0;
 
 void osp_unsorted_3aa10(void);
 void osp_unsorted_3abd0(void);

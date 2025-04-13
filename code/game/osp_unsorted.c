@@ -5,8 +5,6 @@
 int time_in_game; //17d6b0
 int game_paused; //17d6bc
 int time_in_pause; //4bd8
-int global_var_27c8;
-int global_var_27d0;
 
 
 
