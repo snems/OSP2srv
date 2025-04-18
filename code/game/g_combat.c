@@ -23,7 +23,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // g_combat.c
 
 #include "g_local.h"
+#include "osp_local.h"
 #include "osp_unimpl.h"
+#include "bg_local.h"
+#include "q_shared.h"
 
 
 /*
@@ -85,6 +88,7 @@ void TossClientItems(gentity_t* self)
 	float       angle;
 	int         i;
 	gentity_t*   drop;
+	qboolean  ftVanilla;
 
 	// drop the weapon if not a gauntlet or machinegun
 	weapon = self->s.weapon;
@@ -105,41 +109,103 @@ void TossClientItems(gentity_t* self)
 		}
 	}
 
-	if (weapon > WP_MACHINEGUN && weapon != WP_GRAPPLING_HOOK &&
-	        self->client->ps.ammo[ weapon ])
+	if ((modeDropAllAmmo || (weapon > WP_MACHINEGUN && weapon != WP_GRAPPLING_HOOK && self->client->ps.ammo[ weapon ])) && weapon_deaddrop.integer && match_instagib.integer <= 0 && g_gametype.integer != GT_CA)
 	{
-		// find the item type for this weapon
-		item = BG_FindItemForWeapon(weapon);
-
-		// spawn the item
-		Drop_Item(self, item, 0);
-	}
-
-	// drop all the powerups if not in teamplay
-	if (g_gametype.integer != GT_TEAM)
-	{
-		angle = 45;
-		for (i = 1 ; i < PW_NUM_POWERUPS ; i++)
+		static const char* ammoNames[7] = {"Bullets", "Shells", "Grenades", "Rockets", "Lightning", "Slugs", "Cells"};
+		static const weapon_t weapons[7] = { WP_MACHINEGUN, WP_SHOTGUN, WP_GRENADE_LAUNCHER, WP_ROCKET_LAUNCHER, WP_LIGHTNING, WP_RAILGUN, WP_PLASMAGUN, };
+		gitem_t* itemDrop = NULL;
+		gentity_t* drop;
+		if (modeDropAllAmmo)
 		{
-			if (self->client->ps.powerups[ i ] > level.time)
+			if (weapon <= WP_MACHINEGUN)
 			{
-				item = BG_FindItemForPowerup(i);
-				if (!item)
+				int w;
+				weapon = -1;
+				for (w = 0; w < 7; ++w)
 				{
-					continue;
+					if (self->client->ps.ammo[ weapons[w] ] != 0)
+					{
+						itemDrop = BG_FindItem(ammoNames[w]);
+						weapon = 10000;
+					}
 				}
-				drop = Drop_Item(self, item, angle);
-				// decide how many seconds it has left
-				drop->count = (self->client->ps.powerups[ i ] - level.time) / 1000;
-				if (drop->count < 1)
-				{
-					drop->count = 1;
-				}
-				angle += 45;
+			}
+		}
+		else
+		{
+			itemDrop =  BG_FindItemForWeapon(weapon);
+		}
+		if (weapon > -1 && itemDrop)
+		{ 
+			drop = Drop_Item(self, itemDrop, 0, 0);
+			if (weapon > WP_MACHINEGUN && weapon < WP_GRAPPLING_HOOK)
+			{
+				int drops = (self->client->clientWeaponStats[weapon].hits >> 16) + 1;
+				int hits = self->client->clientWeaponStats[weapon].hits & 0x0000ffff;
+				self->client->clientWeaponStats[weapon].hits = hits | (drops << 16);
+			}
+			if (modeDropAllAmmo != 0)
+			{
+				drop->s.eFlags |= PW_BATTLESUIT;
+				drop->damage       = ((self->client->ps.ammo[WP_MACHINEGUN]& 0xff) << 8) + (self->client->ps.ammo[WP_SHOTGUN]& 0xff);
+				drop->health       = ((self->client->ps.ammo[WP_GRENADE_LAUNCHER]& 0xff) << 8) + (self->client->ps.ammo[WP_ROCKET_LAUNCHER]& 0xff);
+				drop->splashDamage = ((self->client->ps.ammo[WP_LIGHTNING]& 0xff) << 8) + (self->client->ps.ammo[WP_RAILGUN]& 0xff);
+				drop->splashRadius = ((self->client->ps.ammo[WP_PLASMAGUN]& 0xff) << 8) + (self->client->ps.ammo[WP_BFG]& 0xff);
 			}
 		}
 	}
 
+	ftVanilla = g_gametype.integer == GT_TEAM && server_freezetag.integer == 2; 
+
+	if (g_gametype.integer != GT_TEAM || ftVanilla)
+	{
+		int i;
+		if (ftVanilla)
+		{
+			holdable_t w;
+			for (w = 1; w < 6; ++w)
+			{
+				if (w != HI_KAMIKAZE)
+				{
+					if (bg_itemlist[self->client->ps.stats[STAT_HOLDABLE_ITEM]].giTag == w)
+					{
+						gitem_t* dropHoldable = BG_FindItemForHoldable(w);
+						if (dropHoldable)
+						{
+							angle = 45.0f;
+							Drop_Item(self, dropHoldable, angle, 0);                            				/* Address : 0x20d53 Type : Interium */
+
+						}
+
+					}
+				}
+
+			}
+		}
+	  // drop all the powerups if not in teamplay
+	  {
+	  	angle = 45;
+	  	for (i = 1 ; i < PW_NUM_POWERUPS ; i++)
+	  	{
+	  		if (self->client->ps.powerups[ i ] > level.time)
+	  		{
+	  			item = BG_FindItemForPowerup(i);
+	  			if (!item)
+	  			{
+	  				continue;
+	  			}
+	  			drop = Drop_Item(self, item, angle, qfalse);
+	  			// decide how many seconds it has left
+	  			drop->count = (self->client->ps.powerups[ i ] - level.time) / 1000;
+	  			if (drop->count < 1)
+	  			{
+	  				drop->count = 1;
+	  			}
+	  			angle += 45;
+	  		}
+	  	}
+	  }
+	}
 }
 
 #ifdef MISSIONPACK

@@ -949,6 +949,10 @@ void Cmd_GetStatsInfo_f(gentity_t* ent)
 	qboolean intermission;
 	clientWeaponStats_t* ws;
 
+	/* can crash by some reason */
+  trap_SendServerCommand(-1, va("print \"Cmd_GetStatsInfo_f is disabled.\n\""));
+	return;
+
 	intermission = level.intermissiontime || level.intermissionQueued;
 
 	if ((client->sess.sessionTeam != TEAM_SPECTATOR && g_gametype.integer == GT_TEAM && server_freezetag.integer && G_IsSpectator(client)) ||

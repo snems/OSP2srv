@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "g_local.h"
 #include "osp_local.h"
 #include "osp_unimpl.h"
+#include "q_shared.h"
 
 /*
 
@@ -720,7 +721,7 @@ Drop_Item
 Spawns an item and tosses it forward
 ================
 */
-gentity_t* Drop_Item(gentity_t* ent, gitem_t* item, float angle)
+gentity_t* Drop_Item(gentity_t* ent, gitem_t* item, float angle, qboolean unk)
 {
 	vec3_t  velocity;
 	vec3_t  angles;

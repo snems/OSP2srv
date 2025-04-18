@@ -265,7 +265,7 @@
 - [X] `railgun_damage <value>`
 - [ ] `replace_*: <replace_mask>`
 - [X] `start_*: <value>`
-- [ ] `weapon_deaddrop <0|1>`
+- [X] `weapon_deaddrop <0|1>`
 - [X] `weapon_have <weapon_mask>`
 - [X] `weapon_start <weapon_mask>`
 

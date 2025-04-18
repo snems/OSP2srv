@@ -119,7 +119,7 @@ extern float modeOSP16;
 extern int   modeBeginWeaponChangeTime;
 extern int   modeFinishWeaponChangeTime;
 extern int   modePMNoAmmoTime;
-extern qboolean modeOSP19;
+extern qboolean modeDropAllAmmo;
 extern int modeOSP20;
 extern qboolean modeOSP21;
 extern int   pm_armorPromode;

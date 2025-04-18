@@ -87,7 +87,7 @@ float modeOSP16;
 int modeBeginWeaponChangeTime;
 int modeFinishWeaponChangeTime;
 int modePMNoAmmoTime;
-qboolean modeOSP19;
+qboolean modeDropAllAmmo;
 int modeOSP20;
 qboolean modeOSP21;
 int pm_armorPromode;
@@ -2520,7 +2520,7 @@ void BG_OSPSetMode (ospMode_t value)
 	modePMNoAmmoTime                   = OSP_SET_MODE_VARIANT(value, 500, 500, 100);//-V583
 	modeOSP17                          = OSP_SET_MODE_VARIANT(value, 0.5f, 1.0f, 1.0f);//-V583
 	modeOSP18                          = OSP_SET_MODE_VARIANT(value, 1.25f, 1.0f, 1.0f);//-V583
-	modeOSP19                          = OSP_SET_MODE_VARIANT(value, qfalse, qfalse, qtrue);//-V583
+	modeDropAllAmmo                    = OSP_SET_MODE_VARIANT(value, qfalse, qfalse, qtrue);//-V583
 	modeOSP20                          = OSP_SET_MODE_VARIANT(value, 18, 18, 36);//-V583
 	modeOSP21                          = OSP_SET_MODE_VARIANT(value, qfalse, qtrue, qtrue);//-V583
 	pm_armorPromode                    = OSP_SET_MODE_VARIANT(value, 0, 1, 1);//-V583

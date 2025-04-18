@@ -755,7 +755,7 @@ void ClientEvents(gentity_t* ent, int oldEventSequence)
 
 				if (item)
 				{
-					drop = Drop_Item(ent, item, 0);
+					drop = Drop_Item(ent, item, 0, qfalse);
 					// decide how many seconds it has left
 					drop->count = (ent->client->ps.powerups[ j ] - level.time) / 1000;
 					if (drop->count < 1)
