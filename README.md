@@ -255,14 +255,14 @@
 ### ITEM/WEAPON SETTINGS
 
 - [ ] `armor_q2style <0|1>`
-- [ ] `gauntlet_damage <value>`
+- [X] `gauntlet_damage <value>`
 - [ ] `gauntlet_disable <0|1>`
 - [ ] `instagib_reload <100-5000>`
 - [ ] `item_disable <item_mask>`
 - [ ] `mg_damage <value>`
 - [ ] `mg_damageTeamplay <value>`
 - [ ] `powerup_disable <powerup_mask>`
-- [ ] `railgun_damage <value>`
+- [X] `railgun_damage <value>`
 - [ ] `replace_*: <replace_mask>`
 - [X] `start_*: <value>`
 - [ ] `weapon_deaddrop <0|1>`
